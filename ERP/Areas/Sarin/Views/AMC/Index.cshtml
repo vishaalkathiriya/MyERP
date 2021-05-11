@@ -1,0 +1,193 @@
+﻿@{
+    ViewBag.Title = "AMC Entry";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRAmcCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>AMC Entry</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRAmc()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" name="amcform" id="amcform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} AMC</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Machine<span class="compulsary">*</span></label>
+                                    <multiselect class="input-xlarge" multiple="true"  data-ng-model="selectedList" options="p.Label for p in MachineList" change="selected()"></multiselect>
+                                    <div data-ng-show="machineError" class="label label-danger">
+                                        Invalid: <span>Please Select Machine.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtStartDate">Start Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1"  data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtStartDate" name="txtStartDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editData.StartDate" data-ng-change="ValidateStartDate(editData.StartDate)" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="calOpenStartDate"
+                                                data-ng-model="startDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenStartDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="amcform.txtStartDate.$dirty && amcform.txtStartDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="amcform.txtStartDate.$error.invalidStartDate">Please enter valid start date</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtEndDate">End Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtEndDate" name="txtEndDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editData.EndDate" data-ng-change="ValidateEndDate(editData.EndDate)" />
+
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="calOpenEndDate"
+                                                data-ng-model="endDate"
+                                                data-min="minDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenEndDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="amcform.txtEndDate.$dirty && amcform.txtEndDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="amcform.txtEndDate.$error.invalidEndDate">Please enter valid end date</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtRemarks">Remarks</label>
+                            <textarea class="form-control" id="txtRemarks" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                            <div data-ng-show="amcform.remarks.$dirty && amcform.remarks.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="amcform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info btn-icon icon-left" ng-click="CreateUpdateSRAmc(editData)" data-ng-disabled="amcform.$invalid "><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRAmc()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRAmc()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--AMC list-->
+    <div class="row" data-ng-init="RetrieveSRAmc()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="'Machine'" data-filter="{'MachineName': 'text' }" data-sortable="'MachineName'">{{d.MachineName}}</td>
+                            <td data-title="'Start Date'" data-sortable="'StartDate'">{{d.StartDate | date:'dd-MMM-yyyy' }}</td>
+                            <td data-title="'End Date'" data-sortable="'EndDate'">{{d.EndDate | date:'dd-MMM-yyyy'}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRAmc(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                         <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRAmc(d.AMCId)" data-message="Are you sure want to delete '{{d.MachineName}}' from AMC?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            
+                            <td colspan="3">Your search did not match any AMC Entry.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRAmcCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRAmcService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+}

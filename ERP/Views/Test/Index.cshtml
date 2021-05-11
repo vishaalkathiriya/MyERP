@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+
+<div class="row" data-ng-controller="testCtrl">
+    <div class="col-sm-12">
+        <h2>Index</h2>
+
+        <button data-ng-click="change()">Change</button>
+
+        <span data-drc-checkbox="" data-ng-model="isChecked"></span>
+
+
+        <button data-drc-confirm-box="" data-callback="onConfirm()">Confirm</button>
+
+
+        <p data-ng-repeat="person in people">
+            <button class="btn btn-danger" data-drc-confirm-box="" data-callback="onConfirm(person)">Delete</button>
+        </p>
+
+
+        <hr />
+
+        <div data-ng-controller="DemoCtrl">
+
+
+            <div class="row">
+
+                <!-- Calendar Start -->
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Date Picker</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p class="input-group">
+                                <input type="text" class="form-control"
+                                    data-datepicker-popup="{{format}}"
+                                    data-ng-model="currentDate"
+                                    data-is-open="calendarOpened"
+                                    data-min="minDate"
+                                    data-max="'2015-06-22'"
+                                    data-datepicker-options="dateOptions"
+                                    data-ng-required="true"
+                                    data-close-text="Close" />
+
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" data-ng-click="calendarOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>
+                            <pre class="alert alert-info">Current Date: {{currentDate}}</pre>
+                        </div>
+                    </div>
+                </div>
+                <!-- Calendar End -->
+
+
+                <!-- ColorPicker Start -->
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Color Picker</h3>
+                        </div>
+                        <div class="panel-body">
+                            <input data-colorpicker=""
+                                data-colorpicker-fixed-position="true"
+                                data-colorpicker-position="bottom"
+                                class="form-control"
+                                type="text"
+                                data-ng-model="colorValue" />
+                            <br />
+                            <pre class="alert alert-info">Current Selected Color: {{colorValue}}</pre>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- ColorPicker End -->
+            </div>
+            <div class="row">
+
+                <!-- Star Rating Start -->
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Star Rating</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div data-rating="" data-value="starRate"
+                                data-max="starMax"
+                                data-readonly="isReadonly"
+                                data-on-hover="hoveringOver(value)"
+                                data-on-leave="overStar = null">
+                            </div>
+                            <input type="text" class="form-control" data-ng-model="starRate" placeholder="enter star rating" />
+                            <br />
+                            <pre class="alert alert-info">Current Rate: {{starRate}}</pre>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- Star Rating End -->
+
+                <!-- DateRange picker Start-->
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">DateRange Picker</h3>
+                        </div>
+                        <div class="panel-body">
+                            <button class="btn btn-xs" data-ng-click="changeDateRange()">Change Range</button>
+                            <input class="form-control" data-drc-daterange-picker="" data-type="daterange" data-format="DD-MM-YYYY" data-ng-model="myDateRange">
+                            <br />
+                            <pre class="alert alert-info">Start Date: {{myDateRange.startDate._d | date:'dd-MM-yyyy'}} - End Date: {{myDateRange.endDate._d | date:'dd-MM-yyyy'}}</pre>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- DateRange picker End-->
+
+            </div>
+            <div class="row">
+                <!-- TimePicker Start -->
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Time Picker</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div data-ng-model="mytime" data-ng-change="changed()" style="display: inline-block;">
+                                <div data-timepicker=""
+                                    data-hour-step="hstep"
+                                    data-minute-step="mstep"
+                                    data-show-meridian="ismeridian">
+                                </div>
+                            </div>
+                            <br />
+                            <pre class="alert alert-info">Time is: {{mytime | date:'shortTime' }}</pre>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- TimePicker End -->
+
+                <!-- Tooltip Start -->
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Tooltip</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>
+                                Pellentesque <a href="#" data-tooltip="{{dynamicTooltip}}">{{dynamicTooltipText}}</a>,
+                      sit amet venenatis urna cursus eget nunc scelerisque viverra mauris, in
+                      aliquam. Tincidunt lobortis feugiat vivamus at 
+                      <a href="#"
+                          data-tooltip-placement="left"
+                          data-tooltip="On the Left!">left</a> eget
+                      arcu dictum varius duis at consectetur lorem. Vitae elementum curabitur
+                      <a href="#"
+                          data-tooltip-placement="right"
+                          data-tooltip="On the Right!">right</a>
+                                nunc sed velit dignissim sodales ut eu sem integer vitae. Turpis egestas 
+                      <a href="#"
+                          data-tooltip-placement="bottom"
+                          data-tooltip="On the Bottom!">bottom</a>
+                                pharetra convallis posuere morbi leo urna, 
+                      <a href="#"
+                          data-tooltip-animation="false"
+                          data-tooltip="I don't fade. :-(">fading</a>
+                                at elementum eu, facilisis sed odio morbi quis commodo odio. In cursus
+                      <a href="#"
+                          data-tooltip-popup-delay='1000'
+                          data-tooltip='appears with delay'>delayed</a> turpis massa tincidunt dui ut.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- Tooltip End -->
+
+
+
+
+
+            </div>
+
+            @*<div data-loading-container="tableParams.settings().$loading">
+                <table data-ng-table="tableParams" class="table table-bordered table-striped">
+                    <tr data-ng-repeat="doc in $data">
+                        <td width="30" style="text-align: left" data-header="'ng-table/headers/checkbox.html'">
+                            <input type="checkbox" data-ng-model="checkboxes.items[doc.Id]" />
+                        </td>
+                        <td data-title="'Documents'" data-filter="{ 'Documents': 'text' }" data-sortable="'Documents'">{{doc.Documents}} {{$loading}}</td>
+                        <td data-title="'IsActive'" data-sortable="'IsActive'">{{doc.IsActive}}</td>
+                        <td data-title="'ChgDate'">{{doc.ChgDate}}</td>
+                        <td data-title="'Actions'">
+                            <a href="#" class="btn btn-primary btn-sm btn-icon icon-left" data-ng-click="editData(doc.Id)"><i class="entypo-pencil"></i>Edit</a>
+                            <a href="#" class="btn btn-danger btn-sm btn-icon icon-left" data-ng-click="deleteData(doc.Id)"><i class="entypo-cancel"></i>Delete</a>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="well well-sm">
+                    <button data-ng-click="getSelected()" class="btn btn-info">Get Selected Checkboxes Ids</button>
+                </div>
+            </div>
+            <script type="text/ng-template" id="ng-table/headers/checkbox.html">
+                <input type="checkbox" data-ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
+            </script>*@
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="~/Scripts/controllers/testCtrl.js"></script>
+    <script src="~/Scripts/directives/checkbox.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+
+
+    <script>
+        angular.module("ERPApp.Directives")
+        .directive('loadingContainer', function () {
+            return {
+                restrict: 'A',
+                scope: false,
+                link: function (scope, element, attrs) {
+                    var loadingLayer = angular.element('<div class="loading"></div>');
+                    element.append(loadingLayer);
+                    element.addClass('loading-container');
+                    scope.$watch(attrs.loadingContainer, function (value) {
+                        loadingLayer.toggleClass('ng-hide', !value);
+                    });
+                }
+            };
+        });
+
+
+        angular.module("ERPApp.Controllers")
+        .controller('DemoCtrl', function ($scope, $timeout, $http, ngTableParams, $filter) {
+
+            //Date picker
+            $scope.dateOptions = {
+                'year-format': "'yy'",
+                'starting-day': 1
+            };
+            $scope.formats = ['dd-MM-yyyy', 'yyyy/MM/dd', 'shortDate'];
+            $scope.format = $scope.formats[0];
+
+            $scope.today = function () {
+                $scope.currentDate = new Date();
+            };
+            $scope.today();
+
+            $scope.showWeeks = true;
+            $scope.toggleWeeks = function () {
+                $scope.showWeeks = !$scope.showWeeks;
+            };
+
+            $scope.clear = function () {
+                $scope.currentDate = null;
+            };
+
+            $scope.calendarOpen = function ($event) {
+                $event.preventDefault();
+                $event.stopPropagation();
+
+                $scope.calendarOpened = true;
+            };
+
+            //Start Rating
+            $scope.starRate = 2;
+            $scope.starMax = 5;
+            $scope.isStarRatingReadonly = false;
+
+
+            //Time Picker
+            $scope.mytime = new Date();
+            $scope.hstep = 1;
+            $scope.mstep = 15;
+            $scope.options = {
+                hstep: [1, 2, 3],
+                mstep: [1, 5, 10, 15, 25, 30]
+            };
+            $scope.ismeridian = true;
+
+
+            //Tooltip
+            $scope.dynamicTooltip = "Hello, World!";
+            $scope.dynamicTooltipText = "dynamic";
+            $scope.htmlTooltip = "I've been made <b>bold</b>!";
+
+
+            //ColorPicker
+            $scope.colorValue = "#000000";
+
+            //DateRangePicker
+            $scope.myDateRange = {
+                startDate: moment("02-02-2014"),
+                endDate: moment("02-02-2014")
+            };
+            $scope.changeDateRange = function () {
+                $scope.myDateRange = {
+                    startDate: moment("02-02-2014"),
+                    endDate: moment("02-08-2014")
+                }; 
+            };
+
+            //$scope.tableParams = new ngTableParams({
+            //    page: 1,
+            //    count: 3,
+            //    sorting: {
+            //        Documents: 'asc'
+            //    }
+            //}, {
+            //    total: 0,
+            //    getData: function ($defer, params) {
+            //        console.log(params);
+            //        console.log(params.orderBy());
+            //        $http({
+            //            method: "GET",
+            //            url: "/api/documents/getTest?page=" + params.page() + "&count=" + params.count() + "&orderby=" + params.orderBy()
+            //        }).success(function (result) {
+            //            params.total(result.total);
+            //            $defer.resolve($scope.documents = result.result);
+            //        });
+            //    }
+            //});
+
+            //$scope.editData = function (id) {
+            //    alert("Edit data Id: " + id);
+            //};
+
+            //$scope.deleteData = function (id) {
+            //    alert("Delete data Id: " + id);
+            //};
+
+            //$scope.getSelected = function () {
+            //    alert("Selected Ids: " + JSON.stringify($scope.checkboxes.items));
+            //};
+
+            //$scope.checkboxes = { 'checked': false, items: {} };
+
+            //// watch for check all checkbox
+            //$scope.$watch('checkboxes.checked', function (value) {
+            //    angular.forEach($scope.documents, function (item) {
+            //        if (angular.isDefined(item.Id)) {
+            //            $scope.checkboxes.items[item.Id] = value;
+            //        }
+            //    });
+            //});
+
+            //// watch for data checkboxes
+            //$scope.$watch('checkboxes.items', function (values) {
+            //    if (!$scope.documents) {
+            //        return;
+            //    }
+            //    var checked = 0, unchecked = 0,
+            //        total = $scope.documents.length;
+            //    angular.forEach($scope.documents, function (item) {
+            //        checked += ($scope.checkboxes.items[item.Id]) || 0;
+            //        unchecked += (!$scope.checkboxes.items[item.Id]) || 0;
+            //    });
+            //    if ((unchecked == 0) || (checked == 0)) {
+            //        $scope.checkboxes.checked = (checked == total);
+            //    }
+            //    // grayed checkbox
+            //    angular.element(document.getElementById("select_all")).prop("indeterminate", (checked != 0 && unchecked != 0));
+            //}, true);
+
+
+
+
+        })
+
+
+    </script>
+
+}

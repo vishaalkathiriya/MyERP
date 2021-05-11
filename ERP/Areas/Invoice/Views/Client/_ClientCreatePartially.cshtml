@@ -1,0 +1,96 @@
+﻿
+
+<div data-tab ng-controller="ClientCreatePartialCtrl" disabled="master.isPartialTabDisabled" active="master.isPartialTabActive" data-select="LoadPartialData()">
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Create Partially
+    </div>
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <form role="form" data-ng-submit="CreateUpdatePartialClient(editDataP)" name="ccpform" id="ccpform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title col-sm-12">{{master.mode}} Client &nbsp;&nbsp;
+                            <span data-ng-click="ShowLink = !ShowLink">
+                                <a class="badge badge-primary pull-right"  data-ng-if="!ShowLink">Show KYC URL</a>
+                                <a class="badge badge-primary pull-right"  data-ng-if="ShowLink">Hide KYC URL</a>
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row" style="padding:10px 0;" data-ng-if="ShowLink">
+                            <div class="col-sm-12">
+                                <b data-ng-if="editDataP.URLKey">Link : <a href="@ViewBag.lnkKYC{{editDataP.URLKey}}" target="_blank">@ViewBag.lnkKYC{{editDataP.URLKey}}</a></b>
+                                <b data-ng-if="!editDataP.URLKey">-- No link generted yet --</b>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtPCompanyName">Company Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtPCompanyName" name="txtPCompanyName" 
+                                        data-ng-model="editDataP.CompanyName" placeholder="Enter company name" maxlength="100" value="" required />
+                                    <div data-ng-show="ccpform.txtPCompanyName.$dirty && ccpform.txtPCompanyName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ccpform.txtPCompanyName.$error.required">Tell us your company name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div>
+                                        <label for="txtPContactPerson">Contact Person<span class="compulsary">*</span></label>
+                                    </div>
+                                    <div class="col-sm-2" style="padding: 0px; max-width: 83px;">
+                                        <select class="form-control" name="drpCPrefix" data-ng-model="editDataP.CPrefix">
+                                            <option selected="selected" value="Mr.">Mr.</option>
+                                            <option value="Ms.">Ms.</option>
+                                            <option value="Mrs.">Mrs.</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="txtPContactPerson" name="txtPContactPerson" 
+                                            data-ng-model="editDataP.ContactPerson" placeholder="Enter contact person name" maxlength="50" value="" required />
+                                        <div data-ng-show="ccpform.txtPContactPerson.$dirty && ccpform.txtPContactPerson.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="ccpform.txtPContactPerson.$error.required">Tell us your contact person name.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpCountry">Country From</label>
+                                    <select id="drpCountry" name="drpCountry" data-ng-model="editDataP.CountryId" class="form-control">
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in Country" data-ng-selected="t.CountryId == editDataP.CountryId" value="{{t.CountryId}}">{{t.CountryName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpSource">Client Source<span class="compulsary">*</span></label>
+                                    <select id="drpSource" name="drpSource" data-ng-model="editDataP.SourceId" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in ClientSource" data-ng-selected="t.Id == editDataP.SourceId" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="ccpform.drpSource.$dirty && validateDropSource()" class="label label-danger">
+                                        Invalid: Please select client source.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="ccpform.$invalid || validateDropSource()"><i class="entypo-check"></i>{{btnPSaveText}}</button>
+                        @*<button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetPClient()"><i class="entypo-erase"></i>Reset</button>*@
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="MakeClient()" data-ng-disabled="master.isConfirmButtonDisabled"><i class="entypo-trophy"></i>Convert To Client</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+</div>

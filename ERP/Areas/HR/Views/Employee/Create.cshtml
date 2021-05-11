@@ -1,0 +1,175 @@
+﻿@{
+    ViewBag.Title = "Manage Employee";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<style>
+    .uploadify-queue {
+        display: none;
+    }
+
+    .modal-dialog {
+        width: 70%;
+    }
+
+    .bootbox .modal-dialog {
+        width: 50% !important;
+    }
+</style>
+<div data-ng-controller="EmpMasterCtrl">
+        <!-- BEGIN HEADER SECTION -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2 style="text-transform: capitalize">
+                        <i class="entypo-doc-text"></i>{{master.Mode}} {{master.EmployeeName}}
+                        <span style="float: right;">
+                            @{
+                                var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                                bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                                bool hasUpdateRights = ERPUtilities.HasAccessPermission(2, ctrl);
+                                bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+                                var hasAccessViewModel = new ERP.Models.HasAccessViewModel(){
+                                    HasInsertRights = hasInsertRights,
+                                    HasUpdateRights = hasUpdateRights,
+                                    HasDeleteRights = hasDeleteRights 
+                                };
+                                if (hasInsertRights)
+                                {
+                                    <a class="btn btn-sm btn-info btn-icon icon-left" href="/HR/Employee/Create"><i class="entypo-plus"></i>Add New</a>
+                                }
+                            }
+                            <a class="btn btn-sm btn-primary btn-icon icon-left" href="/HR/Employee"><i class="entypo-reply"></i>Back To List</a>
+                        </span>
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <!-- / END HEADER SECTION -->
+        <!-- BEGIN FORM SECTION -->
+        <div class="row">
+            <div class="col-sm-12 employee-tabs">
+                <div data-tabset>
+
+                    @if (ERPUtilities.HasAccessPermission(4, ctrl))
+                    {
+                        <!-- BEGIN PERSONAL INFORMATION -->
+                        @Html.Partial("_EmployeePersonal", hasAccessViewModel)
+                        <!-- / END PERSONAL INFORMATION -->
+                    }
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(5, ctrl))
+                        {
+                        <!-- BEGIN QUALIFICATION INFORMATION -->
+                        @Html.Partial("_EmployeeQualification", hasAccessViewModel)
+                        <!-- / END QUALIFICATION INFORMATION -->
+                        }
+                    }
+
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(6, ctrl))
+                        {
+                        <!-- BEGIN WORK EXPERIENCE INFORMATION -->
+                        @Html.Partial("_EmployeeWorkExperience", hasAccessViewModel)   
+                        <!-- / END WORK EXPERIENCE INFORMATION -->
+                        }
+                    }
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(7, ctrl))
+                        {
+                        <!-- BEGIN EMPLOYEE DOCUMENT INFORMATION -->
+                        @Html.Partial("_EmployeeDocument",hasAccessViewModel)
+                        <!-- / END EMPLOYEE DOCUMENT INFORMATION -->
+                        }
+                    }
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(8, ctrl))
+                        {
+                        <!-- BEGIN COMPANY INFORMATION -->
+                        @Html.Partial("_EmployeeCompanyInfo",hasAccessViewModel)
+                        <!-- / END COMPANY INFORMATION -->
+                        }
+                    }
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(9, ctrl))
+                        {
+                        <!-- BEGIN PAYROLL INFORMATION -->
+                        @Html.Partial("_EmployeePayroll",hasAccessViewModel)  
+                        <!-- / END PAYROLL INFORMATION -->
+                        }
+                    }
+
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(10, ctrl))
+                        {
+                        <!-- BEGIN RELATIVE INFORMATION -->
+                        @Html.Partial("_EmployeeRelative", hasAccessViewModel)   
+                        <!-- / END RELATIVE INFORMATION -->
+                        }
+                    }
+
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(11, ctrl))
+                        {
+                        <!-- BEGIN COMPANY CREDENTIAL INFORMATION -->
+                        @Html.Partial("_EmployeeCompanyCredential", hasAccessViewModel) 
+                        <!-- / END COMPANY CREDENTIAL INFORMATION -->
+                        }
+                    }
+
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(12, ctrl))
+                        {
+                        <!-- BEGIN LOGIN INFORMATION -->
+                        @Html.Partial("_EmployeeLoginInfo", hasAccessViewModel)
+                        <!-- / END LOGIN INFORMATION -->
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <!-- / END FORM SECTION -->
+</div>
+
+@* EMP DOCUMENT - BEGIN IMAGE SHOW POPUP TEMPLATE *@
+<script type="text/ng-template" id="Slider.html">
+    <div class="modal-body">
+        <div class="row leave-row">
+            <div class="col-sm-12">
+                <slider data-list="slideImages" data-mainpath="@ViewBag.mainDocPath" data-id="0" data-index="{{imgCurrentIndex}}" data-callbackevent="callback()" />
+            </div>
+        </div>
+    </div>
+</script>
+@* EMP DOCUMENT - END IMAGE SHOW POPUP TEMPLATE *@
+
+@* EMP DOCUMENT - BEGIN IMAGE SHOW POPUP TEMPLATE *@
+<script type="text/ng-template" id="Profile.html">
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <a href="#" title="close" data-ng-click="CloseProfilePicture()" style="position: absolute;right: 10px;z-index: 1000;"><i class="entypo-cancel"></i></a>
+                <img src="{{profilePath}}" style="max-width: 100%;" />
+            </div>
+        </div>
+    </div>
+</script>
+@* EMP DOCUMENT - END IMAGE SHOW POPUP TEMPLATE *@
+
+<script type="text/javascript">
+    window.Origin = "@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()";
+    window.temp = "@ViewBag.TempImageThumbPath";
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/Area/HR/Scripts/employeeCreate")
+}

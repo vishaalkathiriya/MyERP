@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "Manage Floor";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRFloorCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Floor</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRFloor()">Add New</button>
+                        }
+                    }
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" name="floorform" id="floorform" novalidate>
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Floor</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpMachine">Machine<span class="compulsary">*</span></label>
+                                    <multiselect class="input-xlarge" multiple="true" data-ng-model="selectedList" options="p.Label for p in MachineList" change="selected()"></multiselect>
+                                    <div data-ng-show="machineError" class="label label-danger">
+                                        Invalid: <span>Please Select Machine.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtManager">Manager<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtManager" name="manager" data-ng-model="editData.Manager" placeholder="Enter manager name" maxlength="50" value="" required />
+                                    <div data-ng-show="floorform.manager.$dirty && floorform.manager.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="floorform.manager.$error.required">Tell us Manager Name</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="drpLocation">Location<span class="compulsary">*</span></label>
+                                <select id="drpLocation" name="drpLocation"
+                                    data-ng-model="editData.LocationId"
+                                    class="form-control"
+                                    required>
+                                    <option value="0">--Select--</option>
+                                    <option data-ng-repeat="t in Locations" value="{{t.Id}}">{{t.Label}}</option>
+                                </select>
+                                <div data-ng-show="floorform.drpLocation.$dirty && validateDropLocation()" class="label label-danger">
+                                    Invalid: Please select Location
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="txtRemarks">Remarks</label>
+                            <textarea class="form-control" id="txtRemarks" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                            <div data-ng-show="floorform.remarks.$dirty && floorform.remarks.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="floorform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info btn-icon icon-left" ng-click="CreateUpdateSRFloor(editData)" data-ng-disabled="floorform.$invalid || validateDropLocation() "><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRFloor()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRFloor()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--Floor list-->
+    <div class="row" data-ng-init="RetrieveSRFloor()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="'Machine'" data-filter="{'MachineName': 'text' }" data-sortable="'MachineName'">{{d.MachineName}}</td>
+                            <td data-title="'Sr.No.'" data-filter="{'SerialNo': 'text' }" data-sortable="'SerialNo'">{{d.SerialNo}}</td>
+                            <td data-title="'Location'" data-filter="{'LocationName': 'text'}" data-sortable="'LocationName'">{{d.LocationName}}</td>
+                            <td data-title="'Manager'" data-filter="{'Manager': 'text' }" data-sortable="'Manager'">{{d.Manager}}</td>
+                            <td data-title="'Remarks'" data-sortable="'Remarks'">{{d.Remarks}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRFloor(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRFloor(d.FloorId)" data-message="Are you sure want to delete Machine '{{d.MachineName}}'   from Floor '{{d.Floor}}'?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+
+                            <td colspan="5">Your search did not match any Floor
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRFloorCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRFloorService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+}

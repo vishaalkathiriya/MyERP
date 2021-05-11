@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>KYC
+                <span style="float: right;">
+                    <a class="btn btn-sm btn-info btn-icon icon-left" href="/Invoice/Client/Create"><i class="entypo-plus"></i>Add New</a>
+                    <a class="btn btn-sm btn-primary btn-icon icon-left" href="/Invoice/Client"><i class="entypo-reply"></i>Back To List</a>
+                </span>
+            </h2>
+        </div>
+    </div>
+</div>
+
+<div data-ng-controller="ClientCreateMasterCtrl">
+    <div class="row" data-ng-init="InitMasterDataLoad('@ViewBag.ID', '@ViewBag.Mode')">
+        <div class="col-sm-12 employee-tabs">
+            <div data-tabset>
+                <!-- BEGIN CLIENT CREATE PARTIALLY-->
+                @Html.Partial("_ClientCreatePartially")
+                <!-- / END CLIENT CREATE PARTIALLY-->
+
+                <!-- BEGIN CLIENT CREATE FULL-->
+                @Html.Partial("_ClientCreateFull")
+                <!-- / END CLIENT CREATE FULL-->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Area/Invoice/Scripts/invoiceClientMaster")
+}

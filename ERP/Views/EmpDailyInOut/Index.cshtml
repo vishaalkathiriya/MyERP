@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Daily In Out Entry";
+}
+
+<div class="row">
+
+    <div class="sol-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Daily In Out </h2>
+        </div>
+    </div>
+
+</div>
+
+<div data-ng-controller="EmpDailyInOutCtrl" >
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <form role="form" data-ng-submit="SaveInOut(dailyInOut)" name="inOutform" id="inOutform">
+                <input type="hidden" data-ng-model="dailyInOut.EmployeeId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Daily In Out</h3>
+                        <div class="panel-options">
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group" data-ng-if="!dailyInOut.Intime && !dailyInOut.OutTime || dailyInOut.Intime && dailyInOut.OutTime">
+                            <label for="lblInComment">In Comment</label>
+                            <input type="text" class="form-control" id="txtInComment" name="txtInComment" data-ng-model="dailyInOut.InComments" placeholder="Enter In Comment"
+                                maxlength="255" value="" data-drc-focus="isFirstFocus" />
+                        </div>
+                        @*dailyInOut.InTime && !dailyInOut.OutTime*@
+                        <div class="form-group" data-ng-if="dailyInOut.Intime && !dailyInOut.OutTime">
+                            <label for="lblOutComment">Out Comment</label>
+                            <input type="text" class="form-control" id="txtOutComment" name="txtOutComment" data-ng-model="dailyInOut.OutComments" placeholder="Enter Out Comment"
+                                maxlength="255" value="" data-drc-focus="isFirstFocus" />
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" class="btn btn-success" >{{saveText}}</button>
+                        <!--
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="SaveInOut(dailyInOut)"><i class="entypo-erase"></i>End</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="cancel()"><i class="entypo-cancel"></i>Close</button>
+                        <label id="lblMsgContainer" class="label label-success" style="display: none;"></label> -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+</div>
+
+@section Scripts{
+   @Scripts.Render("~/Scripts/dailyInOut")
+}

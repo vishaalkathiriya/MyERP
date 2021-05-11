@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@using ERP.Utilities
+
+
+<div data-ng-controller="EmployeeViewProfile" class="view-profile">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>View User Profile</h2>
+            </div>
+        </div>
+    </div>
+    <!-- BEGIN VIEW EMPLOYEE PROFILE SECTION -->
+    <div class="row" data-ng-init="RetrieveEmpProfile()">
+        <div class="col-sm-12">
+            <form role="form" data-ng-submit="changeProfile(editData)" name="UserProfile" id="UserProfile">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="view-profile-pic" data-ng-click="showHideProfilePic()">
+                            <img data-ng-if="!editdata.ProfilePhoto" src="~/Content/images/thumb_User.png" class="img-responsive" width="100%" title="Please select a profile picture" />
+                            <img data-ng-if="editdata.ProfilePhoto"  data-ng-src="/@ViewBag.ProfileImage/{{editdata.ProfilePhoto}}" title="{{editdata.ProfilePhoto}}" class="img-responsive" width="100%" />
+                            <div class="view-profile-pic-hint">
+                                <span data-ng-if="!editdata.isProfilePicVisible">Change Profile Picture</span>
+                                <span data-ng-if="editdata.isProfilePicVisible">Cancel</span>
+                            </div>
+                            <div upload-file data-ng-if="editdata.isProfilePicVisible" data-filename="editdata.ProfilePhoto " data-buttonclass="profile-pic-upload-btn" data-id="profile_pic" data-uploadhandler="/HR/ViewProfile/employeeProfileImage" data-ischanged="isChanged" data-ext="*.jpg; *.jpeg" >
+                                <input id="imageOne">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-10">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <strong>Ecode : </strong>{{editdata.EmployeeRegisterCode}}
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Full Name : </strong>{{editdata.CandidateFirstName}} {{editdata.CandidateMiddleName}} {{editdata.CandidateLastName}}
+                            </div>
+                            <div class="list-group-item">
+                                <strong>Guardian Name : </strong>{{editdata.GuardianFirstName}} {{editdata.GuardianMiddleName}} {{editdata.GuardianLastName}}
+                            </div>
+                            <div class="list-group-item" data-ng-show="editdata.Gender != null"  ><strong>Gender : </strong>{{editdata.Gender == "M" ? "Male" : "Female" }}</div>
+                            <div class="row" >
+                                <div class="col-sm-6"><div class="list-group-item" data-ng-show="editdata.BirthDate != null"><strong>BirthDate:</strong> {{editdata.BirthDate | date:'dd-MMM-yyyy'}}</div></div>
+                                 <div class="col-sm-6"><div class="list-group-item" data-ng-show="editdata.JoiningDate != null"><strong>JoinDate:</strong> {{editdata.JoiningDate | date:'dd-MMM-yyyy'}}</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="list-group">
+                            <h4><i class="entypo-address"></i>Present Address</h4>
+                            <div class="list-group-item">
+                                <span data-ng-show="editdata.Present_Location != null">{{editdata.Present_HouseNo || "-"}}, {{editdata.Present_Location}}, </span>
+                            </div>
+                            <div class="list-group-item">
+                               <span data-ng-show="editdata.Present_Area != null">{{editdata.Present_Area}}, </span> 
+                            </div>
+                            <div class="list-group-item"><span  data-ng-show="editdata.Present_City != null">{{editdata.Present_City}}</span> <span data-ng-show="editdata.Present_PostalCode != null"> - {{editdata.Present_PostalCode}},</span></div>
+                            <div class="list-group-item" ><span data-ng-show="editdata.Present_State != null">{{editdata.Present_State}}, </span><span data-ng-show="editdata.Present_Country != null">{{editdata.Present_Country}}.</span></div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="list-group">
+                            <h4><i class="entypo-address"></i> Permanent Address</h4>
+                            <div class="list-group-item">
+                                <span data-ng-show="editdata.Permanent_HouseNo != null">{{editdata.Permanent_HouseNo}}, </span><span data-ng-show="editdata.Permanent_Location != null" >{{editdata.Permanent_Location}}, </span>
+                            </div>
+                            <div class="list-group-item">
+                                <span data-ng-show="editdata.Permanent_Area != null">{{editdata.Permanent_Area}}, </span>
+                            </div>
+                            <div class="list-group-item"> <span data-ng-show="editdata.Permanent_City != null">{{editdata.Permanent_City}}</span> <span data-ng-show="editdata.Permanent_PostalCode != null"> - {{editdata.Permanent_PostalCode}},</span></div>
+                            <div class="list-group-item"> <span data-ng-show="editdata.Permanent_State != null">{{editdata.Permanent_State}}, </span><span data-ng-show="editdata.Permanent_Country != null">{{editdata.Permanent_Country}}. </span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12"> <h4><i class="entypo-info"></i> Other Information</h4></div>
+
+                    <div class="col-sm-6">
+                        <div class="list-group">
+                             <div class="list-group-item" > <strong>Company Email : </strong> {{editdata.CompanyEmailId || "Not Available"}}</div>
+                            <div class="list-group-item" > <strong>Personal Email : </strong> {{editdata.PersonalEmailId || "Not Available"}}</div>
+                             <div class="list-group-item" > <strong>Marital Status : </strong> {{editdata.MaritalStatus || "Not Available"}} <span data-ng-show="editdata.MaritalStatus=='Married'">@@{{editdata.MarriageAnniversaryDate  | date:'dd-MMM-yyyy'}}</span></div>
+                            <div class="list-group-item"  > <strong>Driving Licence Number : </strong> {{editdata.DrivingLicenceNumber || "Not Available"}} </div>
+                            <div class="list-group-item" > <strong>Passport Number : </strong> {{editdata.PassportNumber || "Not Available"}}  <span data-ng-show="editdata.PassportExpiryDate != null"> till {{editdata.PassportExpiryDate  | date:'dd-MMM-yyyy'}}</span></div>
+                            <div class="list-group-item" > <strong>Bank Account : </strong> {{editdata.CompanyBankAccount || "Not Available"}} <span  data-ng-show="editdata.CompanyBankName != null" >@@ {{editdata.CompanyBankName || "Not Available"}} </span></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+
+                        <div class="list-group">
+                             <div class="list-group-item" ><strong>Company Mobile : </strong> {{editdata.CompanyMobile || "Not Available"}}</div>
+                            <div class="list-group-item" ><strong>Personal Mobile : </strong> {{editdata.PersonalMobile || "Not Available"}}</div>
+                            <div class="list-group-item" ><strong>PAN Number : </strong> {{editdata.PANCardNumber || "Not Available"}}</div>
+                            <div class="list-group-item" ><strong>Adhar Card Number : </strong> {{editdata.AdharNumber || "Not Available"}}</div>
+                            <div class="list-group-item" ><strong>Blood Group : </strong> {{editdata.BloodGroup || "Not Available"}}</div>
+                            <div class="list-group-item"> <strong>Nominee Mobile Number : </strong> {{editdata.NomineeMobile || "Not Available"}}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END  VIEW EMPLOYEE PROFILE SECTION -->
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Area/HR/Scripts/employeeViewProfile")
+}

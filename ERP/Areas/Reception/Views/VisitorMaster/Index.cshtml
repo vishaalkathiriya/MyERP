@@ -1,0 +1,473 @@
+﻿@{
+    ViewBag.Title = "Visitor Master";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<script language="Javascript">
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    function isBraces(evt) {
+        debugger;
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode == 44)
+            return false;
+
+        return true;
+    }
+</script>
+
+<style>
+    ul.dropdown-menu.ng-isolate-scope
+    {
+        max-height: 150px;
+        overflow: auto;
+    }
+
+    .photobooth ul
+    {
+        padding: 0;
+        margin: 0;
+        list-style: none outside none;
+    }
+    .tooltip
+    {
+        z-index:999999 !important;
+    }
+</style>
+
+<div  data-ng-controller="VisitorMasterCtrl">
+    <div class="col-sm-12 employee-tabs">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2><i class="entypo-doc-text"></i>Visitor Master</h2>
+                </div>
+            </div>
+        </div>
+
+        <div data-tabset>
+            <div data-tab
+                data-active="master.isOuterTabActive">
+                <div data-tab-heading>
+                    <i class="entypo-vcard"></i>Visitor Entry
+                </div>
+                <form role="form" name="visitorform" id="s">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3>Personal Information</h3>
+                            <hr />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="txtMobileNo" style="display: none">Mobile  No<span class="compulsary"></span></label>
+                                        @*<input type="text" tabindex="1" class="form-control" id="txtMobileNo" name="txtMobileNo" onkeypress="return isNumberKey(event)" data-ng-model="editData.MobileNo" placeholder="Mobile Number" maxlength="10" value="" ng-blur='GetData()' required />*@
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" style="display: none">
+                                    <div class="form-group">
+                                        <label for="txtVisitorID">Visitor  ID</label>
+                                        <input type="text" tabindex="2" class="form-control" id="txtVisitorID" name="txtVisitorID" data-ng-model="editData.VisitorID" placeholder="VisitorID" maxlength="50" value="" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="txtFullName">Full Name</label>
+                                        <input type="text" tabindex="3" class="form-control" id="txtFullName" name="txtFullName" data-ng-model="editData.FullName" placeholder="Full Name" value="" capital-input required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="txtBlockNo">Address</label>
+                                        <input type="text" tabindex="4" class="form-control" id="txtBlockNo" name="txtBlockNo" data-ng-model="editData.BlockNo" placeholder="Block Number" onkeypress="return isBraces(event)" value="" capital-input required />
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label for="txtSoc"></label>
+                                        <input type="text" tabindex="5" class="form-control" id="txtSoc" name="txtSoc" data-ng-model="editData.Soc" placeholder="Appartment / Society / Street" onkeypress="return isBraces(event)" value="" style="margin-top: 5px" capital-input required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input type="text" tabindex="6" class="form-control" id="txtStreet1" name="txtStreet1" data-ng-model="editData.Street1" placeholder="Land Mark / Main Road" onkeypress="return isBraces(event)" value="" capital-input required />
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input type="text" tabindex="7" class="form-control" id="txtStreet2" name="txtStreet2" data-ng-model="editData.Street2" placeholder="Area & City" onkeypress="return isBraces(event)" value="" capital-input required />
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="drpCompany">Company</label>
+                                        <input type="text" tabindex="8" class="form-control" id="txtcompamy" name="txtcompamy" data-ng-model="editData.comapny" typeahead="company.Company as company.Company for company in CompanyList | filter:$viewValue" value="" capital-input required />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="drpdesignation">Designation</label>
+                                        <input type="text" tabindex="9" class="form-control" id="txtdesignation" name="txtdesignation" data-ng-model="editData.Designation" typeahead="d.Designation as d.Designation for d in DesignationList | filter:$viewValue" value="" capital-input required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="txtRemark">Remark</label>
+                                        <input type="text" tabindex="10" class="form-control" id="txtRemark" name="txtRemark" data-ng-model="editData.Remark" value="" capital-input />
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <hr>
+                                    <button type="submit" tabindex="11" class="btn btn-sm btn-info btn-icon icon-left ng-binding" data-ng-disabled="visitorform.$invalid || !editData.MobileNo" data-ng-click="CreateUpdateVisitor(editData)"><i class="entypo-check"></i>{{saveText}}</button>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                @*<div id="example">
+                                        <div id="Camera" drc-upload-img style="width:276px; height: 208px;"></div>
+                                    </div>*@
+                                <div id="Camera" style="width: 276px; height: 208px; margin-top: 40px;"></div>
+                                @*<button drc-upload-img photo_url="photo_url" callback="photoUrlChanged(photo_url)">Get img data</button>*@
+                                <hr />
+                                <button id="resetHSB" class="btn btn-default">ResetHSB</button>
+                                @*<div  style="height: 300px; width: 300px;"></div>*@
+                                <div id="gallery" photo-url="editData.VisitorImg">
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    @*<div class="row">
+                            <div class="col-sm-6">
+                                <hr>
+                                <button type="submit" tabindex="11" class="btn btn-sm btn-info btn-icon icon-left ng-binding" data-ng-disabled="visitorform.$invalid" data-ng-click="CreateUpdateVisitor(editData)"><i class="entypo-check"></i>{{saveText}}</button>
+
+                            </div>
+                        </div>*@
+                </form>
+            </div>
+
+            <div class="pull-right form-inline">
+
+                <div style="margin-top: -5px;">
+                    <div class="form-group">
+                        <input type="text" tabindex="" class="form-control" id="txtMobileNo" name="txtMobileNo" onkeypress="return isNumberKey(event)" ng-blur='GetData()' data-ng-model="editData.MobileNo" placeholder="Mobile Number" maxlength="10" value="" style="width: 100%; margin-right: 70px;" required />
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn  btn-success btn-icon icon-left" data-ng-click="ResetVisitor()"><i class="entypo-erase"></i>Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div data-tab
+                data-active="master.isInterTabActive">
+                <div data-tab-heading>
+                    <i class="entypo-back-in-time"></i>In Out Log
+                </div>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h3>Visitor Entry</h3>
+                        <hr />
+
+                    </div>
+
+                </div>
+                <!--form-->
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <form role="form" id="inform" name="inform">
+
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="drpCompany">ECode</label>
+                                            <select id="drpEcode" tabindex="8" name="drpEcode" data-ng-model="editData.ecode" class=" form-control" ng-init="editData.ecode=0">
+                                                <option selected disabled hidden value=''></option>
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="r in EcodeList" value="{{r.Ecode}}">{{r.Ecode}}</option>
+
+                                            </select>
+                                            @*<input type="text" tabindex="10" class="form-control" id="txtEcode" name="txtEcode" data-ng-model="editData.ecode" typeahead="r.Ecode as r.Ecode for r in EcodeList | filter:$viewValue" value="" capital-input />*@
+                                            <!--<input type="text" tabindex="10" class="form-control" id="txtEcode" name="txtEcode" data-ng-model="editData.ecode"  />-->
+
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="txtToExt">Ref. Name</label>
+                                                <input type="text" tabindex="11" class="form-control" id="txtRefName" name="txtRefName" data-ng-model="editData.RefName" typeahead="r.RefName as r.RefName for r in RefNameList | filter:$viewValue" value="" required capital-input />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtPesron">Total Person</label>
+                                            <div class="form-group">
+                                                <input type="text" tabindex="12" class="form-control" id="txtTotalPerson" name="txtTotalPerson" onkeypress="return isNumberKey(event)" data-ng-model="editData.TotalPerson" placeholder="Total Person" maxlength="10" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="txtToExt">Manager</label>
+                                                <input type="text" tabindex="13" class="form-control" id="txtManager" name="txtManager" data-ng-model="editData.Manager" typeahead="m.manager as m.manager for m in ManagerList | filter:$viewValue" value="" capital-input required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+
+                                        <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="txtToExt">Department</label>
+                                                <input type="text" tabindex="14" class="form-control" id="txtDept" name="txtDept" data-ng-model="editData.Dept" typeahead="d.Param1 as d.Param1 for d in DeptList | filter:$viewValue" value="" capital-input required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtExtNo">Ext No</label>
+                                            <div class="form-group">
+                                                <input type="text" tabindex="15" class="form-control" id="txtExtNo" name="txtExtNo" onkeypress="return isNumberKey(event)" data-ng-model="editData.ExtNo" placeholder="" maxlength="10" value="" required />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="txtReason">Reason</label>
+                                            <div class="form-group">
+                                                <input type="text" tabindex="16" class="form-control" id="txtReason" name="txtReason" data-ng-model="editData.Reason" placeholder="Reason" maxlength="10" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer" style="margin-bottom: 5px;">
+                                    <button type="submit" class="btn btn-sm btn-info btn-icon icon-left ng-binding" tabindex="17" data-ng-click="visitorIn(editData)" data-ng-disabled="inform.$invalid"><i class="entypo-arrows-ccw"></i>Visitor In</button>
+                                    @*<button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="" tabindex="18"><i class="entypo-arrow-combo"></i>Visitor Out</button>*@
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div id="visitorNameLable">
+                                    <label>Name:</label>
+                                </div>
+                                <div id="VisitorPhoto" style="width: auto; height: auto;"></div>
+
+
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-condensed table-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>SrNo</th>
+                                    <th>VisitorID</th>
+                                    <th>MobileNo</th>
+                                    <th>VisitorName</th>
+                                    <th>InTime</th>
+                                    <th>ECode</th>
+                                    <th>RefName</th>
+                                    <th>Person</th>
+                                    <th>Department</th>
+                                    <th>Manager</th>
+                                    <th>ExtNo</th>
+                                    <th>Reason</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ip in InPersonList">
+                                    <td style="width: 10px">
+                                        <button type="button" class="btn btn-sm btn-success" data-ng-click="VisitorOut(ip)" tabindex="">Out</button>
+                                    </td>
+                                    <td>{{ip.SrNo}}</td>
+                                    <td>{{ip.VisitorId}}</td>
+                                    <td>{{ip.MobileNo}}</td>
+                                    <td>{{ip.VisitorName}}</td>
+                                    <td>{{ip.InTime |  date:'dd/MM/yyyy hh:mm a'}}</td>
+                                    <td>{{ip.ECode}}</td>
+                                    <td>{{ip.RefName}}</td>
+                                    <td>{{ip.Person}}</td>
+                                    <td>{{ip.Department}}</td>
+                                    <td>{{ip.Manager}}</td>
+                                    <td>{{ip.ExtNo}}</td>
+                                    @*<td>{{ip.RefName}}</td>*@
+                                    <td>{{ip.Reason}}</td>
+
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div data-tab
+                data-active="master.isReportTabActive">
+                <div data-tab-heading>
+                    <i class="entypo-back-in-time"></i>Report
+                </div>
+
+                <div class="row" data-ng-init="GetVisitorData_Table()">
+                    <div class="col-sm-12">
+                        <div data-loading-container="tableParams.settings().$loading">
+                            <div class="table-responsive">
+                                <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                    <tr data-ng-repeat="d in $data">
+                                        <td style="width: 110px;">
+                                            <a class="btn btn-success btn-xs" data-ng-click="GetMeIn(d)"  data-original-title="" title="" tooltip="Visitor In"><i class="entypo-check" ></i></a>
+                                            <a class="btn btn-primary btn-xs" data-ng-click="UpdateVisitor(d)"  data-original-title="" title="" tooltip="Edit"><i class="entypo-pencil" ></i></a>
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteVisitorData(d)" data-message="Are you sure want to delete 'visitor' from VisistorList?" ><i class="entypo-trash" tooltip="Delete"></i></a>
+                                        </td>
+
+                                        <td data-title="'MobileNo'" data-filter="{'MobileNo': 'text' }" data-sortable="'MobileNo'">{{d.MobileNo}}</td>
+                                        <td data-title="'Name'" data-filter="{'Name': 'text'}" data-sortable="'Name'">{{d.Name }}</td>
+                                        <td data-title="'Address'" data-filter="{'Address': 'text'}" data-sortable="'Address'">{{d.Address }}</td>
+                                        <td data-title="'Company'" data-filter="{'Company': 'text'}" data-sortable="'Company'">{{d.Company }}</td>
+                                        <td data-title="'Designation'" data-filter="{'Designation': 'text'}" data-sortable="'Designation'">{{d.Designation }}</td>
+                                        <td data-title="'VisitorID'" data-filter="{'VisitorId': 'text' }" data-sortable="'VisitorId'">{{d.VisitorId}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+
+
+
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="~/Areas/Reception/Scripts/typeahead.js"></script>
+    <script src="@Url.Content("~/Areas/Reception/Scripts/controllers/VisitorMasterCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Reception/Scripts/services/VisitorMasterService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src=" ~/Scripts/directives/drcCapitalize.js"></script>
+    <script src="~/Areas/Reception/Directive/drcUploadImg.js"></script>
+    <script src="@Url.Content("~/Scripts/webcam/webcam.js")"></script>
+    
+    <script>
+        $(function () {
+
+            $('#Camera').photobooth().on("image", function (event, dataUrl) {
+                console.log(dataUrl);
+                $("#gallery").html('');
+                $("#gallery").append('<img  src="' + dataUrl + '" >');
+                window.visitorphotourl = dataUrl;
+                $.ajax({
+                    method: 'POST',
+                    url: 'WebCam/Capture',
+                    type: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ fileData: dataUrl }),
+                    success: function (data) {
+                        console.log(data);
+                        alert(data);
+                    }
+                })
+
+            });
+
+
+
+            //$('#txtEcode').on("click", function () {
+            //    debugger;
+            //    ev = $.Event("keydown")
+            //    ev.keyCode = ev.which = 40
+            //    $('#txtEcode').val("9");
+            //    $(this).trigger(ev)
+            //    return true
+            //});
+
+
+
+            //<div photocam="" photo-url="variablenamefromscope"></div>
+
+            //directive photocam
+            // scope: { photoUrl: '=' }
+            // scope.photoUrl
+            // success: function(){ scope.$apply(function(){ scope.photoUrl = data; }); }
+
+            $('#resetHSB').on('click', function () {
+                $('#Camera').data("photobooth").setBrightnessOffset(0);
+                $('#Camera').data("photobooth").setHueOffset(0);
+                $('#Camera').data("photobooth").setSaturationOffset(0);
+            });
+        });
+        //debugger;
+
+        //$("#drpEcode").val('9371');
+        //var text1 = '9323';
+        //$("#drpEcode option").filter(function () {
+        //    debugger;
+        //    //may want to use $.trim in here
+        //    return $(this).text() == text1;
+        //}).attr('selected', selected);
+
+
+
+    </script>
+}

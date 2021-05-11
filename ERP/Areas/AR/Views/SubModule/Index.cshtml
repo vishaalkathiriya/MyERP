@@ -1,0 +1,202 @@
+﻿@{
+    ViewBag.Title = "Manage Sub Modules";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="ARSubModuleCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Sub Modules</h2>
+            </div>
+        </div>
+    </div>
+
+    @{
+        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+            if(hasInsertRights){
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well well-sm">
+                            <form class="form-inline">
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSubModule()">Add New</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSubModule(editData)" name="smform" id="smform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Sub Module</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="drpModuleName">Module Name<span class="compulsary">*</span></label>
+                                    <select id="drpModuleName" tabindex="1" name="drpModuleName" data-ng-model="editData.ModuleId" data-drc-focus="isFirstFocus" data-ng-change="loadAccessPermissionDrop()" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in ModuleList" data-ng-selected="t.Id == editData.ModuleId" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="smform.drpModuleName.$dirty && validateModuleName()" class="label label-danger">
+                                        Invalid: Please select module name.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="txtSubModuleName">Sub Module Name<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="2" class="form-control" id="txtSubModuleName" name="txtSubModuleName" data-ng-model="editData.SubModuleName" data-ng-change="loadAccessPermissionDrop()" placeholder="Enter sub module name" maxlength="50" value="" required />
+                                    <div data-ng-show="smform.txtSubModuleName.$dirty && smform.txtSubModuleName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="smform.txtSubModuleName.$error.required">Tell us your sub module name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="txtURL">URL<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="3" class="form-control" id="txtURL" name="txtURL" data-ng-model="editData.URL" placeholder="Enter sub module URL" maxlength="100" value="" required />
+                                    <div data-ng-show="smform.txtURL.$dirty && smform.txtURL.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="smform.txtURL.$error.required">Tell us your sub module URL.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="txtSeqNo">Sequence Number<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="4" class="form-control" id="txtSeqNo" name="txtSeqNo" data-ng-model="editData.SeqNo" data-ng-pattern="/^\d*\.?\d*$/" placeholder="Enter your sequence number" maxlength="2" value="" required />
+                                    <div data-ng-show="smform.txtSeqNo.$dirty && smform.txtSeqNo.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="smform.txtSeqNo.$error.required">Tell us your sequence number.</span>
+                                                <span data-ng-show="smform.txtSeqNo.$error.pattern" class="">Please enter valid sequence number.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group" data-ng-if="PermissionList">
+                                    <div>
+                                        <label>Access Rights</label>
+                                    </div>
+                                    <label><input type="checkbox" data-ng-model="isAllSelected" data-ng-click="selectAll(isAllSelected)">{{SelectText}}</label>
+                                    <div data-ng-repeat="p in PermissionList">
+                                        <label><input type="checkbox" data-ng-model="PermissionList[$index].IsSelected">{{p.Label}}&nbsp;</label>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights) {
+                                <button type="submit" tabindex="6" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="smform.$invalid || validateModuleName()"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" tabindex="7" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSubModule()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" tabindex="8" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSubModule()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--Sub module list-->
+    <div class="row" data-ng-init="RetrieveSubModules()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data" data-ng-form="subform">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.SubModuleId, d.IsActive)" data-message="Are you sure want to InActive '{{d.SubModuleName}}' Sub Module?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.SubModuleId, d.IsActive)" data-message="Are you sure want to Active '{{d.SubModuleName}}' Sub Module?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                   
+	                            }
+                            }
+                            
+
+                            <td data-title="'Module'" data-filter="{ 'ModuleId': 'select' }" filter-data="ModuleLst($column)" data-sortable="'ModuleName'">{{d.ModuleName}}</td>
+                            <td data-title="'Sub Module'" data-filter="{ 'SubModuleName': 'text' }" data-sortable="'SubModuleName'">{{d.SubModuleName}}</td>
+                            <td data-title="'URL'" data-sortable="'URL'">{{d.URL}}</td>
+                             @{
+                                 if (editPermission) {
+                                    <td data-title="'Seq'" data-sortable="'SeqNo'" style="width:125px;">
+                                        <div data-ng-if="!isEdit[$index]" data-ng-click="isEdit[$index] = 'true'; oldSeqNo[$index] = $data[$index].SeqNo">
+                                            {{$data[$index].SeqNo}}
+                                        </div>
+                                        <div data-ng-if="isEdit[$index]">
+                                            <input type="text" name="txtGridSeqNo" data-ng-model="$data[$index].SeqNo" data-ng-pattern="/^[1-9][0-9]*$/" value="{{d.SeqNo}}" maxlength="2" style="width:40px;" required/>
+                                            <a data-ng-click="ChangeSeqNo($data[$index].SeqNo, d.SubModuleId, $index)" data-ng-disabled="subform.txtGridSeqNo.$error.pattern || subform.txtGridSeqNo.$error.required" class="btn btn-info btn-xs" style="margin-bottom: 3px;"><i class="entypo-check"></i></a>
+                                            <a data-ng-click="CancelSeqChange($index,$data)" class="btn btn-danger btn-xs" style="margin-bottom: 3px;"><i class="entypo-cancel"></i></a>
+                                        </div>
+                                    </td>
+                                 }
+                                 else { 
+                                     <td data-title="'Seq'" data-sortable="'SeqNo'" style="width:125px;">
+                                        {{d.SeqNo}}
+                                    </td>
+                                 }
+                            }
+                            <td data-title="'Allowed Access'" style="width:200px;">
+                                <span data-ng-repeat="value in d.AllowedAccess">
+                                    {{ value.Label}}<span ng-show=" ! $last ">,</span>
+                                </span>
+                            </td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @if (editPermission) {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSubModule(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                        }
+                                        @if (deletePermission) {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSubModule(d.SubModuleId)" data-message="Are you sure want to delete '{{d.SubModuleName}}' from Sub Module?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td colspan="5">Your search did not match any sub module.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Area/AR/Scripts/arsubmodules")
+}

@@ -1,0 +1,219 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab data-ng-controller="EmpWorkExperienceCtrl" data-select="RetrieveEmpWorkExperience();SetFocus()" disabled="!master.Mode == 'Edit' || master.Mode == 'Add'">
+    <div data-tab-heading>
+        <i class="entypo-gauge"></i>Work Experience
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateWorkExperience(workExperience)" name="frmWorkExp" id="frmWorkExp">
+        <input type="hidden" data-ng-model="workExperience.SrNo" />
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Work Experience Information</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtCompanyName">Company Name<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="1" name="txtCompanyName" id="txtCompanyName" data-ng-model="workExperience.CompanyName" data-drc-focus="isFirstFocus" class="form-control" placeholder="Enter company name" maxlength="100" value="" required />
+                            <div data-ng-show="frmWorkExp.txtCompanyName.$dirty && frmWorkExp.txtCompanyName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmWorkExp.txtCompanyName.$error.required">Tell us your company name.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtDesignation">Designation<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="2" name="txtDesignation" id="txtDesignation" data-ng-model="workExperience.Designation" class="form-control" placeholder="Enter designation" maxlength="50" value="" required />
+                            <div data-ng-show="frmWorkExp.txtDesignation.$dirty && frmWorkExp.txtDesignation.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmWorkExp.txtDesignation.$error.required">Tell us your designation.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtSkills">Skills</label>
+                            @*<div data-tags-input="" data-ng-model="workExperience.Skills">
+                                <auto-complete source="RetriveTechnology($query)" tabindex="3"
+                                               min-length="0"
+                                               max-results-to-show="1000"
+                                               highlight-matched-text="true">
+                                </auto-complete>
+                           </div>*@
+
+                            <tags-input data-ng-model="workExperience.Skills">
+                                <auto-complete source="RetriveTechnology($query)" tabindex="3"
+                                               min-length="0"
+                                               max-results-to-show="1000"
+                                               highlight-matched-text="true">
+                                </auto-complete>
+                            </tags-input>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtFromDate">From Date<span class="compulsary">*</span></label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p4">
+                                <input type="text" data-parentid="p4" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="4" class="form-control" id="txtFromDate" name="txtFromDate" placeholder="DD-MM-YYYY"
+                                       maxlength="10" value="" required data-ng-model="workExperience.FromDate"
+                                       data-ng-change="ValidateWorkExpFromDate(workExperience.FromDate)" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                            data-is-open="workExperience.calOpenWorkExpFromDate"
+                                            data-ng-model="workExperience.fromDate"
+                                            data-max="maxDate"
+                                            data-datepicker-options="dateOptions"
+                                            data-close-text="Close"
+                                            data-ng-required="true"
+                                            data-ng-click="calendarOpenWorkExpFromDate($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+                            <div data-ng-show="frmWorkExp.txtFromDate.$dirty && frmWorkExp.txtFromDate.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmWorkExp.txtFromDate.$error.required">Please select from date.</span>
+                                <span data-ng-show="frmWorkExp.txtFromDate.$error.invalidWorkExpFromDate">Please enter valid from date.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtToDate">To Date<span class="compulsary">*</span></label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p5">
+                                <input type="text" data-parentid="p5" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="5" class="form-control" id="txtToDate" name="txtToDate" placeholder="DD-MM-YYYY"
+                                       maxlength="10" value="" required data-ng-model="workExperience.ToDate"
+                                       data-ng-change="ValidateWorkExpToDate(workExperience.ToDate)" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                            data-is-open="workExperience.calOpenWorkExpToDate"
+                                            data-ng-model="workExperience.toDate"
+                                            data-min="minDate"
+                                            data-max="maxDate"
+                                            data-datepicker-options="dateOptions"
+                                            data-close-text="Close"
+                                            data-ng-required="true"
+                                            data-ng-click="calendarOpenWorkExpToDate($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+                            <div data-ng-show="frmWorkExp.txtToDate.$dirty && frmWorkExp.txtToDate.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmWorkExp.txtToDate.$error.required">Please select to date.</span>
+                                <span data-ng-show="frmWorkExp.txtToDate.$error.invalidWorkExpToDate">Please enter valid to date.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtSalary">Salary<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="6" class="form-control" id="txtSalary" name="txtSalary" data-ng-model="workExperience.Salary" data-ng-pattern="/^[0-9]{1,6}$/" data-ng-maxlength="8" placeholder="Enter Salary" value="" required />
+                            <div data-ng-show="frmWorkExp.txtSalary.$dirty && frmWorkExp.txtSalary.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmWorkExp.txtSalary.$error.required">Tell us your salary.</span>
+                                <span data-ng-show="frmWorkExp.txtSalary.$error.pattern">Please enter valid salary.</span>
+                                <span data-ng-show="frmWorkExp.txtSalary.$error.maxlength">Please enter fewer digits.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtComments">Comments</label>
+                            <textarea class="form-control" tabindex="7" id="txtComments" name="txtComments" placeholder="Enter comments" data-ng-model="workExperience.Comments"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                @{
+                    if (Model.HasUpdateRights || Model.HasUpdateRights)
+                    {
+                        <button type="submit" tabindex="8" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmWorkExp.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                    }
+                }
+
+                <button type="button" tabindex="9" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetEmpWorkExperience()"><i class="entypo-erase"></i>Reset</button>
+                <button type="button" tabindex="10" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="ClearEmpWorkExperience()"><i class="entypo-cancel"></i>Clear</button>
+            </div>
+        </div>
+    </form>
+
+    <br />
+    <!-- BEGIN WORK EXPERIENCE LIST -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeIsActive(d)" data-message="Are you sure want to InActive '{{d.CompanyName}}'?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeIsActive(d)" data-message="Are you sure want to Active '{{d.CompanyName}}'?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>
+                                }
+                            }
+
+                            <td style="width: 150px;" data-title="'Company Name'" data-filter="{ 'CompanyName': 'text' }" data-sortable="'CompanyName'">{{d.CompanyName}}</td>
+                            <td style="width: 150px;" data-title="'Designation'" data-filter="{ 'Designation': 'text' }" data-sortable="'Designation'">{{d.Designation}}</td>
+                            <td style="width: 150px;" data-title="'Skills'" data-filter="{ 'Skills': 'text' }" data-sortable="'Skills'">{{d.Skills}}</td>
+                            <td style="width: 125px;" data-title="'From'" data-sortable="'FromDate'">{{d.FromDate | date:'dd-MMM-yyyy'}}</td>
+                            <td style="width: 125px;" data-title="'To'" data-sortable="'ToDate'">{{d.ToDate | date:'dd-MMM-yyyy'}}</td>
+                            <td style="width: 125px; text-align: right;" data-title="'Salary'" data-sortable="'Salary'">{{d.Salary}}</td>
+                            <td style="width: 135px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @{
+                                    if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateEmpWorkExperience(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                        }
+
+                                        @{
+                                    if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteEmpWorkExperience(d)" data-message="Are you sure want to delete '{{d.CompanyName}}' from  work experience?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                        }
+                                    </td>
+                                }
+                            }
+
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+
+                            <td colspan="6">Your search did not match any record.</td>
+                            <td style="width: 130px;"></td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /END WORK EXPERIENCE LIST -->
+</div>

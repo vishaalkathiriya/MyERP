@@ -1,0 +1,77 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="EmpLoginInfoCtrl" disabled="!master.Mode == 'Edit' || master.Mode == 'Add'" data-select="FetchLoginInfo();SetFocus()">
+    <div data-tab-heading>
+        <i class="entypo-key"></i>Login
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateEmpLogin(login)" name="empLform" id="empLform">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Login Information</h3>
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtLUserName">Username</label>
+                            <input type="text" class="form-control" id="txtLUserName" name="txtLUserName" data-drc-focus="isFirstFocus" data-ng-model="login.UserName" placeholder="Enter username" maxlength="50" value="" required />
+                            <div data-ng-show="empLform.txtLUserName.$dirty && empLform.txtLUserName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empLform.txtLUserName.$error.required">Tell us your username.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtLPassword">Password</label>
+                            <input type="password" class="form-control" id="txtLPassword" name="txtLPassword" data-ng-model="login.Password" placeholder="Enter password" maxlength="100" value="" required />
+                            <div data-ng-show="empLform.txtLPassword.$dirty && empLform.txtLPassword.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empLform.txtLPassword.$error.required">Tell us your password.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtLPasswordExpiryDays">Password Expiry Days</label>
+                            <input type="text" class="form-control" id="txtLPasswordExpiryDays" name="txtLPasswordExpiryDays" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="login.PasswordExpiresDays" placeholder="Enter password expiry limit" maxlength="3" value="" required />
+                            <div data-ng-show="empLform.txtLPasswordExpiryDays.$dirty && empLform.txtLPasswordExpiryDays.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empLform.txtLPasswordExpiryDays.$error.required">Tell us your password expiry days.</span>
+                                <span data-ng-show="empLform.txtLPasswordExpiryDays.$error.pattern">Please enter valid days.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="checkbox">
+                            <input type="checkbox" data-ng-model="login.IsRemoteLogin">IsRemoteLogin
+                        </label>
+                        &nbsp;
+                        <label class="checkbox">
+                            <input type="checkbox" data-ng-model="login.IsPermit">IsPermit
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row" style="display: none;">
+                    <div class="col-md-12">
+                        <label class="checkbox">
+                            <input type="checkbox" data-ng-model="login.IsActive">Active
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="empLform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetLoginInfo()"><i class="entypo-erase"></i>Reset</button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Manage Category";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Manage Category</h2>
+        </div>
+    </div>
+</div>
+
+<div data-ng-controller="CategoriesCtrl" data-ng-hide="IsAjaxLoading">
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                          bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                    if (hasInsertRights) { 
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="addCategory()">Add New</button>
+		                    }
+                    }
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="SaveCategory(editData)" name="catform" id="catform">
+                <input type="hidden" data-ng-model="editData.CategoryId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Category</h3>
+                        <div class="panel-options">
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtCategoryName">Category Name</label>
+                            <input type="text" class="form-control" id="txtCategoryName" name="catName" data-ng-model="editData.CategoryName" placeholder="Enter Category name"
+                                maxlength="50" value="" data-drc-focus="isFirstFocus" required />
+                            <div data-ng-show="catform.catName.$dirty && catform.catName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="catform.catName.$error.required">Tell us your Category name.</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+		                    if (hasInsertRights) { 
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="catform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>                                
+		                    }
+                        }
+
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="reset(editData)"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="cancel()"><i class="entypo-cancel"></i>Close</button>
+
+                        <label id="lblMsgContainer" class="label label-success" style="display: none;"></label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+     <!-- / END FORM SECTION -->
+
+    <!-- BEGING CATEGORY LIST -->
+    <div class="row" data-ng-init="loadAllCategories()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="cat in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{cat.IsActive}}" data-drc-confirm-box="" data-callback="IsActive(cat)" data-message="Are you sure want to InActive '{{cat.CategoryName}}' Category?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!cat.IsActive}}" data-drc-confirm-box="" data-callback="IsActive(cat)" data-message="Are you sure want to Active '{{cat.CategoryName}}' Category?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                               
+	                            }
+                            }
+
+                            <td data-title="'Category Name'" data-filter="{ 'CategoryName': 'text' }" data-sortable="'CategoryName'">{{cat.CategoryName}}</td>
+                            <td data-title="'Changed On'" style="width: 125px" data-sortable="'ChgDate'">{{cat.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission){
+                                    <td data-title="'Actions'" style="width: 80px; text-align: center;">
+                                        @if (editPermission) {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="EditCategory(cat)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                               
+                                        }
+                                        @if (deletePermission) {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteCategory(cat)" data-message="Are you sure want to delete '{{cat.CategoryName}}' from 'Categories'?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                              
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any Category.</td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END CATEGORY LIST -->
+</div>
+@section Scripts{
+      @Scripts.Render("~/Area/Inventory/Scripts/categorys")
+}

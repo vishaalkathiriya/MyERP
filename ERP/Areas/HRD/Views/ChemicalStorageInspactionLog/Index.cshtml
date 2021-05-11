@@ -1,0 +1,289 @@
+﻿@{
+    ViewBag.Title = "Manage Chemical Storage Inspaction Log";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@using ERP.Utilities
+
+<div data-ng-controller="HRDChemicalStorageInspactionCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Chemical Storage Inspaction Log</h2>
+            </div>
+        </div>
+    </div>
+    <!--BEGIN HEADER SECTION-->
+
+    <div class="row">
+
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByCreDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            {
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddChemicalInspaction()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--END HEADER SECTION-->
+    <!--BEGIN FORM SECTION-->
+    <div class="row">
+        <div class="col-sm-12  " data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateChemicalInspaction(editData)" name="ChemicalInspactionLogform" id="ChemicalInspactionLogform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Chemical Storage Inspaction Log </h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtDateOfInspectione">Date of Inspection<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtDateOfInspection" name="txtDateOfInspection" placeholder="DD-MM-YYYY" maxlength="10" tabindex="1" value="" required data-ng-model="editData.DateOfInspection" data-ng-change="ValidateDateOfInspection(editData.DateOfInspection)" />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                    data-is-open="editData.calOpenDateOfInspection"
+                                                    data-ng-model="dateofinspaction"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-required="true"
+                                                    data-ng-click="calendarOpenDateOfInspection($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="ChemicalInspactionLogform.txtDateOfInspection.$dirty && ChemicalInspactionLogform.txtDateOfInspection.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ChemicalInspactionLogform.txtDateOfInspection.$error.required">Please select Date of Inspection.</span>
+                                        <span data-ng-show="ChemicalInspactionLogform.txtDateOfInspection.$error.invalidIssueDate">Please enter valid Date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtCheckedyBy">Checked By<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtCheckedyBy" name="CheckedyBy" data-ng-model="editData.CheckedyBy" maxlength="99"  placeholder="Enter Name Checked By" tabindex="2" value="" required />
+                                    <div data-ng-show="ChemicalInspactionLogform.CheckedyBy.$dirty && ChemicalInspactionLogform.CheckedyBy.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ChemicalInspactionLogform.CheckedyBy.$error.required">Tell us Checked By.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFindings ">Findings <span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtFindings" name="Findings" data-ng-model="editData.Findings" maxlength="249"  placeholder="Enter Findings" tabindex="3" value="" required />
+                                    <div data-ng-show="ChemicalInspactionLogform.Findings.$dirty && ChemicalInspactionLogform.Findings.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ChemicalInspactionLogform.Findings.$error.required">Tell us Findings.</span>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtRootCause">Root Cause <span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtRootCause" name="RootCause" data-ng-model="editData.RootCause" maxlength="249"  placeholder="Enter Root Cause" tabindex="4" value="" required />
+                                            <div data-ng-show="ChemicalInspactionLogform.RootCause.$dirty && ChemicalInspactionLogform.RootCause.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ChemicalInspactionLogform.RootCause.$error.required">Tell us Root Cause.</span>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtCorrectiveAction">Corrective Action<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtCorrectiveAction" name="CorrectiveAction" data-ng-model="editData.CorrectiveAction" maxlength="249"  placeholder="Enter Corrective Action" tabindex="5" value="" required />
+                                            <div data-ng-show="ChemicalInspactionLogform.CorrectiveAction.$dirty && ChemicalInspactionLogform.CorrectiveAction.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ChemicalInspactionLogform.CorrectiveAction.$error.required">Tell us Corrective Action.</span>
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="txtRemark">Remark</label>
+                                            <textarea class="form-control" id="txtRemarks" name="Remark" data-ng-model="editData.Remark" maxlength="249" placeholder="Enter Remark" tabindex="6"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <img src="/Content/images/thumb_Document.png" class="img-responsive" title="Please select a Document" style="margin-left:33%;height:91px; width:99px">
+                                <div class="btn btn-info" style="width:93%;" ng-model-rejected="rejFiles" data-ngf-select data-ngf-change="upload($files)" data-ngf-accept="'*.doc,*.xlsx,application/pdf'" tabindex="7" data-ng-model=" editdata.files">Select a File</div>
+                                <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Add'" href="/@ViewBag.tempDocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Edit'" href="/@ViewBag.DocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                            </div>
+
+                        </div>
+                        @*<div style="clear:both" ng-show="rejFiles.length > 0" class="alert alert-danger  response">
+                            <div class="sel-file" ng-repeat="f in rejFiles">
+
+                                <span>Rejected file: {{f.name}} - size: {{f.size}}B - type: {{f.type}}</span><br />
+                                <strong>
+                                    <span>Please select valid file format</span>
+                                </strong>
+
+                            </div>
+                        </div>*@
+
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            {
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="ChemicalInspactionLogform.$invalid" tabindex="8"><i class="entypo-check"></i> {{saveText}} </button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetChemicalInspactionLog()" tabindex="9"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseChemicalInspactionLog()" tabindex="10"><i class="entypo-cancel"></i>Close</button>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <!--END FORM SECTION-->
+    <!--BEGIN CEMICALRECORD INSPACTION CLEANING RECORDS-->
+    <div class="row" data-ng-init="RetriveChemicalInspaction()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="" style="width: 50px;"><a ng-if="d.Attachment != NULL && d.Attachment != '' " href="@ViewBag.DocPdf/{{d.Attachment}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+
+                            <td data-title="'Date of Inspection'" data-sortable="'DateOfInspection'">{{d.DateOfInspection| date:'dd-MMM-yyyy'}}</td>
+
+                            <td data-title="'CheckedyBy'" data-sortable="'CheckedyBy'">{{d.CheckedyBy}}</td>
+                            <td data-title="'Findings '" data-sortable="'Findings '">{{d.Findings}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+
+
+
+                                <td style="width: 128px; text-align: center;" data-title="'Actions'">
+                                    <a class="btn btn-info btn-xs" data-ng-click="ShowChemicalStorageInspactionLog(d)"><i class="entypo-eye"></i></a>
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateChemicalInspaction(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteChemicalStorageInspactionLog(d.SrNo)" data-message="Are you sure want to delete   chemical storage inspaction log?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>
+                                Your search - <b>{{filterText}}</b> - did not match any Recored.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--ENDCEMICALRECORD INSPACTION RECORDS-->
+<script type="text/ng-template" id="ChemicalStorageInspaction.html">
+    <div class="modal-body">
+        <h4> Chemical Storage Inspaction Log Information</h4>
+        <table class="table table-striped">
+            <tr>
+                <td><b>Date of Inspection:</b></td>
+                <td>{{items.DateOfInspection| date:'dd-MMM-yyyy'}}</td>
+                <td><b>Checkedy BY:</b></td>
+                <td>{{items.CheckedyBy}}</td>
+
+            </tr>
+            <tr>
+                <td><b>Findings :</b></td>
+                <td>{{items.Findings}}</td>
+                <td><b>Root Cause:</b></td>
+                <td>{{items.RootCause}}</td>
+            </tr>
+            <tr>
+                <td><b>Corrective Action:</b></td>
+                <td>{{items.CorrectiveAction || '-'}}</td>
+                <td><b>Remark:</b></td>
+                <td>{{items.Remark || '-'}}</td>
+            </tr>
+
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="Close()">Close</button>
+    </div>
+
+</script>
+
+@section Scripts{
+
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="~/Areas/HRD/Scripts/controllers/HRDChemicalStorageInspactionLogCtrl.js"></script>
+    <script src="~/Areas/HRD/Scripts/services/HRDChemicalStorageInspactionLogService.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+}

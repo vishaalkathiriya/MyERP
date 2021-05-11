@@ -1,0 +1,352 @@
+﻿@{
+    ViewBag.Title = "Manage Accident Records";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="AccidentRecordsCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Accident Records</h2>
+            </div>
+        </div>
+    </div>
+    <!--BEGIN HEADER SECTION-->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByCreDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            {
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddAccidentRecords()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--END HEADER SECTION-->
+    <!--BEGIN FORM SECTION-->
+    <div class="row">
+        <div class="col-sm-12 " data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateAccidentRecords(editData)" name="AccidentRecordsform" id="AccidentRecordsform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Accident Records</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtTypeOfAccident">Type of Accident<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtTypeOfAccident" name="TypeOfAccident" data-ng-model="editData.TypeOfAccident" data-drc-focus="isFirstFocus" maxlength="99"  placeholder="Enter Type of Accident" tabindex="1" value="" required />
+                                    <div data-ng-show="AccidentRecordsform.TypeOfAccident.$dirty && AccidentRecordsform.TypeOfAccident.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="AccidentRecordsform.TypeOfAccident.$error.required">Tell us Name of Issuer.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtDepartment">Department<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtDepartment" name="Department" data-ng-model="editData.Department" placeholder="Enter Department" maxlength="99" tabindex="2" value="" required />
+                                    <div data-ng-show="AccidentRecordsform.Department.$dirty && AccidentRecordsform.Department.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="AccidentRecordsform.Department.$error.required">Tell us Department.</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtManagerName">Manager Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtManagerNams" name="ManagerName" data-ng-model="editData.ManagerName" maxlength="99"  placeholder="Enter Manager Name" tabindex="3" value="" required />
+                                    <div data-ng-show="AccidentRecordsform.ManagerName.$dirty && AccidentRecordsform.ManagerName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="AccidentRecordsform.ManagerName.$error.required">Tell us Manager Name.</span>
+                                        <span data-ng-show="AccidentRecordsform.ManagerName.$error.pattern">Please enter only Alphabet characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtNameOfInjuredPerson">Name of Injured Person<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtNameOfInjuredPerson" name="NameOfInjuredPerson" data-ng-model="editData.NameOfInjuredPerson" maxlength="99"  placeholder="Enter Name of Injured Person" tabindex="4" value="" required />
+                                            <div data-ng-show="AccidentRecordsform.NameOfInjuredPerson.$dirty && AccidentRecordsform.NameOfInjuredPerson.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="AccidentRecordsform.NameOfInjuredPerson.$error.required">Tell us Name of Injured Person.</span>
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtRootCauseOfAccident">Root Cause of Accident<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtRootCauseOfAccident" name="RootCauseOfAccident" data-ng-model="editData.RootCauseOfAccident" maxlength="249"  placeholder="Enter Root Cause of Accident" tabindex="5" value="" required />
+                                            <div data-ng-show="AccidentRecordsform.RootCauseOfAccident.$dirty && AccidentRecordsform.RootCauseOfAccident.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="AccidentRecordsform.RootCauseOfAccident.$error.required">Tell us Root Cause of Accident.</span>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtNoOfCasualities">No of Casualities<span class="compulsary">*</span> </label>
+                                            <input type="text" class="form-control" id="txtNoOfCasualities" name="NoOfCasualities " data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.NoOfCasualities " placeholder="Enter No of Casualities " maxlength="15" tabindex="6" value="" required />
+                                            <div data-ng-show="AccidentRecordsform.NoOfCasualities.$dirty && AccidentRecordsform.NoOfCasualities.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="AccidentRecordsform.NoOfCasualities.$error.required">Tell us No of Casualities.</span>
+                                                <span data-ng-show="AccidentRecordsform.NoOfCasualities.$error.pattern" class="">Please enter only Numeric characters.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtCorrectiveActionTaken">Corrective Action Taken<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtCorrectiveActionTaken" name="CorrectiveActionTaken" data-ng-model="editData.CorrectiveActionTaken" maxlength="249"  placeholder="Enter Corrective Action Taken" tabindex="7" value="" required />
+                                            <div data-ng-show="AccidentRecordsform.CorrectiveActionTaken.$dirty && AccidentRecordsform.CorrectiveActionTaken.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="AccidentRecordsform.CorrectiveActionTaken.$error.required">Tell us Corrective Action Taken.</span>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <img src="/Content/images/thumb_Document.png" class="img-responsive" title="Please select a Document" style="margin-left:33%;height:91px; width:99px">
+                                <div class="btn btn-info" style="width:93%" ng-model-rejected="rejFiles" data-ngf-select data-ngf-change="upload($files)" data-ngf-accept="'*.doc,*.xlsx,application/pdf'" data-ng-model=" editdata.files">Select a File</div>
+                                <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Add'" href="/@ViewBag.tempDocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Edit'" href="/@ViewBag.DocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                            </div>
+                        </div>
+                        @*<div class="row">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <input type="checkbox" data-ng-model="editData.Hospitalized" id="chkHospitalized"><b>Hospitalized</b>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <input type="checkbox" data-ng-model="editData.Hospitalized" id="chkHospitalized" tabindex="9"><b>Hospitalized?</b>
+                                </div>
+                            </div>
+                        </div>
+                      
+
+                        <div class="row">
+                            <div class="col-sm-4" ng-show="editData.Hospitalized">
+                                <div class="form-group">
+                                    <label for="txtNameOfHospital">Name of Hospital<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtNameOfHospital" name="NameOfHospital" data-ng-model="editData.NameOfHospital" placeholder="Enter Name of Hospital" tabindex="10" maxlength="99" value="" ng-required="editData.Hospitalized" /> 
+                                    <div data-ng-show="AccidentRecordsform.NameOfHospital.$dirty && AccidentRecordsform.NameOfHospital.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="AccidentRecordsform.NameOfHospital.$error.required">Tell us Name of Hospital.</span>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4" ng-show="editData.Hospitalized">
+                                <div class="form-group">
+                                    <label for="txtTreatmentExpenses">Treatment Expenses<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtTreatmentExpenses" name="TreatmentExpenses" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.TreatmentExpenses" placeholder="Enter Treatment Expenses" tabindex="15" maxlength="9" value="" ng-required="editData.Hospitalized" />
+                                    <div data-ng-show="AccidentRecordsform.TreatmentExpenses.$dirty && AccidentRecordsform.TreatmentExpenses.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="AccidentRecordsform.TreatmentExpenses.$error.required">Tell us Treatment Expensesm.</span>
+                                        <span data-ng-show="AccidentRecordsform.TreatmentExpenses.$error.pattern">Please enter only Numeric characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div style="clear:both" ng-show="rejFiles.length > 0" class="response alert alert-danger">
+                                <div class="sel-file" ng-repeat="f in rejFiles">
+                                    <span style="color:red">Rejected file: {{f.name}} - size: {{f.size}}B - type: {{f.type}}</span><br />
+                                    <strong>Please select valid file format</strong>
+                                    
+                                </div>
+                            </div>*@
+                        </div>
+
+
+
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            {
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="AccidentRecordsform.$invalid" tabindex="12"><i class="entypo-check"></i> {{saveText}} </button>
+                            }
+                        }
+
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetAccidentRecords()" tabindex="13"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseAccidentRecords()" tabindex="14"><i class="entypo-cancel"></i>Close</button>
+
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--END FORM SECTION-->
+    <!--BEGIN ACCIDENT RECORDS LIST-->
+    <div class="row" data-ng-init="RetrieveAccidentRecords()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="" style="width: 50px;"><a ng-if="d.Attachment != NULL && d.Attachment != '' " href="@ViewBag.DocPdf/{{d.Attachment}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+                            <td data-title="'Name of Injured Person'" data-filter="{ 'NameOfInjuredPerson': 'text' }" data-sortable="'NameOfInjuredPerson'">{{d.NameOfInjuredPerson}}</td>
+                            <td data-title="'Type of Accident'" data-filter="{ 'TypeOfAccident': 'text' }" data-sortable="'TypeOfAccident'">{{d.TypeOfAccident}}</td>
+                            <td data-title="'Department'" data-filter="{ 'Department': 'text' }" data-sortable="'Department'">{{d.Department}}</td>
+
+                            <td data-title="'Hospitalized'"
+                                data-filter="{ 'Hospitalized': 'select' }"
+                                filter-data="FilterHospitalized($column)"
+                                data-sortable="'Hospitalized'">
+                                {{d.Hospitalized == true ? "Yes" : "No"}}
+                            </td>
+                            <!--  <td data-title="'ReceiveBy'" data-filter="{ 'ReceiveBy': 'text' }" data-sortable="'ReceiveBy'">{{d.ReceiveBy}}</td>
+                              <td data-title="'Relation'" data-filter="{ 'Relation': 'text' }" data-sortable="'Relation'">{{d.Relation}}</td> -->
+                            <!--   <td data-title="'Price'" data-sortable="'Price'">{{d.Price}}</td>-->
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+
+                                <td style="width: 128px; text-align: center;" data-title="'Actions'">
+                                    <a class="btn btn-info btn-xs" data-ng-click="ShowAccidentRecords(d)"><i class="entypo-eye"></i></a>
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateAccidentRecords(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteAccidentsRecords(d.SrNo)" data-message="Are you sure want to delete '{{d.NameOfInjuredPerson}}' from accident records?"data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>
+                                Your search - <b>{{filterText}}</b> - did not match any Recored.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END ACCIDENT RECORDS LIST-->
+    <!-- BEGIN MODEL SECTION -->
+    <script type="text/ng-template" id="AccidentRecords.html">
+        <div class="modal-body">
+            <h4> PPE Issue Register Information</h4>
+            <table class="table table-striped">
+                <tr>
+                    <td><b>Type of Accident:</b></td>
+                    <td>{{items.TypeOfAccident}}</td>
+                    <td><b>Department:</b></td>
+                    <td>{{items.Department}}</td>
+                </tr>
+                <tr>
+                    <td><b>Manager Name:</b></td>
+                    <td>{{items.ManagerName}}</td>
+                    <td><b>Name of Injured Person:</b></td>
+                    <td>{{items.NameOfInjuredPerson}}</td>
+                </tr>
+                <tr>
+                    <td><b>Root Cause of Accident:</b></td>
+                    <td>{{items.RootCauseOfAccident}}</td>
+                    <td><b>No of Casualities:</b></td>
+                    <td>{{items.NoOfCasualities}}</td>
+                </tr>
+                <tr>
+                    <td><b>Corrective Action Taken:</b></td>
+                    <td>{{items.CorrectiveActionTaken}}</td>
+                    @*<td><b>Hospitalized:</b></td>
+                        <td>{{items.Hospitalized}}</td>*@
+                </tr>
+                @*<tr>
+                        <td><b>Name of Hospital:</b></td>
+                        <td>{{items.NameOfHospital ||'-'}}</td>
+                        <td><b>Treatment Expenses:</b></td>
+                        <td>{{items.TreatmentExpenses}}</td>
+                    </tr>*@
+                <tr>
+                    <td><b>Hospitalized:</b></td>
+                    <td>{{items.Hospitalized  == true ? "Yes" : "No"}}</td>
+                </tr>
+                <tr>
+                    <td ng-if="items.NameOfHospital != ''"><b>Name of Hospital:</b></td>
+                    <td ng-if="items.NameOfHospital != ''">{{items.NameOfHospital}}</td>
+                    <td ng-if="items.TreatmentExpenses != '' "><b>Treatment Expenses:</b></td>
+                    <td ng-if="items.TreatmentExpenses != ''">{{items.TreatmentExpenses}}</td>
+                </tr>
+
+
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="Close()">Close</button>
+        </div>
+    </script>
+</div>
+
+@section Scripts{
+
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="~/Areas/HRD/Scripts/controllers/HRDAccidentRecordsCtrl.js"></script>
+    <script src="~/Areas/HRD/Scripts/services/HRDAccidentRecordsService.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+}
+
+

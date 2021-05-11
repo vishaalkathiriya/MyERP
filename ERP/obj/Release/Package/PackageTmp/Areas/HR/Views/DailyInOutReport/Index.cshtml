@@ -1,0 +1,312 @@
+﻿@{
+    ViewBag.Title = "Daily In-Out Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<style>
+    .modal-dialog {
+        width: 50%;
+    }
+
+    .bootbox {
+        z-index: 1070;
+    }
+
+        .bootbox .modal-dialog {
+            width: 50% !important;
+        }
+
+        .bootbox + div {
+            z-index: 1060;
+        }
+</style>
+<div data-ng-controller="DailyInOutReportCtrl">
+
+    <div class="page-header main-page-header">
+        <h2><i class="entypo-doc-text"></i>Daily In-Out Report</h2>
+    </div>
+    <!-- BEGIN HEADER SECTION -->
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByDate(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date :</label>
+                    </div>
+
+                    <div class="form-group">
+                        <p class="input-group" style="margin-bottom: 0; width: 200px;" id="p1">
+                            <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" tabindex="1" id="txtDate" name="txtDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                   required data-ng-model="filterData.date" data-ng-change="ValidateFilterDate(filterData.date)" />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                        data-is-open="calOpenDate"
+                                        data-ng-model="filterData.pickerDate"
+                                        data-datepicker-options="dateOptions"
+                                        data-close-text="Close"
+                                        data-ng-required="true"
+                                        data-ng-click="calendarOpenDate($event)">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <select id="drpGroupName" name="drpGroupName" data-ng-model="filterData.GroupName" class="form-control">
+                            <option value="">--Select--</option>
+                            <option value="DD">DD</option>
+                            <option value="DRC">DRC</option>
+                            <option value="KREELI">KREELI</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary" ng-disabled="filterData.IsDisabled" tabindex="2">Filter</button>
+                        <button type="button" class="btn btn-sm btn-danger" ng-click="ClearFilter()" tabindex="3">Clear Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+    <!-- BEGIN DAILY IN-OUT LIST -->
+    <div>
+        <div class="ajax-progress-pms" data-ng-show="IsAjaxLoadingPMS">Please wait while loading...</div>
+        <div class="row" data-ng-hide="IsAjaxLoadingPMS" ng-hide="temp.IsHide" data-ng-repeat="temp in DailyInOutReportList">
+            <div class="col-sm-12" ng-hide="DailyInOutReportList[$index].IsHide">
+                <div class="todo-state-title-wrapper todo-hold-wrapper">
+                    <div>
+                        <h4 class="todo-hold-title">{{temp.EmpName}} - {{temp.Ecode}}</h4>
+                        <h4 class="todo-hold-title">{{temp.Edate | date:'dd-MMM-yyyy'}}</h4>
+                        <h4 class="todo-hold-title" title="Pending Leave" ng-hide="{{temp.TotalPendingLeave == ''}}">{{temp.TotalPendingLeave}}</h4>
+                        <h4 class="todo-hold-title" title="Edit">
+                            <a href="#" data-ng-click="EditInOutDetails(temp)">Edit </a>
+                        </h4>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%"><b></b></th>
+                                <th style="width: 40%">From</th>
+                                <th style="width: 40%">To</th>
+                                <th style="width: 5%">Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>In Company</b></td>
+                                <td>{{temp.InOutDetail.InCompanyTime | date:'hh:mm a' }}</td>
+                                <td>{{temp.InOutDetail.OutCompanyTime | date:'hh:mm a' }}</td>
+                                <td class="text-right">{{temp.InOutDetail.companyHrs ? temp.InOutDetail.companyHrs : 0}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Company Work</b></td>
+                                <td>{{temp.InOutDetail.CompanyWorkStart | date:'hh:mm a' }} </td>
+                                <td>{{temp.InOutDetail.CompanyWorkEnd | date:'hh:mm a' }}</td>
+                                <td class="text-right">{{temp.InOutDetail.CompanyWorkHrs ? temp.InOutDetail.CompanyWorkHrs :  0}} </td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Personal Work</b></td>
+                                <td>{{temp.InOutDetail.PersonalWorkStart | date:'hh:mm a' }} </td>
+                                <td>{{temp.InOutDetail.PersonalWorkEnd | date:'hh:mm a' }}</td>
+                                <td class="text-right">{{temp.InOutDetail.personalWorkHrs ? temp.InOutDetail.personalWorkHrs : 0}} </td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Lunch Break</b></td>
+                                <td>{{temp.InOutDetail.LunchBreakStart | date:'hh:mm a' }} </td>
+                                <td>{{temp.InOutDetail.LunchBreakEnd | date:'hh:mm a' }}</td>
+                                <td class="text-right">{{temp.InOutDetail.lunchBreakHrs ? temp.InOutDetail.lunchBreakHrs : 0}} </td>
+                            </tr>
+
+                            <tr style="background-color: #F5F5F6;">
+                                <td class="text-right" colspan="3"><b>Total Hours</b></td>
+                                <td class="text-right"><b>{{temp.TotalHours ? temp.TotalHours : 0}}</b></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <div class="row" style="margin-bottom: -5px;">
+                                        <div class="col-sm-1">
+                                            <label class="checkbox">
+                                                <input type="checkbox" id="chkIsHoliday" name="chkIsHoliday" ng-click="CheckIsHoliday(DailyInOutReportList[$index].IsHoliday, $index)" data-ng-model="DailyInOutReportList[$index].IsHoliday">IsHoliday
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <select id="drpPresence" name="drpPresence" class="form-control"
+                                                    ng-disabled="DailyInOutReportList[$index].IsHoliday"
+                                                    ng-model="DailyInOutReportList[$index].Presence"
+                                                    data-ng-change="OnChangePresenceList(DailyInOutReportList[$index].Presence,$index)">
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="fm in temp.PresenceList" value="{{fm.val}}">{{fm.key}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <select id="drpLeave" name="drpLeave" class="form-control"
+                                                    ng-disabled="DailyInOutReportList[$index].IsHoliday"
+                                                    ng-model="DailyInOutReportList[$index].Leave"
+                                                    data-ng-change="OnChangeLeaveList(DailyInOutReportList[$index].Leave,$index)">
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="fm in temp.LeaveList" value="{{fm.val}}">{{fm.key}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <select id="drpAbsence" name="drpAbsence" class="form-control"
+                                                    ng-disabled="DailyInOutReportList[$index].IsHoliday"
+                                                    ng-model="DailyInOutReportList[$index].Absence"
+                                                    data-ng-change="OnChangeAbsenceList(DailyInOutReportList[$index].Absence,$index)">
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="fm in temp.AbsenceList" value="{{fm.val}}">{{fm.key}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <select id="drpOT" name="drpOT" class="form-control" ng-model="DailyInOutReportList[$index].OT">
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="fm in temp.OTList" value="{{fm.val}}">{{fm.key}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" ng-model="DailyInOutReportList[$index].Remark" placeholder="Remark" />
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" ng-class="(temp.btnText=='Insert') ? 'btn-white' : 'btn-orange'" class="btn btn-block" ng-click="SaveData(temp, $index);">{{temp.btnText}}</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- begin display when user salary based on hourly (day :'D' and Hourly:'H')  -->
+                            <tr data-ng-show="temp.SalaryBasedOn == 'H'">
+                                <td colspan="4">
+                                    <div class="row" style="margin-bottom: -5px;">
+                                        <div class="col-sm-1">
+                                            <label class="checkbox">
+                                                <input type="checkbox" id="chkIsHourly" name="chkIsHourly" data-ng-model="DailyInOutReportList[$index].IsHourly">IsHourly
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" ng-model="DailyInOutReportList[$index].nofHours" placeholder="No of Hours" />
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- end / display when user salary based on hourly -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div data-ng-if="DailyInOutReportList.length == 0">
+            <p class="lead text-danger text-center">
+                Record not found!
+            </p>
+        </div>
+    </div>
+    <!-- / END DAILY IN-OUT LIST -->
+</div>
+
+<script type="text/ng-template" id="InOutDetailPopup.html">
+
+    <div class="modal-header">
+        <h3>{{EmpData.EmpName}} ({{EmpData.Edate | date:'dd-MMM-yyyy'}})</h3>
+    </div>
+    <div class="modal-body">
+        <div class="panel panel-default panel-shadow" ng-show="isFormvisible">
+            <div class="panel-heading">
+                <h3 class="panel-title">Edit In-Out Detail</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>In-Type</label>
+                            <select id="drpInType" name="drpInType" data-ng-model="editData.InType" ng-options="option.value as option.name for option in InTypeOptions" class="form-control">
+                                <option value="">--Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="txtStartTime">In-Time</label>
+                            <input type="text" data-drc-input-mask='{ "mask": "y-m-d h:s:s"}' id="txtStartTime" name="txtstarttime" tabindex="1" class="form-control" placeholder="yyyy-MM-dd HH:mm:ss" maxlength="50" value=""
+                                   data-drc-focus="isFirstFocus" data-ng-model="editData.InTime" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Out-Type</label>
+                            <select id="drpOutType" name="drpOutType" data-ng-model="editData.OutType" ng-options="option.value as option.name for option in OutTypeOptions" class="form-control">
+                                <option value="">--Select--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="txtEndTime">Out-Time</label>
+                            <input type="text" data-drc-input-mask='{ "mask": "y-m-d h:s:s"}' id="txtEndTime" tabindex="2" class="form-control" placeholder="yyyy-MM-dd HH:mm:ss" maxlength="50" value=""
+                                   data-ng-model="editData.OutTime" required />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button type="button" class="btn btn-sm btn-info btn-icon icon-left" ng-click="CreateUpdateInOutTime()"><i class="entypo-check"></i>Update</button>
+                <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseEditForm()"><i class="entypo-cancel"></i>Close</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <table class="table table-hover table-bordered table-condensed  table-striped">
+                    <tr>
+                        <th>In-Type</th>
+                        <th>In-Time</th>
+                        <th>Out-Type</th>
+                        <th>Out-Time</th>
+                        <th style="text-align: center;">Action</th>
+                    </tr>
+                    <tr data-ng-repeat="d in EmployeeInOutDetailList">
+                        <td ng-switch on="{{d.InType}}">
+                            <span ng-switch-when="1">Company In</span>
+                            <span ng-switch-when="4">Lunch-Break End</span>
+                            <span ng-switch-when="6">Company-Work End</span>
+                            <span ng-switch-when="8">Personal-Work End</span>
+                        </td>
+                        <td>{{d.Intime}}</td>
+                        <td ng-switch on="{{d.OutType}}">
+                            <span ng-switch-when="2">Company Out</span>
+                            <span ng-switch-when="3">Lunch-Break Start</span>
+                            <span ng-switch-when="5">Company-Work Start</span>
+                            <span ng-switch-when="7">Personal-Work Start</span>
+                        </td>
+                        <td>{{d.OutTime}}</td>
+                        <td style="width: 80px; text-align: center;">
+                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateInOutDetail(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>
+                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteEmployeeInOutDelete(d)" data-message="Are you sure to delete this entry?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-default" ng-click="CloseDetailPopup()">Close</button>
+        </div>
+    </div>
+
+</script>
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/HR/Scripts/services/DailyInOutReportService.js")"></script>
+    <script src="@Url.Content("~/Areas/HR/Scripts/controllers/DailyInOutReportCtrl.js")"></script>
+    @Scripts.Render("~/Areas/HR/Scripts/dailyInOutReport")
+}

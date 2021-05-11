@@ -1,0 +1,264 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<!-- BEGIN INVOICE REPORT -->
+<div data-tab disabled="false" data-ng-controller="ReportInvoiceCtrl" data-select="LoadClientList();RetrieveInvoices();">
+    <div data-tab-heading>
+        <i class="entypo-cc-nc"></i>Invoice Report
+    </div>
+
+    <!-- BEGIN FILTER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline" data-ng-submit="FilterInvoice(filterData)" name="filterform" role="form">
+                    <div class="form-group">
+                        <label for="drpClientList">Client:</label>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control input-sm" id="drpClientList" name="drpClientList" data-ng-model="filterData.ClientId" required>
+                            <option value="0">--ALL--</option>
+                            <option data-ng-repeat="t in ClientList" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="drpInvoiceType">Type:</label>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control input-sm" id="drpInvoiceType" name="drpInvoiceType" data-ng-model="filterData.InvoiceType">
+                            <option value="">--Select--</option>
+                            <option value="E">Export</option>
+                            <option value="L">Local</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="drpCurrency">Currency:</label>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control input-sm" id="drpCurrency" name="drpCurrency" data-ng-model="filterData.Currency">
+                            <option value="0">--Select--</option>
+                            <option data-ng-repeat="t in CurrencyList"
+                                    data-ng-selected="t.CurrencyCode == filterData.Currency"
+                                    value="{{t.CurrencyCode}}">
+                                {{t.CurrencyName}}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="txtInvoiceDate">Date:</label>
+                    </div>
+                    <div class="form-group form-group-with-close">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterData.dateRange" value="" />
+                        <a class="close" data-ng-click="clearDateBox($event);">×</a>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="drpStatus">Status:</label>
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control input-sm" id="drpStatus" name="drpStatus" data-ng-model="filterData.Status">
+                            <option value="">--Select--</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Clear">Clear</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END FILTER SECTION -->
+    <!--BEGIN INVOICE LIST-->
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data" data-ng-class="{'alert-info': d.Flag=='total'}">
+                            @*<td data-title="'InvoiceCode'" data-filter="{ 'InvoiceCode': 'text' }" data-sortable="'InvoiceCode'">{{d.InvoiceCode}}</td>
+            <td data-title="'InvoiceDate'" data-sortable="'InvoiceDate'">{{d.InvoiceDate | date:'dd-MM-yyyy'}}</td>*@
+
+                            <td data-title="'InvoiceCode'" data-filter="{ 'InvoiceCode': 'text' }">{{d.InvoiceCode}}</td>
+                            <td data-title="'InvoiceDate'">{{d.InvoiceDate | date:'dd-MM-yyyy'}}</td>
+                            <td data-title="'Currency'" data-sortable="'Currency'" data-filter="{ 'Currency': 'text' }">{{d.Currency}}</td>
+                            <td data-title="'Price'" data-sortable="'TotalAmount'" class="text-right">{{d.TotalAmount | number: 2}}</td>
+                            <td data-title="'Received'" class="text-right">{{d.ReceivedAmount | number: 2}}</td>
+                            <td data-title="'Pending'" class="text-right">{{d.PendingAmount | number: 2}}</td>
+                            <td data-title="'RoundOff'" class="text-right">{{d.RoundOff | number: 2}}</td>
+                            @{
+                                if (Model.HasInsertRights || Model.HasUpdateRights)
+                                {
+                                    <td data-title="'Actions'" style="width: 50px; text-align: center;" >
+                                        <a class="btn btn-info btn-xs" data-ng-click="ViewMore(d)" data-drc-tooltip="ViewMore" ng-if="d.Flag !='total'"><i class="entypo-eye"></i></a>
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        @*<tr data-ng-hide="noRecord" style="background-color: #EBEBEB;">
+                                <td colspan="3"></td>
+                                <td class="text-right"><b>{{SumTotalAmount | number: 2}}</b></td>
+                                <td class="text-right"><b>{{SumReceivedAmount | number: 2}}</b></td>
+                                <td class="text-right"><b>{{SumPendingAmount | number: 2}}</b></td>
+                                <td class="text-right"><b>{{SumRoundOffAmount | number: 2}}</b></td>
+                                @{
+                                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                                    {
+                                        <td style="width: 50px;"></td>
+                                    }
+                                }
+                            </tr>*@
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="7">Your search did not match any record.</td>
+                            @{
+                                if (Model.HasInsertRights || Model.HasUpdateRights)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END INVOICE LIST-->
+    <!-- BEGIN REPORT POPUP TEMPLATE -->
+    <script type="text/ng-template" id="ReportInvoice.html">
+        <div class="modal-header">
+            <h3>More Information</h3>
+        </div>
+        <div class="modal-body">
+            <!-- MILESTONE -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4 style="float:right;">
+                        <b>Currency: {{invoice.Currency}}</b>
+                    </h4>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th><b></b>Milestone Name</th>
+                                        <th>Duration</th>
+                                        <th>Hours</th>
+                                        <th class="text-right">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="m in milestoneList">
+                                        <td>{{m.MilestoneName}}</td>
+                                        <td>{{m.StartDate | date:'dd-MM-yyyy'}} <span data-ng-if="m.EndDate">to</span> {{m.EndDate | date:'dd-MM-yyyy'}}</td>
+                                        <td>{{m.TotalHours}}</td>
+                                        <td class="text-right"><b>{{m.Price | number : 2}}</b></td>
+                                    </tr>
+
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / MILESTONE -->
+            <!-- TAX -->
+            <div data-ng-repeat="m in taxList">
+                <div class="row">
+                    <div class="col-sm-5">&nbsp;</div>
+                    <div class="col-sm-7" style="margin: 10px -15px 0px -15px;border-top: 1px solid #EBEBEB;padding-top: 5px;">
+                        <div class="row text-right" style="margin-right: -5px !important;">
+                            <div class="col-sm-6">{{m.tblINVTaxMaster.TaxTypeName}}</div>
+                            <div class="col-sm-3">{{m.TaxPercentage}}%</div>
+                            <div class="col-sm-3" style="padding-right: 0;">
+                                <b>
+                                    <span data-ng-if="m.tblINVTaxMaster.Mode == 'P'">+</span>
+                                    <span data-ng-if="m.tblINVTaxMaster.Mode == 'M'">-</span>
+                                    {{m.Amount | number: 2}}
+                                </b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / TAX -->
+            <!-- ROUND OFF -->
+            <div class="row">
+                <div class="col-sm-5">&nbsp;</div>
+                <div class="col-sm-7" style="margin: 10px -15px 0px -15px;border-top: 1px solid #EBEBEB;padding-top: 5px;">
+                    <div class="row text-right" style="margin-right: -5px !important;">
+                        <div class="col-sm-6">Round Off</div>
+                        <div class="col-sm-3">&nbsp;</div>
+                        <div class="col-sm-3" style="padding-right: 0;"><b>{{invoice.RoundOff | number: 2}}</b></div>
+                    </div>
+                </div>
+            </div>
+            <!-- / ROUND OFF -->
+            <!-- TOTAL -->
+            <div class="row">
+                <div class="col-sm-5">&nbsp;</div>
+                <div class="col-sm-7" style="margin: 10px -15px 0px -15px;border-top: 1px solid #EBEBEB;padding-top: 5px;">
+                    <div class="row text-right" style="margin-right: -5px !important;">
+                        <div class="col-sm-6">Total Amount</div>
+                        <div class="col-sm-3">&nbsp;</div>
+                        <div class="col-sm-3" style="font-size: 1.7em;"><b>{{invoice.TotalAmount | number: 2}}</b></div>
+                    </div>
+                </div>
+            </div>
+            <!-- / TOTAL -->
+            <!-- PAYMENT -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4><b>Payment Received</b></h4>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered" data-ng-if="paymentList.length > 0">
+                                <thead>
+                                    <tr>
+                                        <th>OnDate</th>
+                                        <th>Received</th>
+                                        <th>Exchange Rate</th>
+                                        <th>OtherCharges</th>
+                                        <th>SubTotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="m in paymentList">
+                                        <td>{{m.PaymentReceivedDate | date: 'dd MMM yyyy'}}</td>
+                                        <td class="text-right">{{m.ExchangeRateINR | number: 2}}</td>
+                                        <td class="text-right">{{m.OnHandReceivedAmount | number: 2}}</td>
+                                        <td class="text-right">{{m.OtherCharges | number: 2}}</td>
+                                        <td class="text-right">{{((m.OnHandReceivedAmount * 1) + (m.OtherCharges * 1) | number: 2)}}</td>
+                                    </tr>
+                                    <tr style="background-color: #EBEBEB;">
+                                        <td colspan="4" class="text-right"><strong> Total</strong></td>
+                                        <td class="text-right"><strong>{{invoice | number:2}}</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="alert text-center text-danger" data-ng-if="paymentList.length == 0">
+                                <strong>
+                                    --No Payment History Found--
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- / PAYMENT -->
+        </div>
+        <div class="modal-footer">
+            <div class="row">
+                <div class="col-lg-12">
+                    <button type="button" tabindex="8" class="btn btn-sm btn-primary btn-icon icon-left" ng-click="Close()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </div>
+    </script>
+    <!-- / END REPORT POPUP TEMPLATE -->
+
+</div>
+<!-- / END INVOICE REPORT -->

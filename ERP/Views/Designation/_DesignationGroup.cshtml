@@ -1,0 +1,138 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab
+    data-ng-controller="DesignationGroupCtrl"
+    data-select="SetFocus('DesignationGroup')">
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Designation Group
+    </div>
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        //var ctrl = ViewBag.ctrlName;
+                        //bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (Model.HasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddDesignationGroup()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isDesignationGroupFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateDesignationGroup(editData)" name="desform" id="desform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Designation Group</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtDesignationGroupName">Designation Group Name</label>
+                            <input type="text" class="form-control" id="txtDesignationGroupName" name="designationGroupName" data-ng-model="editData.DesignationGroup" data-drc-focus="isFirstFocus" placeholder="Enter designation group name" maxlength="50" value="" required />
+                            <div data-ng-show="desform.designationGroupName.$dirty && desform.designationGroupName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="desform.designationGroupName.$error.required">Tell us your designation group name.</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="desform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetDesignationGroup()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseDesignationGroup()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING DESIGNATION GROUP LIST -->
+    <div class="row" data-ng-init="RetrieveDesignationGroup()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                //var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                    <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to InActive '{{d.DesignationGroup}}' Designation Group?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                    <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to Active '{{d.DesignationGroup}}' Designation Group?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                </td>                                
+                                }
+                            }
+                            <td data-title="'Designation Group'" data-filter="{ 'DesignationGroup': 'text' }" data-sortable="'DesignationGroup'">{{d.DesignationGroup}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                //var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateDesignationGroup(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                        
+                                    }
+                                    @if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteDesignationGroup(d.Id)" data-message="Are you sure want to delete '{{d.DesignationGroup}}' from Designation Group?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                        
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any designation group.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END DESIGNATION GROUP LIST -->
+
+</div>
+

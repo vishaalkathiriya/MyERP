@@ -1,0 +1,239 @@
+﻿@{
+    ViewBag.Title = "PMS Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="PMSReportCtrl" >
+    <div class="row" id="pmsreport">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>PMS Report</h2>
+            </div>
+        </div>
+    </div>
+    <div data-ng-init="setReadMoreCounter(@ViewBag.readMoreCounter)"></div>
+    <div class="row hidden-print">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline" data-ng-submit="FilterReport(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Filter:</label>
+                    </div>
+
+                    <div class="form-group">
+                        <select name="drpLoadFilter" data-ng-model="filterData.LoadType" class="form-control" style="width: 150px;" data-ng-change="filterEnable()" required>
+                            <option value="1" data-ng-selected="true">User Wise</option>
+                            <option value="2">Project Wise</option>
+                        </select>
+                    </div>
+
+                    <!-- BEGIN USER LIST-->
+                    <div class="form-group" data-ng-if="filterData.LoadType == 1">
+                        <select name="drpUserList" data-ng-model="filterData.UserId" class="form-control" style="width: 150px;" data-ng-change="filterEnableOnProj(filterData.UserId)" required>
+                            <option value="-1" data-ng-selected="true">--Select--</option>
+                           <!--   <option value="0">ALL</option> -->
+                            <option data-ng-repeat="t in UserList" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <!-- / END USER LIST-->
+
+                    <!-- BEGIN PROJECT LIST -->
+                    <div class="form-group" data-ng-if="filterData.LoadType == 2">
+                        <select name="drpProjectList" data-ng-model="filterData.ProjectId" class="form-control" style="width: 150px;" data-ng-change="filterEnableOnProj(filterData.ProjectId)" required>
+                            <option value="-1" data-ng-selected="true">--Select--</option>
+                            <!-- <option value="0">ALL</option> -->
+                            <option data-ng-repeat="t in ProjectList" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <!-- / END PROJECT LIST -->
+
+                    <!-- BEGIN DATA OPERATION -->
+                    <div class="form-group form-group-with-close">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                        <a class="close" data-ng-click="clearDateBox($event);">×</a>
+                    </div>
+                    <!-- / END DATA OPERATION -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary" data-ng-disabled="filterBtnFlag">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN REPORT DATA -->
+    <div class="row ">
+
+        <div data-ng-if="data[0].userWiseKeekList.length > 0">
+            <div data-ng-if=" filterDate.dateRange.endDate != '' &&  filterDate.dateRange.stratDate != '' ">
+                <div class="col-sm-12">
+                    <div class="well well-sm">
+                        <h2>Week report</h2>
+
+                        
+                        <table class="table visible-print">
+                            <thead>
+                                <tr>
+                                    <th style="width: 20%;"><strong>Week</strong></th>
+                                    <th style="width: 10%;"><strong>Sun</strong></th>
+                                    <th style="width: 10%;"><strong>Mon</strong></th>
+                                    <th style="width: 10%;"><strong>Tue</strong></th>
+                                    <th style="width: 10%;"><strong>Wed</strong></th>
+                                    <th style="width: 10%;"><strong>Thu</strong></th>
+                                    <th style="width: 10%;"><strong>Fri</strong></th>
+                                    <th style="width: 10%;"><strong>Sat</strong></th>
+                                    <th style="width: 10%;"><strong>Total</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="weekInfo in data[0].userWiseKeekList">
+                                    <td>{{convertToShortDateTitle(weekInfo.week)}}</td>
+                                    <td><a href="#">{{weekInfo.sun}}</a></td>
+                                    <td><a href="#">{{weekInfo.mon}}</a></td>
+                                    <td><a href="#">{{weekInfo.tue}}</a></td>
+                                    <td><a href="#">{{weekInfo.wed}}</a></td>
+                                    <td><a href="#">{{weekInfo.thu}}</a></td>
+                                    <td><a href="#">{{weekInfo.fri}}</a></td>
+                                    <td><a href="#">{{weekInfo.sat}}</a></td>
+                                    <td>{{weekInfo.weekTotal}}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8"></td>
+                                    <td>{{data[0].grantTotal}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+
+                        <div class="table-responsive hidden-print">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%;"><strong>Week</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Sun</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Mon</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Tue</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Wed</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Thu</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Fri</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Sat</strong></th>
+                                        <th class="text-right" style="width: 10%;"><strong>Total</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="hidden-print">
+                                    <tr data-ng-repeat="weekInfo in data[0].userWiseKeekList">
+                                        <td>{{convertToShortDateTitle(weekInfo.week)}}</td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 0);" tooltip="{{getTooltipDay(weekInfo.week, 0)}}" tooltip-placement="top">{{weekInfo.sun || '-' | number:2}}</a></td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 1);" tooltip="{{getTooltipDay(weekInfo.week, 1)}}" tooltip-placement="top">{{weekInfo.mon || '-' | number:2}}</a></td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 2);" tooltip="{{getTooltipDay(weekInfo.week, 2)}}" tooltip-placement="top">{{weekInfo.tue || '-' | number:2}}</a></td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 3);" tooltip="{{getTooltipDay(weekInfo.week, 3)}}" tooltip-placement="top">{{weekInfo.wed || '-' | number:2}}</a></td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 4);" tooltip="{{getTooltipDay(weekInfo.week, 4)}}" tooltip-placement="top">{{weekInfo.thu || '-' | number:2}}</a></td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 5);" tooltip="{{getTooltipDay(weekInfo.week, 5)}}" tooltip-placement="top">{{weekInfo.fri || '-' | number:2}}</a></td>
+                                        <td align="right"><a href="" data-ng-click="moveToSpecificTimelineArea(weekInfo.week, 6);" tooltip="{{getTooltipDay(weekInfo.week, 6)}}" tooltip-placement="top">{{weekInfo.sat || '-' | number:2}}</a></td>
+                                        <td align="right">{{weekInfo.weekTotal | number:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right" colspan="9"><strong>Total Hours : </strong> {{data[0].grantTotal | number:2 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+      
+
+        <div class="col-sm-12">
+            <div data-ng-if="data.length > 0">
+                <div data-ng-if="filterData.LoadType == 1">
+                    <h2>User Report : {{data[0].userName}}</h2>
+                    <ul class="timeline">
+                        <li data-ng-repeat="userInfo in data" data-ng-if="filterData.LoadType == 1" ng-class-even="'timeline-inverted'">
+                            <div class="timeline-badge"></div>
+                            <div class="timeline-panel" id="#{{userInfo.workDate |date:'dd-MMM-yyyy'}}">
+                                <div class="timeline-heading">
+                                    <h4 class="timeline-title">
+                                        {{userInfo.workDate  | date:'dd-MMM-yyyy'}} - {{userInfo.userTotalwork}} hour(s)
+                                    </h4>
+                                </div>
+                                <div class="timeline-body">
+                                    <div data-ng-repeat=" projectInfo in userInfo.projectList">
+                                        <h5 class="text-info">
+                                            <a target="_blank" href="Module/{{projectInfo.projectId}}">{{projectInfo.projectName}} - {{projectInfo.projectTotalwork}} hour(s)</a>
+                                        </h5>
+                                        <ul class="list-group">
+                                            <li class="list-group-item" data-ng-repeat="todoInfo in projectInfo.todoList">
+                                                <a target="_blank" href="TodoComment/{{todoInfo.todoId}}">{{todoInfo.todoText}}</a>
+                                                <br />
+                                                <div class="text-muted" data-ng-bind-html="todoInfo.commentText | removehtmltags"></div>
+                                                <span class="label label-info label-hour">{{todoInfo.actualHours}} hour(s)</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div data-ng-if="filterData.LoadType == 2">
+                    <h2>Project Report : <a target="_blank" href="Module/{{data[0].ProjectId}}">{{data[0].ProjectName}}</a></h2>
+                    <ul class="timeline">
+                        <li data-ng-repeat="projectInfo in data" data-ng-if="filterData.LoadType == 2" ng-class-even="'timeline-inverted'">
+                            <div class="timeline-badge"></div>
+                            <div class="timeline-panel" id="#{{projectInfo.workDate |date:'dd-MMM-yyyy'}}">
+                                <div class="timeline-heading">
+                                    <h4 class="timeline-title">
+                                        {{projectInfo.workDate  | date:'dd-MMM-yyyy'}} - {{projectInfo.projectTotalwork}} hour(s)
+                                    </h4>
+                                </div>
+                                <div class="timeline-body">
+                                 <!--   <p>{{projectInfo}}</p> -->
+                                    <div data-ng-repeat=" userInfo in projectInfo.UserList">
+                                        <h5 class="text-info">
+                                            {{userInfo.UserName}} - {{userInfo.userTotalwork}} hour(s)
+                                        </h5>
+                                        <ul class="list-group">
+                                            <li class="list-group-item" data-ng-repeat="todoInfo in userInfo.TodoList">
+                                                <a target="_blank" href="TodoComment/{{todoInfo.TodoId}}">{{todoInfo.TodoText}}</a>
+                                                <br />
+                                                <div class="text-muted" data-ng-bind-html="todoInfo.CommentText | removehtmltags"></div>
+                                                <span class="label label-info label-hour">{{todoInfo.ActualHours}} hour(s)</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div data-ng-if="data.length == 0">
+                <p class="lead text-danger text-center">
+                    Record not found!
+                </p>
+            </div>
+
+        </div>
+        <div class="timeline-load-more-item">
+            <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-hide="readMoreDisable" data-ng-click="readMoreProject(filterData)">
+                <i class="fa fa-plus"></i>
+                Load more
+            </button>
+        </div>
+    </div>
+    <!-- / END REPORT DATA -->
+    <div class="timeline-centered">
+    </div>
+
+</div>
+
+@section Scripts{
+   @Scripts.Render("~/Areas/PMS/Scripts/pmsProjectReport")
+}
+

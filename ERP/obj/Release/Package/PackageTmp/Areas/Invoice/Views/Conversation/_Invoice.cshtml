@@ -1,0 +1,296 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="InvoiceCtrl" disabled="false" data-active="master.IsInvoiceTabOpened"
+    data-select="SetOpenedTab('Invoice');GetClient();GetInvoiceMilestoneList();">
+    <div data-tab-heading>
+        <i class="entypo-clipboard"></i>Invoice
+    </div>
+
+    <div data-ng-if="master.filterData.ClientId == 0">
+        <div class="alert text-center text-danger">
+            <strong>Please select client to load the data...
+            </strong>
+        </div>
+    </div>
+
+    <!--BEGIN CLIENT INFORMATION-->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12">
+            <div class="kyc-section">
+                <div class="row">
+                    <div class="col-sm-12 kyc-header">
+                        <h3>Client Information
+                            <span class="pull-right">
+                                <a class="badge" href="/Invoice/Client/OverView/{{ClientInfo.PKClientId}}" target="_blank"><i class="fa fa-eye"></i>View Full Client</a>
+                            </span>
+                        </h3>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Company Name : </label>
+                                    <span>{{ClientInfo.CompanyName}}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Contact Person : </label>
+                                    <span>{{ClientInfo.CPrefix}} {{ClientInfo.ContactPerson}}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Client Code : </label>
+                                    <span>{{ClientInfo.ClientCode}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Email : </label>
+                            <span>{{ClientInfo.Email}}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Mobile No. : </label>
+                            <span>{{ClientInfo.MobileNo}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END CLIENT INFORMATION-->
+
+    <!--BEGIN INVOICE LIST-->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="'InvoiceCode'" data-filter="{ 'InvoiceCode': 'text' }" data-sortable="'InvoiceCode'">{{d.InvoiceCode}}</td>
+                            <td data-title="'InvoiceDate'" data-sortable="'InvoiceDate'">{{d.InvoiceDate | date:'dd-MM-yyyy'}}</td>
+                            <td data-title="'Currency'" data-sortable="'Currency'" data-filter="{ 'Currency': 'text' }">{{d.Currency}}</td>
+                            <td data-title="'Price'" data-sortable="'TotalAmount'" class="text-right">{{d.TotalAmount | number: 2}}</td>
+                            <td data-title="'Actions'" style="width: 130px; text-align: center;">
+                                @{
+                                    if(Model.HasUpdateRights){
+                                        <a class="btn btn-primary btn-xs" data-ng-click="UpdateInvoice(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                        <a class="btn btn-warning btn-xs" data-drc-confirm-box="" data-callback="CopyInvoice(d.PKInvoiceId)" data-message="Are you sure want to copy '{{d.InvoiceCode}}' invoice?" data-drc-tooltip="Copy"><i class="entypo-docs"></i></a>   
+                                    }    
+                                }
+                                <a class="btn btn-info btn-xs" target="_blank" href="/Invoice/Conversation/PrintInvoice/{{d.PKInvoiceId}}" data-drc-tooltip="Print Invoice"><i class="entypo-print"></i></a>
+                                @{
+                                    if(Model.HasDeleteRights){
+                                        <a class="btn btn-danger btn-xs" 
+                                            data-drc-confirm-box="" data-callback="DeleteInvoice(d)" 
+                                            data-message="Are you sure want to delete this record?" 
+                                            data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>   
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="4">Your search did not match any record.</td>
+                            <td style="width: 130px;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END INVOICE LIST-->
+
+    <br />
+    <!--BEGIN INVOICE SECTION-->
+    <div class="panel panel-default panel-shadow" data-ng-form="frmInvoice" data-ng-if="master.filterData.ClientId > 0 && (master.SelectedMilestoneList.length > 0 || invoice.mode == 'Edit')">
+        <div class="panel-heading" >
+            <h3 class="panel-title">{{invoice.mode}} Invoice <b>{{invoiceData.InvoiceCode}}</b></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="txtInvoiceRemarks">Invoice short description</label>
+                        <textarea tabindex="1" data-drc-focus="isFirstFocusInvoice" class="form-control" id="txtInvoiceRemarks" name="txtInvoiceRemarks" data-ng-model="invoiceData.Remarks"
+                             placeholder="Enter remarks" maxlength="500"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="txtInvoiceDate">Invoice Date<span class="compulsary">*</span></label>
+                        <p class="input-group" style="margin-bottom: 0;" id="p3">
+                            <input type="text" data-parentid="p3" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtInvoiceDate" name="txtInvoiceDate" tabindex="2"
+                                    data-ng-model="invoiceData.InvoiceDate"
+                                    data-ng-change="ValidateInvoiceDate(invoiceData.InvoiceDate, frmInvoice)"
+                                    placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                        data-is-open="isInvoiceDateOpened"
+                                        data-ng-model="invoiceData.iDate"
+                                        data-max="maxDate"
+                                        data-datepicker-options="dateOptions"
+                                        data-close-text="Close"
+                                        data-ng-click="OpenInvoiceDateCalender($event)">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                        </p>
+                        <div data-ng-show="frmInvoice.txtInvoiceDate.$error.invalidInvoiceDate" class="label label-danger">
+                            Invalid: <span>Please enter valid date.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="drpCurrency">Currency<span class="compulsary">*</span></label>
+                        <select disabled="true" id="drpCurrency" name="drpCurrency" data-ng-model="invoiceData.Currency" class="form-control" tabindex="3" required>
+                            <option value="0">--Select--</option>
+                            <option data-ng-repeat="t in master.CurrencyList" 
+                                    data-ng-selected="t.CurrencyCode == invoiceData.Currency" 
+                                    value="{{t.CurrencyCode}}">{{t.CurrencyName}}</option>
+                        </select>
+                        <div data-ng-show="frmInvoice.drpCurrency.$dirty && validateDropCurrency()" class="label label-danger">
+                            Invalid: Please select currency.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>Client VAT Number</label>
+                        <span data-ng-init="GetClientVATNumber()" class="form-control" disabled="true">{{ClientVATNumber}}</span>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="drpInvoiceType">Invoice Type</label>
+                        <select tabindex="4" class="form-control" ng-disabled="invoice.mode == 'Edit'" id="drpInvoiceType" name="drpInvoiceType" data-ng-model="invoiceData.InvoiceType">
+                            <option value="E">Export</option>
+                            <option value="L">Local</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 kyc-header">
+                    <h4>Milestone Details</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div data-ng-if="invoiceData.milestoneList.length > 0">
+                        <table class="table responsive">
+                            <thead>
+                                <tr>
+                                    <th><b></b>Milestone Name</th>
+                                    <th>Duration</th>
+                                    <th>Hours</th>
+                                    <th class="text-right">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="m in invoiceData.milestoneList">
+                                    <td>{{m.MilestoneName}}</td>
+                                    <td>{{m.StartDate | date:'dd-MM-yyyy'}} <span data-ng-if="m.EndDate">to</span> {{m.EndDate | date:'dd-MM-yyyy'}}</td>
+                                    <td>{{m.TotalHours}}</td>
+                                    <td class="text-right"><b>{{m.Price | number : 2}}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+       
+            <div class="row" data-ng-if="invoiceData.milestoneList.length == 0">
+                <div class="col-sm-12">
+                    <div class="alert text-center text-danger">
+                        <strong>
+                            No milestone selection found. You can't create invoice without milestone(s).
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-12 kyc-header">
+                    <h4>Apply Various Taxes
+                        &nbsp;<a class="badge badge-default icon-left" data-ng-click="AddNewTax()"><i class="fa fa-plus"></i>Add New Tax</a>
+                    </h4>
+                </div>
+            </div>
+            <div class="row" data-ng-repeat="t in invoiceData.invoiceTaxList track by $index" data-ng-form="taxform" style="margin-top:10px;margin-bottom:10px;">
+                <div class="col-sm-4">&nbsp;</div>
+                <div class="col-sm-1" style="padding-top:7px;">
+                    <a href="#" class="pull-right btn btn-xs btn-danger" data-ng-if="$index > 0" data-ng-click="DeleteTax($index, t.PKInvoiceTaxId)"><i class="entypo-trash"></i></a>
+                </div>
+                <div class="col-sm-3">
+                    <select id="drpTaxes" name="drpTaxes" data-ng-model="t.PKTaxId" ng-change="OnTaxTypeChange(t.PKTaxId, $index)" class="form-control">
+                        <option data-ng-repeat="tm in TaxList" data-ng-selected="tm.PKTaxId == t.PKTaxId" value="{{tm.PKTaxId}}">{{tm.TaxTypeName}}</option>
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="txtTaxPercentage" name="txtTaxPercentage"
+                            ng-change="CalculateTaxAmount($index,t.Percentage)" data-ng-pattern="/^\d{0,9}(\.\d{1,9})?$/"
+                        data-ng-model="t.Percentage" placeholder="Tax Percentage" maxlength="5" value="" required />
+                    <div data-ng-show="(taxform.txtTaxPercentage.$dirty && taxform.txtTaxPercentage.$invalid) || taxform.txtTaxPercentage.$error.pattern" class="label label-danger">
+                        Invalid: <span data-ng-show="taxform.txtTaxPercentage.$error.required">Tell us tax percentage.</span>
+                                <span data-ng-show="taxform.txtTaxPercentage.$error.pattern" class="ng-hide">Enter valid percentage.</span>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <label class="form-control text-right" data-ng-model="t.Amount" style="background-color:transparent;">
+                        <b>{{t.Amount | number : 2}}</b>
+                    </label>
+                </div>
+            </div>
+        
+            <br />
+            <div class="row">
+                <div class="col-sm-12 kyc-header">
+                    <h4>Round Off Amount</h4>
+                </div>
+            </div>
+            <div class="row" style="margin-top:10px;margin-bottom:10px;">
+                <div class="col-sm-8">&nbsp;</div>
+                <div class="col-sm-2 text-right" style="line-height:30px;">
+                    Round Off Amount : 
+                </div>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control text-right" id="txtRoundOff" name="txtRoundOff"
+                        data-ng-model="invoiceData.RoundOff" placeholder="Round Off Amount" maxlength="10" value=""/>
+                </div>
+            </div>
+        
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="well text-right">
+                        <h3>Total Invoice Amount : {{invoiceData.FinalTotal}}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-lg-12">
+                    @{
+                        if(Model.HasInsertRights || Model.HasUpdateRights){
+                            <button type="button" class="btn btn-sm btn-info btn-icon icon-left"
+                                data-ng-click="CreateUpdateInvoice(invoiceData, frmInvoice)"
+                                data-ng-disabled="frmInvoice.$invalid || taxform.$invalid || invoiceData.milestoneList.length == 0"><i class="entypo-check"></i>{{invoice.saveText}}</button>   
+                        }
+                    }
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" ng-click="Close()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END INVOICE SECTION-->
+
+</div>

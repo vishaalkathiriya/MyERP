@@ -1,0 +1,318 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="MilestoneCtrl" disabled="false" data-select="SetOpenedTab('Milestone');GetClient();RetrieveConfirmedProjects();">
+    <div data-tab-heading>
+        <i class="entypo-flag"></i>Milestone
+    </div>
+    <div data-ng-if="master.filterData.ClientId == 0">
+        <div class="alert text-center text-danger">
+            <strong>Please select client to load the data...
+            </strong>
+        </div>
+    </div>
+
+    <!--BEGIN CLIENT INFORMATION-->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12">
+            <div class="kyc-section">
+                <div class="row">
+                    <div class="col-sm-12 kyc-header">
+                        <h3>Client Information
+                            <span class="pull-right">
+                                <a class="badge" href="/Invoice/Client/OverView/{{ClientInfo.PKClientId}}" target="_blank"><i class="fa fa-eye"></i>View Full Client</a>
+                            </span>
+                        </h3>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Company Name : </label>
+                                    <span>{{ClientInfo.CompanyName}}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Contact Person : </label>
+                                    <span>{{ClientInfo.CPrefix}} {{ClientInfo.ContactPerson}}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Client Code : </label>
+                                    <span>{{ClientInfo.ClientCode}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Email : </label>
+                            <span>{{ClientInfo.Email}}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Mobile No. : </label>
+                            <span>{{ClientInfo.MobileNo}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END CLIENT INFORMATION-->
+    
+    <!-- BEGIN ACCORDION CONFIRMED PROJECT LIST -->
+    <div class="well well-att clearfix" data-ng-if="master.filterData.ClientId > 0 && projectList.length > 0">
+        <div class="pull-left att-det-footer">
+            <span class="att-det att-det-ot"></span>= Running &nbsp;&nbsp;
+            <span class="att-det att-det-holiday"></span>= Completed  &nbsp;&nbsp;
+            <span class="att-det att-det-leaveabsence"></span>= Stopped &nbsp;&nbsp;
+        </div>
+    </div>
+
+    <div data-ng-if="master.filterData.ClientId > 0">
+        <accordion close-others="true">
+            <accordion-group is-open="p.isOpen" ng-repeat="p in projectList">
+                <accordion-heading>
+                    <div data-ng-init="RetrieveProjectMilestones(p.PKProjectId, p.isOpen, $index)">
+                        <a href="#">
+                            <span class="att-det" ng-class="{'att-det-ot': (p.ProjectStatus =='Running'),'att-det-holiday': (p.ProjectStatus == 'Completed'),'att-det-leaveabsence': (p.ProjectStatus == 'Stopped')}"></span>
+                            <b>{{p.ProjectTitle}}</b>
+                            <span class="badge badge-secondary-danger ng-binding">  {{p.ProjectType}} </span>
+                            <span class="badge" data-drc-tooltip="Milestone Price / Project Price"> <span ng-class="{'text-danger': (p.milestonePrice > p.Price)}"> {{p.milestonePrice | number: 2}}/{{p.Price | number: 2}}</span> {{p.Currency}}</span>
+                            <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': p.isOpen, 'glyphicon-chevron-right': !p.isOpen}"></i>
+                            <span class="pull-right badge badge-milestone-change " data-ng-show="p.milestoneList.length > 0 "> Changed On {{p.maxMilestoneDate | date: 'dd MMM yyyy'}}</span>
+
+                        </a>
+                    </div>
+                </accordion-heading>
+                @{
+                    if (Model.HasInsertRights)
+                    {
+                        <div class="pull-right" data-ng-if="p.ProjectStatus != 'Completed'">
+                            <a class="badge" data-ng-if="p.milestoneList.length > 0 " data-ng-click="GenerateInvoice($index)"><i class="fa fa-plus"></i> Generate Invoice</a>
+                            <a class="badge" data-ng-click="AddProjectMilestone(p.PKProjectId, 0,p.Currency,p.Price,p.milestonePrice,$index)"><i class="fa fa-plus"></i> Add New Milestone</a>
+                        </div>
+                    }
+                }
+
+                <div data-ng-repeat="m in p.milestoneList">
+                    <div style="margin:10px;" data-ng-init="CalculateMilestonePrice(m.Price, $parent.$index)">
+                        <input type="checkbox" data-ng-model="m.isSelected" data-ng-disabled="m.IsInvoiceCreated" />
+                        <b> {{m.MilestoneName}} </b>
+                        <span class="badge badge-info">
+                            {{m.TotalHours}} H
+                        </span>
+                        <span class="text-xs"> {{m.Price | number: 2}} {{m.Currency}} </span>
+                        <span class="badge badge-milestone-change">
+                            Changed On {{m.ChgDate | date: 'dd MMM yyyy hh:mm'}}
+                        </span>
+                        @{
+                            if (Model.HasUpdateRights)
+                            {
+        <a class="badge badge-primary" title="edit" data-ng-if="!m.IsInvoiceCreated" data-ng-click="UpdateProjectMilestone(p.PKProjectId, m, $parent.$parent.$index,p.Price,p.milestonePrice)"><i class="entypo-pencil"></i></a>
+                            }
+}
+                        @{
+                            if (Model.HasDeleteRights)
+                            {
+                                <a class="badge badge-danger" title="delete" data-drc-confirm-box="" data-ng-if="!m.IsInvoiceCreated"
+                                   data-callback="DeleteProjectMilestone(p.PKProjectId, m.PKMilestoneId, $parent.$parent.$index)"
+                                   data-message="Are you sure want to delete '{{m.MilestoneName}}' Milestone?"><i class="entypo-trash"></i></a>
+                            }
+                        }
+                    </div>
+                </div>
+            </accordion-group>
+        </accordion>
+    </div>
+
+
+    <div class="row" data-ng-if="projectList.length == 0 && master.filterData.ClientId > 0">
+        <div class="col-sm-12 alert text-center text-danger">
+            <strong>Record not found!
+            </strong>
+        </div>
+    </div>
+    <!-- END ACCORDION CONFIRMED PROJECT LIST -->
+
+    <!-- BEGIN PROJECT POPUP TEMPLATE -->
+    <script type="text/ng-template" id="Milestone.html">
+        <div class="modal-header">
+            <h3>{{milestone.mode}} Milestone</h3>
+        </div>
+        <div class="modal-body">
+            <!-- BEGIN FORM -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <form role="form" data-ng-submit="CreateUpdateMilestone(milestoneData, frmMilestone)" name="frmMilestone" id="frmMilestone">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="txtMilestoneName">Milestone Name<span class="compulsary">*</span></label>
+                                    <input type="text" data-drc-focus="isMilestoneFirstFocus" tabindex="501" class="form-control" id="txtMilestoneName" name="txtMilestoneName" data-ng-model="milestoneData.MilestoneName" placeholder="Enter milestone name" maxlength="50" value="" required />
+                                    <div data-ng-show="frmMilestone.txtMilestoneName.$dirty && frmMilestone.txtMilestoneName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmMilestone.txtMilestoneName.$error.required">Tell us your milestone name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="txtMilestoneDesc">Milestone Description<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="502" class="form-control" id="txtMilestoneDesc" name="txtMilestoneDesc"
+                                           data-ng-model="milestoneData.MilestoneDesc" placeholder="Enter milestone description" maxlength="60" value="" required />
+                                    <div data-ng-show="frmMilestone.txtMilestoneDesc.$dirty && frmMilestone.txtMilestoneDesc.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmMilestone.txtMilestoneDesc.$error.required">Tell us your milestone description.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="txtStartDate">Start Date</label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtStartDate" name="txtStartDate" tabindex="503"
+                                               data-ng-model="milestoneData.StartDate"
+                                               data-ng-change="ValidateStartDate(milestoneData.StartDate, frmMilestone)"
+                                               placeholder="DD-MM-YYYY" maxlength="10" value="" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default"
+                                                    data-datepicker-popup="{{format}}"
+                                                    data-is-open="isStartDateOpened"
+                                                    data-ng-model="milestoneData.sDate"
+                                                    data-max="maxDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-click="OpenStartDateCalender($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="frmMilestone.txtStartDate.$error.invalidStartDate" class="label label-danger">
+                                        Invalid: <span>Please enter valid date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="txtEndDate">End Date</label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtEndDate" name="txtEndDate" tabindex="504"
+                                               data-ng-model="milestoneData.EndDate"
+                                               data-ng-change="ValidateEndDate(milestoneData.EndDate, frmMilestone)"
+                                               placeholder="DD-MM-YYYY" maxlength="10" value="" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default"
+                                                    data-datepicker-popup="{{format}}"
+                                                    data-is-open="isEndDateOpened"
+                                                    data-ng-model="milestoneData.eDate"
+                                                    data-min="milestoneData.sDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-click="OpenEndDateCalender($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="frmMilestone.txtEndDate.$error.invalidEndDate" class="label label-danger">
+                                        Invalid: <span>Please enter valid date.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label for="drpMCurrency">Currency<span class="compulsary">*</span></label>
+                                    <select id="drpMCurrency" name="drpMCurrency" disabled="true" data-ng-model="milestoneData.Currency" tabindex="505" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in master.CurrencyList"
+                                                data-ng-selected="t.CurrencyCode == milestoneData.Currency"
+                                                value="{{t.CurrencyCode}}">
+                                            {{t.CurrencyName}}
+                                        </option>
+                                    </select>
+                                    <div data-ng-show="frmMilestone.drpMCurrency.$dirty && validateDropMilestoneCurrency()" class="label label-danger">
+                                        Invalid: Please select currency.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="txtMilestoneHours">Total Hours<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="506" class="form-control" id="txtMilestoneHours" name="txtMilestoneHours"
+                                           data-ng-model="milestoneData.TotalHours" data-ng-pattern="/^\d{0,9}(\.\d{1,9})?$/" placeholder="Enter milestone hours" maxlength="5" value="" required />
+                                    <div data-ng-show="(frmMilestone.txtMilestoneHours.$dirty && frmMilestone.txtMilestoneHours.$invalid) || frmMilestone.txtMilestoneHours.$error.pattern" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmMilestone.txtMilestoneHours.$error.required">Tell us your milestone hours.</span>
+                                        <span ng-show="frmMilestone.txtMilestoneHours.$error.pattern" class="ng-hide">Enter valid hours.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label for="txtMilestonePrice">Milestone Price<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="507" class="form-control" id="txtMilestonePrice" name="txtMilestonePrice" data-ng-blur="cmpProjectAndMilestonePrice(milestoneData.Price,milestoneData.pendingPrice, frmMilestone)"
+                                           data-ng-model="milestoneData.Price" data-ng-pattern="/^\d{0,9}(\.\d{1,9})?$/" placeholder="Enter milestone price" maxlength="10" value="" required />
+                                    <div data-ng-show="(frmMilestone.txtMilestonePrice.$dirty && frmMilestone.txtMilestonePrice.$invalid) || frmMilestone.txtMilestonePrice.$error.pattern" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmMilestone.txtMilestonePrice.$error.required">Tell us your milestone price.</span>
+                                        <span ng-show="frmMilestone.txtMilestonePrice.$error.pattern" class="ng-hide">Enter valid milestone price.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Project Price</th>
+                                            <th>Milestone Price</th>
+                                            <th>Pending Price</th>    
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-right">{{milestoneData.ProjectPrice | number: 2}}</td>
+                                            <td class="text-right">{{milestoneData.milestonePrice | number: 2}}</td>
+                                            <td class="text-right">
+                                                <span ng-class="{'text-danger': (milestoneData.ProjectPrice < milestoneData.milestonePrice)}">{{milestoneData.pendingPrice | number: 2}}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row" style="display:none;">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="milestoneData.IsActive"><label> IsActive</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="col-lg-12">
+                                @{
+                                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                                    {
+                                        <button type="submit" tabindex="507" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmMilestone.$invalid || frmMilestone.$error.invalidForm"><i class="entypo-check"></i>{{milestone.saveText}}</button>
+                                    }
+                                }
+                                <button type="button" tabindex="508" class="btn btn-sm btn-primary btn-icon icon-left" ng-click="Close()"><i class="entypo-cancel"></i>Close</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- / END FORM -->
+        </div>
+    </script>
+    <!-- / END PROJECT POPUP TEMPLATE -->
+</div>

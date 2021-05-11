@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.Title = "Manage First Aid LogBook";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+@using ERP.Utilities
+
+<div data-ng-controller="HRDFirstAIdLogBookCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage First Aid Log Book</h2>
+            </div>
+        </div>
+    </div>
+    <!--BEGIN START HEADER SECTION-->
+    <div class="row">
+        <div class="col-sm-12">
+            <form role="form" class="form-inline" data-ng-submit="FilterByExpiryDate()" name="filterform">
+                <div class="well well-sm well-filter">
+
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            {
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddFirstAIdLogBookform()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- / END HEADER SECTION -->
+    <!--BEGIN FORM SECTION-->
+    <div class="row">
+        <div class="col-sm-12" data-ng-show="isFormVisible">
+            @*{{editData | json }}*@
+            <form role="form" data-ng-submit="CreateUpdateFirstAIdLogBook(editData)" name="FirstAIdLogBookform" id="FirstAIdLogBookform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} First Aid Log Book</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtNameOfIssuer">Name Of Issuer<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtNameOfIssuer" name="NameOfIssuer" data-ng-model="editData.NameOfIssuer"  data-drc-focus="isFirstFocus" maxlength="99" placeholder="Enter Name Of Issuer" tabindex="1" value="" required />
+                                    <div data-ng-show="FirstAIdLogBookform.NameOfIssuer.$dirty && FirstAIdLogBookform.NameOfIssuer.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FirstAIdLogBookform.NameOfIssuer.$error.required">Tell us Name Of Issuer.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtNameOfReceiver">Name Of Receiver<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtNameOfReceiver" name="NameOfReceiver" data-ng-model="editData.NameOfReceiver"  maxlength="99" placeholder="Enter Name Of Receiver" tabindex="2" value="" required>
+                                    <div data-ng-show="FirstAIdLogBookform.NameOfReceiver.$dirty && FirstAIdLogBookform.NameOfReceiver.$invalid" class="label label-danger">
+                                        Invalid<span data-ng-show="FirstAIdLogBookform.NameOfReceiver.$error.required">Tell  us Name Of Receiver</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtNameOfFirstAIdItems">Name of First Aid Items<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtNameOfFirstAIdItems" name="NameOfFirstAIdItems" data-ng-model="editData.NameOfFirstAIdItems"  maxlength="99" placeholder="Enter Name of First Aid Items" tabindex="3" value="" required>
+                                    <div data-ng-show="FirstAIdLogBookform.NameOfFirstAIdItems.$dirty && FirstAIdLogBookform.NameOfFirstAIdItems.$invalid" class="label label-danger">
+                                        Invalid<span data-ng-show="FirstAIdLogBookform.NameOfFirstAIdItems.$error.required">Tell  us Name of First Aid  Items</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtDateOfIssue">Date of Issue<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtDateOfIssue" name="txtDateOfIssue" placeholder="DD-MM-YYYY" maxlength="10" tabindex="4" value="" required data-ng-model="editData.DateOfIssue" data-ng-change="ValidateIssuedDate(editData.DateOfIssue)" />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                    data-is-open="editData.calOpenIssueDate"
+                                                    data-ng-model="dateofissue"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-required="true"
+                                                    data-ng-click="calendarOpenIssueDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="FirstAIdLogBookform.txtDateOfIssue.$dirty && FirstAIdLogBookform.txtDateOfIssue.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FirstAIdLogBookform.txtDateOfIssue.$error.required">Please select Issue Date.</span>
+                                        <span data-ng-show="FirstAIdLogBookform.txtDateOfIssue.$error.invalidIssueDate">Please enter valid Date.</span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtQuanity">Quanity<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtQuanity" name="Quanity" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.Quanity" placeholder="Enter Quanity" maxlength="15" tabindex="5" value="" required />
+                                    <div data-ng-show="FirstAIdLogBookform.Quanity.$dirty && FirstAIdLogBookform.Quanity.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FirstAIdLogBookform.Quanity.$error.required">Tell us Quanity.</span>
+                                        <span data-ng-show="FirstAIdLogBookform.Quanity.$error.pattern" class="">Please enter only Numeric characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtSize">Size</label>
+                                    <input type="text" class="form-control" id="txtSize" name="Size" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.Size" placeholder="Enter Size" maxlength="15" tabindex="6" value="" />
+                                    <div data-ng-show="FirstAIdLogBookform.Size.$dirty && FirstAIdLogBookform.Size.$invalid" class="label label-danger">
+                                        <span data-ng-show="FirstAIdLogBookform.Size.$error.pattern" class="">Please enter only Numeric characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtManagerName">Manager Name<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtManagerNams" name="ManagerName"  data-ng-model="editData.ManagerName" maxlength="99" placeholder="Enter Manager Name" tabindex="7" value="" required />
+                                            <div data-ng-show="FirstAIdLogBookform.ManagerName.$dirty && FirstAIdLogBookform.ManagerName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="FirstAIdLogBookform.ManagerName.$error.required">Tell us Manager Name.</span>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtLocationOfFirstAIdBox">Location of First Aid  Box<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtLocationOfFirstAIdBoxx" name="LocationOfFirstAIdBox" data-ng-model="editData.LocationOfFirstAIdBox" maxlength="99" placeholder="Enter Location Of First Aid  Box" tabindex="8" value="" required />
+                                            <div data-ng-show="FirstAIdLogBookform.LocationOfFirstAIdBox.$dirty && FirstAIdLogBookform.LocationOfFirstAIdBox.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="FirstAIdLogBookform.LocationOfFirstAIdBox.$error.required">Tell us Location Of First Aid Box.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtPrice ">Price </label>
+                                            <input type="text" class="form-control" id="txtPrice " name="Price " data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.Price " placeholder="Enter Price " maxlength="15" tabindex="9" value="" />
+                                            <div data-ng-show="FirstAIdLogBookform.Price.$dirty && FirstAIdLogBookform.Price.$invalid" class="label label-danger">
+                                                <span data-ng-show="FirstAIdLogBookform.Price.$error.pattern" class="">Please enter only Numeric characters.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtExpiryDate">Expiry Date<span class="compulsary">*</span></label>
+                                            <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                                <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtExpiryDate" name="txtExpiryDate" placeholder="DD-MM-YYYY" maxlength="10" value="" required data-ng-model="editData.ExpiryDate" tabindex="10" data-ng-change="ValidateDateOfExpiry(editData.ExpiryDate)" />
+                                                <span class="input-group-btn" style="position: initial;">
+                                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                            data-is-open="editData.calOpenDateOfExpiry"
+                                                            data-ng-model="expirydate"
+                                                            data-datepicker-options="dateOptions"
+                                                            data-close-text="Close"
+                                                            data-ng-required="true"
+                                                            data-ng-click="calendarOpenDateOfExpiry($event)">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </p>
+                                            <div data-ng-show="FirstAIdLogBookform.txtDateOfExpiry.$dirty && FirstAIdLogBookform.txtDateOfExpiry.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="FirstAIdLogBookform.txtDateOfExpiry.$error.required">Please select Expiry Date.</span>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <img src="/Content/images/thumb_Document.png" class="img-responsive" title="Please select a Document" style="margin-left:33%;height:91px; width:99px">
+                                <div class="btn btn-info" style="width:93%;" ng-model-rejected="rejFiles" data-ngf-select data-ngf-change="upload($files)" data-ngf-accept="'*.doc,*.xlsx,application/pdf'" data-ng-model=" editdata.files">Select a File</div>
+                                <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Add'" href="/@ViewBag.tempDocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Edit'" href="/@ViewBag.DocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label for="txtRemark">Remark</label>
+                                    <textarea class="form-control" id="txtRemarks" name="Remarks" data-ng-model="editData.Remarks" maxlength="500" placeholder="Enter Remark" tabindex="11"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                        @*<div style="clear:both" ng-show="rejFiles.length > 0" class="response alert alert-danger">
+                            <div class="sel-file" ng-repeat="f in rejFiles">
+                                <span style="color:red">rejected file: {{f.name}} - size: {{f.size}}b - type: {{f.type}}</span><br />
+                                <strong>Please select valid file format</strong>
+                                <script type="text/javascript">
+                                        toastr.warning('Please select valid file format', 'Opps, Something went wrong');
+                                    </script>
+
+                            </div>
+                        </div>*@
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            {
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="FirstAIdLogBookform.$invalid" tabindex="12"><i class="entypo-check"></i> {{saveText}} </button>
+                            }
+                        }
+
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetFirstAIdLogBookform()" tabindex="13"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseFirstAIdLogBookform()" tabindex="14"><i class="entypo-cancel"></i>Close</button>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--END FORM SECTION-->
+    <!--BEGIN FIRST AID LIST-->
+    <div class="row" data-ng-init="RetrieveFirstAIdLogBook()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="" style="width: 50px;"><a ng-if="d.Attachment != NULL && d.Attachment != '' " href="@ViewBag.DocPdf/{{d.Attachment}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+
+                            <td data-title="'Name of Issuer'" data-filter="{ 'NameOfIssuer': 'text' }" data-sortable="'NameOfIssuer'">{{d.NameOfIssuer}}</td>
+                            <td data-title="'Name of Receiver'" data-filter="{ 'NameOfReceiver': 'text' }" data-sortable="'NameOfReceiver'">{{d.NameOfReceiver}}</td>
+
+                            <td data-title="'Date of Issue'" data-sortable="'DateOfIssue'">{{d.DateOfIssue | date:'dd-MMM-yyyy'}}</td>
+                            <!--  <td data-title="'ReceiveBy'" data-filter="{ 'ReceiveBy': 'text' }" data-sortable="'ReceiveBy'">{{d.ReceiveBy}}</td>
+                            <td data-title="'Relation'" data-filter="{ 'Relation': 'text' }" data-sortable="'Relation'">{{d.Relation}}</td> -->
+                            <td data-title="'Location of First Aid Box'" data-sortable="'LocationOfFirstAIdBox'">{{d.LocationOfFirstAIdBox}}</td>
+                            <td data-title="'Expiry Date'" data-sortable="'ExpiryDate'">{{d.ExpiryDate | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+
+
+
+                                <td style="width: 128px; text-align: center;" data-title="'Actions'">
+                                    <a class="btn btn-info btn-xs" data-ng-click="ShowFirstAIdLogBook(d)"><i class="entypo-eye"></i></a>
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateFirstAIdLogBook(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteFirstAIdLogBook(d.SrNo)" data-message="Are you sure want to delete '{{d.NameOfIssuer}}' from first aid log book?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>
+                                Your search - <b>{{filterText}}</b> - did not match any Recored.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END FIRST AID LOG RECORD-->
+
+    <script type="text/ng-template" id="FirstAIdLogBook.html">
+        <div class="modal-body">
+            <h4> First Aid log book Information</h4>
+            <table class="table table-striped">
+                <tr>
+                    <td><b>Name of Issuer:</b></td>
+                    <td>{{items.NameOfIssuer}}</td>
+                    <td><b>Name of Receiver:</b></td>
+                    <td>{{items.NameOfReceiver}}</td>
+                </tr>
+                <tr>
+                    <td><b>Name of First Aid Items:</b></td>
+                    <td>{{items.NameOfFirstAIdItems}}</td>
+                    <td><b>Date of Issue:</b></td>
+                    <td>{{items.DateOfIssue| date:'dd-MMM-yyyy'}}</td>
+                </tr>
+                <tr>
+                    <td><b>Quanity:</b></td>
+                    <td>{{items.Quanity}}</td>
+                    <td><b>Size:</b></td>
+                    <td>{{items.Size || '-'}}</td>
+                </tr>
+                <tr>
+                    <td><b>ManagerName:</b></td>
+                    <td>{{items.ManagerName}}</td>
+                    <td><b>Location of First Aid Box:</b></td>
+                    <td>{{items.LocationOfFirstAIdBox}}</td>
+                </tr>
+                <tr>
+                    <td><b>Price:</b></td>
+                    <td>{{items.Price || '-'}}</td>
+                    <td><b>ExpiryDate:</b></td>
+                    <td>{{items.ExpiryDate| date:'dd-MMM-yyyy'}}</td>
+                </tr>
+                <tr>
+                    <td><b>Remarks:</b></td>
+                    <td>{{items.Remarks || '-'}}</td>
+
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="Close()">Close</button>
+        </div>
+
+    </script>
+</div>
+@section Scripts{
+
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/controllers/HRDFirstAIdLogBookCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/services/HRDFirstAIdLogBookService.js")"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+}
+
+

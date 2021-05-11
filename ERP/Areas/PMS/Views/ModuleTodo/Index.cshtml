@@ -1,0 +1,311 @@
+﻿@{
+    ViewBag.Title = "Manage Module Todo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="PMSModuleCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2>
+                    <i class="entypo-doc-text"></i>Manage Module Todo
+                    <span style="float: right;">
+                        <span class="todo-status-text todo-status-info">OnHold</span>
+                        <span class="todo-status-text todo-status-success">Finished</span>
+                        <span class="todo-status-text todo-status-danger">Deleted</span>
+                    </span>
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN LIST OF MODULE AND TODO LIST -->
+    <div class="row" data-ng-init="setModuleId('@ViewBag.ID')">
+        <div class="col-sm-12">
+            <!-- BEGIN NEVIGATION PANEL-->
+            <div class="row">
+                <div class="col-sm-12">
+                    <ol class="breadcrumb bc-3">
+                        <li>
+                            <a href="/PMS/Module/{{projectId}}"><i class="entypo-left-open-big"></i>Back to Module List</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <!-- / END NEVIGATION PANEL-->
+
+            <div class="row">
+                <div class="ajax-progress-pms" data-ng-show="IsAjaxLoadingPMS">Please wait while loading...</div>
+                <div class="col-sm-12">
+                    <div id="divMain">
+                        <div class="module-row" data-ng-repeat="m in ModuleTodoList">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="module-header module-list-row module-list-row-header">
+                                        <h3 class="module-title">
+                                            <a href="#" class="module-page-title">{{m.ModuleName}} </a>
+                                            <a href="#" class="badge badge-secondary-danger" style="position: relative; top: -3px;">{{m.ActiveStatusCount}} / {{m.totalTaskCount}} Task(s) </a>
+                                            <a href="#" class="badge badge-secondary-danger" style="position: relative; top: -3px;">{{m.ActualHours}} / {{m.AssignedHours}}</a>
+                                        </h3>
+                                    </div>
+
+                                    <!-- BEGIN TODO LIST -->
+                                    <div class="droppableTodo">
+                                        <div class="todo-row draggableTodo" data-ng-repeat="t in m.TodoList" data-id="{{t.TodoId}}" data-drc-drag-to-sort-for-todo="">
+                                            <!--Active: Assigned & UnAssigned-->
+                                            <div class="row" style="margin-left: 50px;">
+                                                <div class="col-sm-12 todo-item" data-ng-class="{highlight: t.ActualHours > t.AssignedHours}">
+                                                    <div data-ng-if="!t.IsEdit" data-drc-module-hover="option-panel">
+                                                        <span class="option-panel todo invisible">
+                                                            @{
+                                                                var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                                                                bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                                                                bool hasEditRights = ERPUtilities.HasAccessPermission(2, ctrl);
+                                                                bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+
+                                                                if (hasEditRights)
+                                                                {
+                                                                <a href="#" class="badge badge-warning" data-ng-click="t.IsEdit = 'true'; GetHourMinutes(t)">edit</a>
+                                                                }
+                                                                if (hasDeleteRights)
+                                                                {
+                                                                <a href="#" class="badge badge-danger" data-drc-confirm-box="" data-callback="DeleteTodoItem(t.TodoId)" data-message="Are you sure want to delete '{{t.TodoText}}' from Todo list?"><i class="entypo-trash"></i></a>
+                                                                }
+                                                            }
+                                                        </span>
+                                                        <span>
+                                                            <input type="checkbox" data-ng-if="getUsercanFinish(empLoginId,t.creById,t.IsCanFinish,t.AssignedUser)"
+                                                                   title="Click to finish this todo" data-drc-confirm-box=""
+                                                                   @*data-callback="FinishTodoItem(t.TodoId)"*@
+                                                                   data-callback="FinishTodoItem(t.TodoId, $index, m)"
+                                                                   data-ng-model="t.IsChecked"
+                                                                   data-cancelcallback="CancelModuleFinish($index, m)"
+                                                                   data-message="Are you sure want to finish '{{t.TodoText}}'?">
+
+
+
+                                                            <a href="/PMS/TodoComment/{{t.TodoId}}" ng-style="{'color': getColorName(t.TodoType)}">{{t.TodoText}}</a>
+                                                            <span class="badge badge-secondary" title="Actual Hours / Total Assigned Hours"><span data-ng-if="t.ActualHours">{{t.ActualHours}}H / </span><span data-ng-if="t.AssignedHours">{{t.AssignedHours}}H</span></span>
+                                                            @{
+                                                                if (hasEditRights)
+                                                                {
+                                                                @*<a class="badge badge-assigned-user" data-date="t.DueDate" data-username="{{t.AssignedUserFullName}}" data-projectid="{{m.ProjectId}}" data-todoid="{{t.TodoId}}" data-userid="t.AssignedUser" data-userlist="UserList" data-callbackevent="popoverCallback(date, userId, projectId, todoId)" data-drc-popover-assign-todo="">{{t.AssignedUserFullName}}</a>*@
+    <a class="badge badge-assigned-user" data-date="t.DueDate" data-username="{{t.AssignedUserFullName}}" data-projectid="{{m.ProjectId}}" data-todoid="{{t.TodoId}}" data-userid="t.AssignedUser" data-userlist="UserList" data-assignedhours="t.AssignedHours" data-iscanfinish="t.IsCanFinish" data-assignuser="t.AssignedUser" data-loginid="empLoginId" data-callbackevent="popoverCallback(date, userId, projectId, todoId,iscanfinish,assignuser,loginid)" data-drc-popover-assign-todo="">{{t.AssignedUserFullName}}</a>
+                                                                }
+                                                                else
+                                                                {
+                                                                <a class="badge badge-assigned-user">{{t.AssignedUserFullName}}</a>
+                                                                }
+                                                            }
+
+                                                            <span class="badge badge-duedate">{{t.DueDate | date: 'dd MMM yyyy'}}</span>
+                                                            <a href="/PMS/TodoComment/{{t.TodoId}}" class="badge badge-comments" data-ng-if="t.TotalComments != 0">{{t.TotalComments}} Comments</a>
+                                                            @{
+                                                                if (hasEditRights)
+                                                                {
+                                                                <a href="#" class="badge badge-hold" data-drc-confirm-box="" data-callback="HoldTodoItem(t.TodoId)" data-message="Are you sure want to hold '{{t.TodoText}}' from Todo list?"><i class="entypo-adjust"></i>hold</a>
+                                                                }
+                                                            }
+                                                            <span class="badge badge-assigned-user">{{t.CreBy}}-{{t.CreDate | date:'dd MMM yyyy'}}</span>
+                                                            
+                                                        </span>
+                                                    </div>
+                                                    <div data-ng-if="t.IsEdit">
+                                                        <form role="form" name="todoUpdateForm" data-ng-submit="UpdateTodoItem(t)">
+                                                            <div class="row">
+                                                                <div class="col-sm-5">
+                                                                    <input type="text" data-drc-focus-next="" class="form-control" name="todoUpdateText" data-ng-model="t.TodoText" placeholder="Enter todo detail" required />
+                                                                    <div data-ng-show="todoUpdateForm.todoUpdateText.$dirty && todoUpdateForm.todoUpdateText.$invalid" class="label label-danger">
+                                                                        Invalid: <span data-ng-show="todoUpdateForm.todoUpdateText.$error.required">Tell us your todo  detail.</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-1">
+                                                                    <input type="text" class="form-control" name="txtUpdateHours" data-ng-model="t.AssignedHours" data-ng-pattern="/^\d*$/" placeholder="Hr" maxlength="3" />
+                                                                    <div data-ng-show="todoUpdateForm.txtUpdateHours.$dirty && todoUpdateForm.txtUpdateHours.$invalid" class="label label-danger">
+                                                                        Invalid:<span data-ng-show="todoUpdateForm.txtUpdateHours.$error.pattern">Please enter valid hours.</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-1">
+                                                                    <input type="text" class="form-control" name="txtUpdateMinutes" data-ng-model="t.AssignedMinutes" data-ng-pattern="/^([0-9]|[0-5][0-9])$/" placeholder="Min" maxlength="2" />
+                                                                    <div data-ng-show="todoUpdateForm.txtUpdateMinutes.$dirty && todoUpdateForm.txtUpdateMinutes.$invalid" class="label label-danger">
+                                                                        Invalid:<span data-ng-show="todoUpdateForm.txtUpdateMinutes.$error.pattern">Please enter valid minutes.</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-2">
+                                                                    <select id="drpUpdateTodoType" name="drpUpdateTodoType" data-ng-model="t.TodoType" class="form-control">
+                                                                        @*<option value="0">--Select--</option>*@
+                                                                        <option data-ng-repeat="p in ModuleTypeList" data-ng-selected="p.Id == t.TodoType" value="{{p.Id}}">{{p.Label}}</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-sm-3" style="margin-top: 5px;">
+                                                                    <button type="submit" class="btn btn-xs btn-success btn-icon icon-left" data-ng-disabled="todoUpdateForm.$invalid"><i class="entypo-pencil"></i>Update</button>
+                                                                    <button type="button" class="btn btn-xs btn-primary btn-icon icon-left" data-ng-click="cancelTodoUpdate(t)"><i class="entypo-cancel"></i>Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--BEGIN ADD  NEW TODO-->
+                                    <div class="row" style="margin-left: 40px;">
+                                        <div class="col-sm-12" data-ng-if="AddTodoForm[$index]">
+                                            <form role="form" name="todoform" data-ng-submit="ShowHideAddTodo($index, false);SaveTodoItem(0,m.ModuleId,todoText[$index],todoHours[$index],todoMinutes[$index],todoType[$index]);ShowHideAddTodo($index, true);">
+                                                <div class="row">
+                                                    <div class="col-sm-5">
+                                                        <div class="form-group">
+                                                            <input type="text" data-drc-focus-next="" class="form-control" id="txtTodoText" name="txtTodoText" data-ng-model="todoText[$index]" data-drc-focus="isFirstFocus" placeholder="Enter todo detail" maxlength="500" value="" required />
+                                                            <div data-ng-show="todoform.txtTodoText.$dirty && todoform.txtTodoText.$invalid" class="label label-danger">
+                                                                Invalid: <span data-ng-show="todoform.txtTodoText.$error.required">Tell us your todo  details.</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-1">
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" id="txtAssignHours" name="txtAssignHours" data-ng-model="todoHours[$index]" data-ng-pattern="/^\d*$/" placeholder="Hr" maxlength="3" value="" />
+                                                            <div data-ng-show="todoform.txtAssignHours.$dirty && todoform.txtAssignHours.$invalid" class="label label-danger">
+                                                                Invalid:<span data-ng-show="todoform.txtAssignHours.$error.pattern">Please enter valid hours.</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-1">
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" id="txtAssignMinutes" name="txtAssignMinutes" data-ng-model="todoMinutes[$index]" data-ng-pattern="/^([0-9]|[0-5][0-9])$/" placeholder="Min" maxlength="2" value="" />
+                                                            <div data-ng-show="todoform.txtAssignMinutes.$dirty && todoform.txtAssignMinutes.$invalid" class="label label-danger">
+                                                                Invalid:<span data-ng-show="todoform.txtAssignMinutes.$error.pattern">Please enter valid minutes.</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <div class="form-group">
+                                                            <select id="drpTodoType" name="drpTodoType" data-ng-model="todoType[$index]" class="form-control" required>
+                                                                <option data-ng-repeat="t in ModuleTypeList" data-ng-selected="t.Id == 3" value="{{t.Id}}">{{t.Label}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3" style="margin-top: 5px;">
+                                                        <button type="submit" class="btn btn-xs btn-info btn-icon icon-left" data-ng-disabled="todoform.$invalid"><i class="entypo-check"></i>Save</button>
+                                                        <button type="button" class="btn btn-xs btn-primary btn-icon icon-left" data-ng-click="ShowHideAddTodo($index, false)"><i class="entypo-cancel"></i>Close</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        @{
+                                            if (hasInsertRights)
+                                            {
+                                            <div class="col-sm-12">
+                                                <a href="#" data-ng-if="!AddTodoForm[$index]" data-ng-click="todoText[$index] = '';todoHours[$index] = '';todoMinutes[$index] = '';todoType[$index] = '3';ShowHideAddTodo($index, true)" class="add-todo-link">Add New Todo</a>
+                                            </div>
+                                            }
+                                        }
+                                    </div>
+                                    <!-- / END TODO LIST -->
+                                    <!--Hold-->
+                                    <div data-ng-show="m.TodoListHold">
+                                        <div class="todo-state-title-wrapper todo-hold-wrapper">
+                                            <h4 class="todo-hold-title">Holded Todo(s)</h4>
+                                        </div>
+                                        <div class="row" data-ng-repeat="h in m.TodoListHold" style="margin-left: 50px;">
+                                            <div class="col-sm-12 todo-item">
+                                                <div>
+                                                    <span>
+                                                        @*<span>{{h.TodoText}}</span>*@
+                                                        <a href="/PMS/TodoComment/{{h.TodoId}}" ng-style="{'color': getColorName(h.TodoType)}">{{h.TodoText}}</a>
+                                                        <span class="badge badge-secondary" title="Actual Hours / Total Assigned Hours"><span data-ng-if="h.ActualHours">{{h.ActualHours}}H / </span><span data-ng-if="h.AssignedHours">{{h.AssignedHours}}H</span></span>
+                                                        <span class="badge badge-assigned-user">{{h.AssignedUserFullName}}</span>
+                                                        <span class="badge badge-duedate">{{h.DueDate | date: 'dd MMM yyyy'}}</span>
+                                                        <span class="badge badge-comments">{{h.TotalComments}} Comments</span>
+                                                        @{
+                                                            if (hasEditRights)
+                                                            {
+                                                            <a href="#" class="badge badge-hold" data-drc-confirm-box="" data-callback="ActiveTodoItem(h.TodoId, 'hold')"
+                                                                data-message="Are you sure want to unhold '{{h.TodoText}}' from Todo list?"><i class="entypo-light-up"></i>unhold</a>
+                                                            }
+                                                        }
+                                                        <span class="badge badge-assigned-user">{{h.CreBy}}-{{h.CreDate | date:'dd MMM yyyy'}}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--Finished-->
+                                    <div data-ng-show="m.TodoListFinished">
+                                        <div class="todo-state-title-wrapper todo-finish-wrapper">
+                                            <h4 class="todo-finish-title">Finished Todo(s)</h4>
+                                        </div>
+                                        <div class="row" data-ng-repeat="h in m.TodoListFinished" data-ng-attr-title="{{h.IsEdit && 'Finish date is bigger than due date given to this task' || '' }}"
+                                            data-ng-class="{highlight: h.IsEdit == true}" style="margin-left: 50px;">
+                                            <div class="col-sm-12 todo-item" data-ng-class="{highlight: h.ActualHours > h.AssignedHours}">
+                                                <div>
+                                                    <span>
+                                                        @*<span>{{h.TodoText}}</span>*@
+                                                        <a href="/PMS/TodoComment/{{h.TodoId}}" ng-style="{'color': getColorName(h.TodoType)}">{{h.TodoText}}</a>
+                                                        <span class="badge badge-secondary" title="Actual Hours / Total Assigned Hours"><span data-ng-if="h.ActualHours">{{h.ActualHours}}H / </span><span data-ng-if="h.AssignedHours">{{h.AssignedHours}}H</span></span>
+                                                        <span class="badge badge-assigned-user">{{h.AssignedUserFullName}}</span>
+                                                        <span class="badge badge-duedate">{{h.DueDate | date: 'dd MMM yyyy'}}</span>
+                                                        <span class="badge badge-comments">{{h.TotalComments}} Comments</span>
+                                                        @{
+                                                            if (hasEditRights)
+                                                            {
+                                                            <a href="#" class="badge badge-hold" data-drc-confirm-box="" data-callback="ActiveTodoItem(h.TodoId, 'reopen')"
+                                                                data-message="Are you sure want to re-open '{{h.TodoText}}' from Todo list?"><i class="entypo-reply"></i>ReOpen</a>
+                                                            }
+                                                        }
+                                                        <span class="badge badge-assigned-user">{{h.CreBy}}-{{h.CreDate | date:'dd MMM yyyy'}}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <!--Archived-->
+                                    <div data-ng-show="m.TodoListArchived">
+                                        <div class="todo-state-title-wrapper todo-delete-wrapper">
+                                            <h4 class="todo-delete-title">Deleted Todo(s)</h4>
+                                        </div>
+                                        <div class="row" data-ng-repeat="h in m.TodoListArchived" style="margin-left: 50px;">
+                                            <div class="col-sm-12 todo-item" style="padding: 9px 10px 8px 10px;">
+                                                <div>
+                                                    <span>
+                                                        @*<span>{{h.TodoText}}</span>*@
+                                                        <a href="/PMS/TodoComment/{{h.TodoId}}" ng-style="{'color': getColorName(h.TodoType)}">{{h.TodoText}}</a>
+                                                        <span class="badge badge-assigned-user">{{h.AssignedUserFullName}}</span>
+                                                        <span class="badge badge-duedate">{{h.DueDate | date: 'dd MMM yyyy'}}</span>
+                                                        <span class="badge badge-comments">{{h.TotalComments}} Comments</span>
+                                                        @{
+                                                            if (hasEditRights)
+                                                            {
+                                                            <a href="#" class="badge badge-hold" data-drc-confirm-box="" data-callback="ActiveTodoItem(h.TodoId, 'active')"
+                                                                data-message="Are you sure want to active '{{h.TodoText}}' from Todo list?"><i class="entypo-check"></i>Active</a>
+                                                            }
+                                                        }
+                                                        <span class="badge badge-assigned-user">{{h.CreBy}}-{{h.CreDate | date:'dd MMM yyyy'}}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--Repeater End-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END LIST OF MODULE AND TODO LIST -->
+
+</div>
+
+@section Scripts{
+
+    @Scripts.Render("~/Areas/PMS/Scripts/PMSModuleTodo");
+
+}

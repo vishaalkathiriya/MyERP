@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title = "Manage Financial Assist Death Employee";
+     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+@using ERP.Utilities
+
+<div data-ng-controller="FinancialDeathEmpCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Financial Assist Death Employee</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByDeathDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddFinancialDeathEmp()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide " data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateFinancialDeathEmp(editData)" name="FinancialDeathEmpform" id="FinancialDeathEmpform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Financial Assist Death Employee</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtEcode">Employee Code<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtEcode" name="Ecode" data-ng-model="editData.ECode" data-drc-focus="isFirstFocus" placeholder="Enter Employee Code" maxlength="9" tabindex="1" value="" required />
+                                    <div data-ng-show="FinancialDeathEmpform.Ecode.$dirty && FinancialDeathEmpform.Ecode.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.Ecode.$error.required">Tell us Employee Code.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtEmployeeName">Employee Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtEmployeeName" name="EmployeeName" data-ng-pattern="/^[A-Za-z ]*$/" data-ng-model="editData.EmployeeName" placeholder="Enter Employee Name" maxlength="50" tabindex="2" value="" required />
+                                    <div data-ng-show="FinancialDeathEmpform.EmployeeName.$dirty && FinancialDeathEmpform.EmployeeName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.EmployeeName.$error.required">Tell us Employee Name.</span>
+                                        <span data-ng-show="FinancialDeathEmpform.EmployeeName.$error.pattern">Please enter only Alphabet characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtDateOfDeath">Date Of Death<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtDateOfDeath" name="txtDateOfDeath" placeholder="DD-MM-YYYY" maxlength="10" value="" required data-ng-model="editData.DateOfDeath" tabindex="3" data-ng-change="ValidateDateOfDeath(editData.DateOfDeath)" />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="editData.calOpenDateOfDeath"
+                                                data-ng-model="dateOfDeath"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenDateOfDeath($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="FinancialDeathEmpform.txtDateOfDeath.$dirty && FinancialDeathEmpform.txtDateOfDeath.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.txtDateOfDeath.$error.required">Please select Employee Date Of Death.</span>
+                                       <!-- <span data-ng-show="FinancialDeathEmpform.txtDateOfDeath.$error.invalidIssueDate">Please enter valid Date.</span> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtReceiveBy">Receive By<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtReceiveBy" name="ReceiveBy" data-ng-model="editData.ReceiveBy" placeholder="Enter Receiver Name" maxlength="50" tabindex="4" value="" required />
+                                    <div data-ng-show="FinancialDeathEmpform.ReceiveBy.$dirty && FinancialDeathEmpform.ReceiveBy.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.ReceiveBy.$error.required">Tell us Receiver Name.</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtRelation">Relation<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtRelation" name="Relation" data-ng-pattern="/^[A-Za-z ]*$/" data-ng-model="editData.Relation" placeholder="Enter Relation" maxlength="50" tabindex="5" value="" required />
+                                    <div data-ng-show="FinancialDeathEmpform.Relation.$dirty && FinancialDeathEmpform.Relation.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.Relation.$error.required">Tell us Relation.</span>
+                                        <span data-ng-show="FinancialDeathEmpform.Relation.$error.pattern">Please enter only Alphabet characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtAmount">Amount<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtAmount" name="Amount" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.Amount" placeholder="Enter Amount" maxlength="15" tabindex="6" value="" required />
+                                    <div data-ng-show="FinancialDeathEmpform.Amount.$dirty && FinancialDeathEmpform.Amount.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.Amount.$error.required">Tell us Amount.</span>
+                                        <span data-ng-show="FinancialDeathEmpform.Amount.$error.pattern" class="">Please enter only Numeric characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtChequeNumber">Cheque Number<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtChequeNumber" name="ChequeNumber" data-ng-model="editData.ChequeNumber" placeholder="Enter Cheque Number" maxlength="20" tabindex="7" value="" required />
+                                    <div data-ng-show="FinancialDeathEmpform.ChequeNumber.$dirty && FinancialDeathEmpform.ChequeNumber.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.ChequeNumber.$error.required">Tell us Cheque Number.</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtIssueDate">Issue Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtIssueDate" name="txtIssueDate" placeholder="DD-MM-YYYY" maxlength="10" tabindex="8" value="" required data-ng-model="editData.IssueDate" data-ng-change="ValidateIssuedDate(editData.IssueDate)" />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="editData.calOpenIssueDate"
+                                                data-ng-model="issueDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenIssueDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="FinancialDeathEmpform.txtIssueDate.$dirty && FinancialDeathEmpform.txtIssueDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.txtIssueDate.$error.required">Please select your Cheque Issue Date.</span>
+                                        <span data-ng-show="FinancialDeathEmpform.txtIssueDate.$error.invalidIssueDate">Please enter valid Date.</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFamilyBackgroundDetail">Family Background Detail<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtFamilyBackgroundDetail" name="FamilyBackgroundDetail" data-ng-pattern="/^[A-Za-z ]*$/" data-ng-model="editData.FamilyBackgroundDetail" placeholder="Enter Family Background Detail" value="" tabindex="9" required />
+                                    <div data-ng-show="FinancialDeathEmpform.FamilyBackgroundDetail.$dirty && FinancialDeathEmpform.FamilyBackgroundDetail.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="FinancialDeathEmpform.FamilyBackgroundDetail.$error.required">Tell us FamilyBackgroundDetail.</span>
+                                        <span data-ng-show="FinancialDeathEmpform.FamilyBackgroundDetail.$error.pattern">Please enter only Alphabet characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="FinancialDeathEmpform.$invalid || validateDrop()" tabindex="10"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetFinancialDeathEmp()" tabindex="11"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseFinancialDeathEmp()" tabindex="12"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING FINANCIAL DEATH EMPLOYEE LIST -->
+    <div class="row" data-ng-init="RetrieveFinacialDeathEmp()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="'Emp Code'" data-filter="{ 'Ecode': 'text' }" data-sortable="'Ecode'">{{d.Ecode}}</td>
+                            <td data-title="'Emp Name'" data-filter="{ 'EmployeeName': 'text' }" data-sortable="'EmployeeName'">{{d.EmployeeName}}</td>
+                            <td data-title="'Date Of Death'" data-sortable="'DateOfDeath'">{{d.DateOfDeath | date:'dd-MMM-yyyy'}}</td>
+                          <!--  <td data-title="'ReceiveBy'" data-filter="{ 'ReceiveBy': 'text' }" data-sortable="'ReceiveBy'">{{d.ReceiveBy}}</td>
+                            <td data-title="'Relation'" data-filter="{ 'Relation': 'text' }" data-sortable="'Relation'">{{d.Relation}}</td> -->
+                            <td data-title="'Amount'" data-sortable="'Amount'">{{d.Amount}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                
+                                
+                                
+                                <td style="width: 128px; text-align: center;" data-title="'Actions'">
+                                    <a class="btn btn-info btn-xs" data-ng-click="ShowFinancialDeathEmp(d)"><i class="entypo-eye"></i></a>
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateFinancialDeathEmp(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteFinancialDeathEmp(d.SrNo)" data-message="Are you sure want to delete '{{d.Ecode}}' from issued documents?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+                                
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any Recored.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END FINANCIAL DEATH EMPLOYEE LIST -->
+</div>
+
+<!-- BEGIN MODEL SECTION -->
+<script type="text/ng-template" id="FinancialDeathEmpPopup.html">
+        <div class="modal-body">
+        <h4> Financial Assis To DeathEmployee Information</h4>
+        <table class="table table-striped">
+            <tr>
+                <td><b>Ecode:</b></td>
+                <td>{{items.Ecode}}</td>
+                <td><b>Employee Name:</b></td>
+                <td>{{items.EmployeeName}}</td>
+            </tr>
+            <tr>
+                <td><b>Date Of Death:</b></td>
+                <td>{{items.DateOfDeath | date:'dd-MMM-yyyy' }}</td>
+                <td><b>Relation:</b></td>
+                <td>{{items.Relation}}</td>
+          </tr>
+            <tr>
+                <td><b>Amount:</b></td>
+                <td>{{items.Amount}}</td>
+                <td><b>Receive By:</b></td>
+                <td>{{items.ReceiveBy}}</td>
+          </tr>
+            <tr>
+                <td><b>ChequeNumber:</b></td>
+                <td>{{items.ChequeNumber}}</td>
+                <td><b>Cheque Issue Date:</b></td>
+                <td>{{items.ChequeIssueDate | date:'dd-MMM-yyyy'}}</td>
+          </tr>
+            <tr>
+                <td><b>FamilyBackgroundDetail:</b></td>
+                <td>{{items.FamilyBackgroundDetail}}</td>              
+          </tr>
+
+         </table>       
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="Close()">Close</button>
+    </div>
+</script>
+<!-- / END MODEL SECTION -->
+
+@section Scripts{
+
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/controllers/HRDFinancialDeathEmpCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/services/HRDFinancialDeathEmpService.js")"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+    
+}

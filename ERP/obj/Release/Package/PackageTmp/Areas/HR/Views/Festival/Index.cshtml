@@ -1,0 +1,69 @@
+﻿@{
+    ViewBag.Title = "Manage Festivals";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="FestivalMasterCtrl">
+    <div>
+        <!-- BEGIN HEADER SECTION -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2 style="text-transform: capitalize">
+                        <i class="entypo-doc-text"></i>Manage Festivals
+                        <span style="float: right;">
+                            @{
+                                var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                                bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                                bool hasUpdateRights = ERPUtilities.HasAccessPermission(2, ctrl);
+                                bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+                                var hasAccessViewModel = new ERP.Models.HasAccessViewModel()
+                                {
+                                    HasInsertRights = hasInsertRights,
+                                    HasUpdateRights = hasUpdateRights,
+                                    HasDeleteRights = hasDeleteRights
+                                };
+                            }
+
+                        </span> 
+                    </h2>
+
+                </div>
+            </div>
+        </div>
+        <!-- / END HEADER SECTION -->
+        <!-- BEGIN FORM SECTION -->
+        <div class="row">
+            <div class="col-sm-12 employee-tabs">
+                <div data-tabset>
+
+                    @if (ERPUtilities.HasAccessPermission(4, ctrl))
+                    {
+                        <!-- BEGIN FESTIVAL-TYPE INFORMATION -->
+                        @Html.Partial("_FestivalType", hasAccessViewModel)
+                        <!-- / END FESTIVAL-TYPE INFORMATION -->
+                    }
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(5, ctrl))
+                        {
+                        <!-- BEGIN FESTIVAL INFORMATION -->
+                            @Html.Partial("_Festival", hasAccessViewModel)
+                        <!-- / END FESTIVAL INFORMATION -->
+                        }
+                    }
+
+                </div>
+            </div>
+        </div>
+        <!-- / END FORM SECTION -->
+
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/Area/HR/Scripts/festivalMaster")
+
+}

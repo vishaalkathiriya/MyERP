@@ -1,0 +1,214 @@
+/*styles for jquery ui daterangepicker plugin */
+
+.ui-daterangepickercontain {
+    position: absolute;
+    z-index: 999;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    background-clip: padding-box;
+}
+
+    .ui-daterangepickercontain .ui-daterangepicker {
+        float: left;
+        padding: 0px !important;
+        width: auto;
+        display: inline;
+        background-image: none !important;
+        clear: left;
+        border-radius: 0;
+        background: #eeeff0;
+    }
+
+.ui-daterangepicker ul, .ui-daterangepicker .ranges, .ui-daterangepicker .range-start, .ui-daterangepicker .range-end {
+    float: left;
+    padding: 0;
+    margin: 0;
+    background: #eeeff0;
+    border-radius: 0;
+    border: none;
+}
+
+.ui-daterangepicker .ranges {
+    width: auto;
+    position: relative;
+    padding: 5px 5px 40px 0;
+    margin-left: 10px;
+}
+
+.ui-daterangepicker .range-start, .ui-daterangepicker .range-end {
+    margin-left: 5px;
+}
+
+.ui-daterangepicker button.btnDone {
+    margin: 0 5px 5px 0;
+    position: absolute;
+    bottom: 5px;
+    right: 0;
+    clear: both;
+    cursor: pointer;
+    font-size: 11px;
+    border-radius: 0;
+    background: #3a3c3c;
+    border-color: #2e2f2f;
+    color: #fff;
+    text-decoration: none;
+}
+
+.ui-daterangepicker ul {
+    width: 17.6em;
+    background: none;
+    border: 0;
+}
+
+.ui-daterangepicker li {
+    list-style: none;
+    padding: 1px;
+    cursor: pointer;
+    margin: 1px 0;
+}
+
+    .ui-daterangepicker li.ui-state-hover, .ui-daterangepicker li.ui-state-active {
+        padding: 0;
+        border-radius: 0;
+        color: #ffffff !important;
+        border: 1px solid #357ebd;
+        text-decoration: none;
+        background-color: #357ebd;
+        background-image: -webkit-gradient(linear, left 0%, left 100%, from(#428bca), to(#357ebd));
+        background-image: -webkit-linear-gradient(top, #428bca, 0%, #357ebd, 100%);
+        background-image: -moz-linear-gradient(top, #428bca 0%, #357ebd 100%);
+        background-image: linear-gradient(to bottom, #428bca 0%, #357ebd 100%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff428bca', endColorstr='#ff357ebd', GradientType=0);
+    }
+
+        .ui-daterangepicker li.ui-state-hover a, .ui-daterangepicker li.ui-state-active a {
+            color: #ffffff !important;
+        }
+
+    .ui-daterangepicker li.preset_0 {
+        margin-top: 1.5em !important;
+    }
+.ui-daterangepicker .ui-widget-content{
+    background:#fff;
+    padding:5px;
+}
+.ui-daterangepicker .ui-widget-content a {
+    text-decoration: none !important;
+    font-family: 'robotoregular', 'Segoe UI', Arial, 'DejaVu Sans', 'Liberation Sans', Freesans, sans-serif;
+}
+
+.ui-daterangepicker li a {
+    font-weight: normal;
+    margin: 2px 6px;
+    display: block;
+    font-size: 11px;
+    color: #222;
+}
+
+.ui-daterangepicker li span {
+    float: right;
+    margin: .3em .2em;
+}
+
+.ui-daterangepicker .title-start, .ui-daterangepicker .title-end {
+    display: block;
+    margin: 0 0 .2em;
+    font-size: 1em;
+    padding: 0 4px 2px;
+    font-weight:normal;
+    text-align:center;
+}
+
+.ui-daterangepicker .ui-datepicker-inline {
+    font-size: 1em;
+}
+
+.ui-daterangepicker-arrows {
+    padding: 2px;
+    width: 204px;
+    position: relative;
+}
+
+    .ui-daterangepicker-arrows input.ui-rangepicker-input {
+        width: 158px;
+        margin: 0 2px 0 20px;
+        padding: 2px;
+        height: 1.1em;
+    }
+
+    .ui-daterangepicker-arrows .ui-daterangepicker-prev, .ui-daterangepicker-arrows .ui-daterangepicker-next {
+        position: absolute;
+        top: 2px;
+        padding: 1px;
+    }
+
+    .ui-daterangepicker-arrows .ui-daterangepicker-prev {
+        left: 2px;
+    }
+
+    .ui-daterangepicker-arrows .ui-daterangepicker-next {
+        right: 2px;
+    }
+
+        .ui-daterangepicker-arrows .ui-daterangepicker-prev:hover,
+        .ui-daterangepicker-arrows .ui-daterangepicker-next:hover,
+        .ui-daterangepicker-arrows .ui-daterangepicker-prev:focus,
+        .ui-daterangepicker-arrows .ui-daterangepicker-next:focus {
+            padding: 0;
+        }
+
+
+
+
+
+
+.ui-datepicker {
+    width: 18em;
+    padding: .2em .2em 0;
+    display: none;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 0px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+
+    .ui-datepicker td a.ui-state-default {
+        background-image: none;
+    }
+
+    .ui-datepicker td a.ui-state-active {
+        border-radius: 0;
+        color: #ffffff !important;
+        border: 1px solid #357ebd;
+        text-decoration: none;
+        background-color: #357ebd;
+        background-image: -webkit-gradient(linear, left 0%, left 100%, from(#428bca), to(#357ebd));
+        background-image: -webkit-linear-gradient(top, #428bca, 0%, #357ebd, 100%);
+        background-image: -moz-linear-gradient(top, #428bca 0%, #357ebd 100%);
+        background-image: linear-gradient(to bottom, #428bca 0%, #357ebd 100%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff428bca', endColorstr='#ff357ebd', GradientType=0);
+    }
+
+    .ui-datepicker .ui-datepicker-header {
+        position: relative;
+        padding: .2em 0;
+        background-image: none;
+        border-radius:0;
+    }
+
+.ui-datepicker-title,
+.ui-datepicker-calendar {
+    font-family: 'robotoregular', 'Segoe UI', Arial, 'DejaVu Sans', 'Liberation Sans', Freesans, sans-serif;
+}
+
+.ui-datepicker-next.ui-state-hover,
+.ui-datepicker-prev.ui-state-hover{
+    background-image:none;
+    border:none;
+}

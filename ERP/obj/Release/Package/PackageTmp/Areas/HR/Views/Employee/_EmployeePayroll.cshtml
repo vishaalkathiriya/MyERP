@@ -1,0 +1,298 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="EmpPayRollCtrl" disabled="!master.Mode == 'Edit' || master.Mode == 'Add'" data-select="FetchPayRollInfo()">
+    <div data-tab-heading>
+        <i class="entypo-cc-nc"></i>PayRoll
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateEmpPayRoll(payRoll)" name="empPform" id="empPform">
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>PayRoll Information</h3>
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayCTC">Current CTC<span class="compulsary">*</span></label>
+                            <input type="text" class="form-control" id="txtPayCTC" tabindex="1" name="txtPayCTC" data-ng-pattern="/^\d*\.?\d*$/" data-drc-focus="isFirstFocus" data-ng-model="payRoll.CTC" placeholder="Current CTC" maxlength="6" value="" required />
+                            <div data-ng-show="empPform.txtPayCTC.$dirty && empPform.txtPayCTC.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empPform.txtPayCTC.$error.required">Tell us your current ctc.</span>
+                                <span data-ng-show="empPform.txtPayCTC.$error.pattern">Please enter valid ctc.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayBasicSal">Basic Salary<span class="compulsary">*</span></label>
+                            <input type="text" class="form-control" id="txtPayBasicSal" tabindex="2" name="txtPayBasicSal" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="payRoll.BasicSalary" placeholder="Basic salary" maxlength="6" value="" required />
+                            <div data-ng-show="empPform.txtPayBasicSal.$dirty && empPform.txtPayBasicSal.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empPform.txtPayBasicSal.$error.required">Tell us your basic salary.</span>
+                                <span data-ng-show="empPform.txtPayBasicSal.$error.pattern">Please enter valid basic salary.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayEmpTax">Employment Tax</label>
+                            <input type="text" class="form-control" id="txtPayEmpTax" tabindex="3" name="txtPayEmpTax" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="payRoll.EmploymentTax" placeholder="Employment Tax" maxlength="7" value="" />
+                            <div data-ng-show="empPform.txtPayEmpTax.$error.pattern" class="label label-danger">
+                                Invalid: Please enter valid employment tax.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayESIC">ESIC</label>
+                            <input type="text" class="form-control" id="txtPayESIC" tabindex="4" name="txtPayESIC" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="payRoll.ESIC" placeholder="ESIC" maxlength="7" value="" />
+                            <div data-ng-show="empPform.txtPayESIC.$error.pattern" class="label label-danger">
+                                Invalid: Please enter valid ESIC.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayTotalLeave">Leaves Allowed Per Year<span class="compulsary">*</span></label>
+                            <input type="text" class="form-control" id="txtPayTotalLeave" tabindex="5" name="txtPayTotalLeave" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="payRoll.LeavesAllowedPerYear" placeholder="Enter total allowed leaves per year" maxlength="3" value="" required />
+                            <div data-ng-show="empPform.txtPayTotalLeave.$dirty && empPform.txtPayTotalLeave.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empPform.txtPayTotalLeave.$error.required">Tell us your leaves allowed per year.</span>
+                                <span data-ng-show="empPform.txtPayTotalLeave.$error.pattern">Please enter valid allowed leaves.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayPF">PF</label>
+                            <input type="text" class="form-control" id="txtPayPF" tabindex="6" name="txtPayPF" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="payRoll.PF" placeholder="Enter PF amount" maxlength="7" value="" />
+                            <div data-ng-show="empPform.txtPayPF.$error.pattern" class="label label-danger">
+                                Invalid: Please enter valid PF amount.
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+
+            </div>
+
+            <div class="col-sm-4">
+                <h3>Other Information</h3>
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayPassNo">Allocated PassNo</label>
+                            <input type="text" class="form-control" id="txtPayPassNo" tabindex="12" name="txtPayPassNo" data-ng-model="payRoll.AllocatedPassNo" placeholder="Enter allocated pass number" maxlength="50" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayJoiningFrom">Joining Date<span class="compulsary">*</span></label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p6">
+                                <input type="text" data-parentid="p6" 
+                                       data-drc-input-mask='{ "mask": "d-m-y"}'
+                                       class="form-control"
+                                       id="txtPayJoiningFrom" tabindex="13"
+                                        data-ng-model="payRoll.JoiningDate"
+                                       data-ng-change="ValidateJoinDate(payRoll.JoiningDate)"
+                                       name="txtPayJoiningFrom" placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                            data-is-open="calendarOpenedJoinDate"
+                                            data-ng-model="JoiningDate"
+                                            data-min="minDate"
+                                            data-max="'2025-06-22'"
+                                            data-datepicker-options="dateOptions"
+                                            data-close-text="Close"
+                                            data-ng-click="calendarOpenJoinDate($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+                            <div data-ng-show="empPform.txtPayJoiningFrom.$dirty && empPform.txtPayJoiningFrom.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empPform.txtPayJoiningFrom.$error.required">Please select joining date.</span>
+                                <span data-ng-show="empPform.txtPayJoiningFrom.$error.invalidJoinDate">Please enter valid join date.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayReLeavingFrom">Re Leaving Date</label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p7">
+                                <input type="text" data-parentid="p7" data-drc-input-mask='{ "mask": "d-m-y"}'
+                                       class="form-control" id="txtPayReLeavingFrom" name="txtPayReLeavingFrom"
+                                       data-ng-model="payRoll.ReLeavingDate" tabindex="14"
+                                       data-ng-change="ValidateReleavingDate(payRoll.ReLeavingDate)"
+                                       placeholder="DD-MM-YYYY" maxlength="10" value="" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                            data-is-open="calendarOpenedRelDate"
+                                            data-ng-model="releavingDate"
+                                            data-min="minDate"
+                                            data-max="'2025-06-22'"
+                                            data-datepicker-options="dateOptions"
+                                            data-close-text="Close"
+                                            data-ng-click="calendarOpenRelDate($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+                            <div data-ng-show="empPform.txtPayReLeavingFrom.$dirty && empPform.txtPayReLeavingFrom.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empPform.txtPayReLeavingFrom.$error.invalidRelDate">Please enter valid releaving date.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayPermanentFrom">Permanent From<span class="compulsary">*</span></label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p8">
+                                <input type="text" data-parentid="p8" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtPayPermanentFrom" name="txtPayPermanentFrom" data-ng-model="payRoll.PermanentFromDate" data-ng-change="ValidatePermanentDate(payRoll.PermanentFromDate)" tabindex="15"
+                                       placeholder="DD-MM-YYYY" maxlength="10" value="" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                            data-is-open="calendarOpenedPerDate"
+                                            data-ng-model="permanentDate"
+                                            data-min="minDate"
+                                            data-max="'2025-06-22'"
+                                            data-datepicker-options="dateOptions"
+                                            data-close-text="Close"
+                                            data-ng-click="calendarOpenPerDate($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+                            <div data-ng-show="empPform.txtPayPermanentFrom.$dirty && empPform.txtPayPermanentFrom.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empPform.txtPayPermanentFrom.$error.invalidPerDate">Please enter valid permanent date.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="drpPayEmpStatus">Employment Status<span class="compulsary">*</span></label>
+                            <select id="drpPayEmpStatus" name="drpPayEmpStatus" tabindex="16" data-ng-model="payRoll.EmploymentStatus" class="form-control" required>
+                                <option value="">--Select--</option>
+                                <option value="Temporary">Temporary</option>
+                                <option value="Probation">Probation</option>
+                                <option value="Permanent">Permanent</option>
+                            </select>
+                            <div data-ng-show="empPform.drpPayEmpStatus.$dirty && validateDropEmpStatus()" class="label label-danger">
+                                Invalid: Please select employment status.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="drpSalaryBasedOn">Salary Based On<span class="compulsary">*</span></label>
+                            <select id="drpSalaryBasedOn" name="drpSalaryBasedOn" tabindex="17" data-ng-model="payRoll.SalaryBasedOn" class="form-control" required>
+                                <option value="">--Select--</option>
+                                <option value="D">Day wise</option>
+                                <option value="H">Hour wise</option>
+                            </select>
+                            <div data-ng-show="empPform.drpSalaryBasedOn.$dirty && validateDropSalaryBasedOn()" class="label label-danger">
+                                Invalid: Please select salary based on.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="display: none;">
+                    <div class="col-md-12">
+                        <label class="checkbox">
+                            <input type="checkbox" data-ng-model="payRoll.IsActive">Active
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-sm-4">
+                <h3>Bank Details</h3>
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayPFAccnt">PF account number</label>
+                            <input type="text" class="form-control" id="txtPayPFAccnt" tabindex="7" name="txtPayPFAccnt" data-ng-model="payRoll.PFAccountNumber" placeholder="Enter PF account number" maxlength="50" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayCompanyBank">Company Bank Name</label>
+                            <input type="text" class="form-control" id="txtPayCompanyBank" tabindex="8" name="txtPayCompanyBank" data-ng-model="payRoll.CompanyBankName" placeholder="Enter company bank name" maxlength="50" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayCompanyBankAccount">Company Bank Account #</label>
+                            <input type="text" class="form-control" id="txtPayCompanyBankAccount" tabindex="9" name="txtPayCompanyBankAccount" data-ng-model="payRoll.CompanyBankAccount" placeholder="Enter company bank account" maxlength="50" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayPersonalBank">Personal Bank Name</label>
+                            <input type="text" class="form-control" id="txtPayPersonalBank" tabindex="10" name="txtPayPersonalBank" data-ng-model="payRoll.PersonalBankName" placeholder="Enter personal bank name" maxlength="50" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPayPersonalBankAccount">Personal Bank Account</label>
+                            <input type="text" class="form-control" id="txtPayPersonalBankAccount" tabindex="11" name="txtPayPersonalBankAccount" data-ng-model="payRoll.PersonalBankAccount" placeholder="Enter personal bank account" maxlength="50" value="" />
+                        </div>
+                    </div>
+                </div>
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="drpGroupName">Group Name<span class="compulsary">*</span></label>
+                            <select id="drpGroupName" name="drpGroupName" tabindex="16" data-ng-model="payRoll.GroupName" class="form-control" required>
+                                <option value="">--Select--</option>
+                                <option value="DD">DD</option>
+                                <option value="DRC">DRC</option>
+                                <option value="KREELI">KREELI</option>
+                            </select>
+                            <div data-ng-show="empPform.drpGroupName.$dirty && validateDropGroupName()" class="label label-danger">
+                                Invalid: Please select group name.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                <button type="submit" tabindex="18" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="empPform.$invalid || validateDropEmpStatus() || validateDropSalaryBasedOn()"><i class="entypo-check"></i>{{saveText}}</button>
+                <button type="button" tabindex="19" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetPayRollInfo()"><i class="entypo-erase"></i>Reset</button>
+            </div>
+        </div>
+    </form>
+</div>

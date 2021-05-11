@@ -1,0 +1,399 @@
+﻿@{
+    ViewBag.Title = "Manage Inventories";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="InventoriesCreateCtrl" data-ng-init="InitInventory(@ViewBag.Id)">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="page-header main-page-header">
+                <h2 style="text-transform: capitalize"><i class="entypo-doc-text"></i>Manage Inventories
+                        <span style="float: right;">
+                            @{
+                                var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                                bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                                if (hasInsertRights)
+                                {
+                                <a class="btn btn-sm btn-info btn-icon icon-left" href="/Inventories/Create"><i class="entypo-plus"></i>Add New</a>
+                                }
+                            }
+                            <a class="btn btn-sm btn-primary btn-icon icon-left" href="/Inventory/Inventories"><i class="entypo-reply"></i>Back To List</a>
+                        </span>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-tabset>
+
+                <!-- BEGIN INVENTORY -->
+                <div data-tab>
+                    <div data-tab-heading>
+                        <i class="glyphicon glyphicon-th-large"></i>Inventory
+                    </div>
+                    <form role="form" data-ng-submit="CreateUpdateInventories(masterData, frmInventories)" name="frmInventories" id="frmInventories">
+                        <input type="hidden" data-ng-model="masterData.InventoryId" />
+                        <div class="panel panel-default panel-shadow">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{mode}} Inventory</h3>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="txtInventoryName">Inventory Name<span class="compulsary">*</span></label>
+                                                    <input type="text" class="form-control" id="txtInventoryName" name="txtInventoryName" data-drc-focus="isFirstFocus" data-ng-model="masterData.InventoryName" placeholder="Enter Inventory Name" maxlength="50" value="" tabindex="1" required />
+                                                    <div data-ng-show="frmInventories.txtInventoryName.$dirty && frmInventories.txtInventoryName.$invalid" class="label label-danger">
+                                                        Invalid: <span data-ng-show="frmInventories.txtInventoryName.$error.required">Tell us your Inventory Name.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="txtIssueTo">Issue To<span class="compulsary">*</span></label>
+                                                    <input type="text" class="form-control" id="txtIssueTo" name="txtIssueTo" data-ng-model="masterData.IssueTo" placeholder="Enter Recipient Name" maxlength="50" value="" tabindex="2" required />
+                                                    <div data-ng-show="frmInventories.txtIssueTo.$dirty && frmInventories.txtIssueTo.$invalid" class="label label-danger">
+                                                        Invalid: <span data-ng-show="frmInventories.txtIssueTo.$error.required">Tell us your Recipient Name.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="cmbVendors">Vendor Name<span class="compulsary">*</span></label>
+                                                    <select id="cmbVendors" data-ng-model="masterData.VendorId" class="form-control" data-ng-required="true" tabindex="3">
+                                                        <option value="0">--Select--</option>
+                                                        <option data-ng-repeat="v in vendors" data-ng-selected="v.VendorId==masterData.VendorId" value="{{v.VendorId}}">{{v.VendorName}}</option>
+                                                    </select>
+                                                    <div data-ng-show="frmInventories.cmbVendors.$dirty && ValidateMasterVendor()" class="label label-danger">
+                                                        Invalid: Please select Vendor.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="txtPurchaseDate">Purchase Date<span class="compulsary">*</span></label>
+                                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtPurchaseDate" name="txtPurchaseDate" tabindex="4"
+                                                            data-ng-model="masterData.PurchaseDate"
+                                                            data-ng-change="ValidatePurchaseDate(masterData.PurchaseDate, frmInventories)"
+                                                            placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default"
+                                                                data-datepicker-popup="{{format}}"
+                                                                data-is-open="isPurchaseDateCalendarOpened"
+                                                                data-ng-model="masterData.pDate"
+                                                                data-max="maxDate"
+                                                                data-datepicker-options="dateOptions"
+                                                                data-close-text="Close"
+                                                                data-ng-click="PurchaseDateCalendarOpened($event)">
+                                                                <i class="glyphicon glyphicon-calendar"></i>
+                                                            </button>
+                                                        </span>
+                                                    </p>
+
+                                                    <div data-ng-show="frmInventories.txtPurchaseDate.$dirty && frmInventories.txtPurchaseDate.$invalid" class="label label-danger">
+                                                        Invalid: <span data-ng-show="frmInventories.txtPurchaseDate.$error.required">Tell us your Purchase Date.</span>
+                                                        <span data-ng-show="frmInventories.txtPurchaseDate.$error.invalidPurchaseDate">Please enter valid Purchase Date.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="cmbLocation">Location<span class="compulsary">*</span></label>
+                                                    <select id="cmbLocation" data-ng-model="masterData.LocationId" class="form-control" data-ng-required="true" tabindex="5">
+                                                        <option value="0">--Select--</option>
+                                                        <option data-ng-repeat="l in locations" data-ng-selected="l.LocationId==masterData.LocationId" value="{{l.LocationId}}">{{l.LocationName}}</option>
+                                                    </select>
+                                                    <div data-ng-show="frmInventories.cmbLocation.$dirty && ValidateMasterLocation()" class="label label-danger">
+                                                        Invalid: Please select Location.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="txtAmount">Amount<span class="compulsary">*</span></label>
+                                                    <input type="text" class="form-control" id="txtAmount" name="txtAmount" data-ng-model="masterData.Amount" data-ng-pattern="/^\d*\.?\d*$/" placeholder="Enter Amount" maxlength="50" value="" required tabindex="6" />
+                                                    <div data-ng-show="frmInventories.txtAmount.$dirty && frmInventories.txtAmount.$invalid" class="label label-danger">
+                                                        Invalid: <span data-ng-show="frmInventories.txtAmount.$error.required">Tell us your Amount.</span>
+                                                        <span data-ng-show="frmInventories.txtAmount.$error.pattern">Please enter valid Amount.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="txtRemarks">Remarks</label>
+                                                    <textarea class="form-control" id="txtRemarks" name="txtRemarks" placeholder="Enter Remarks" data-ng-model="masterData.Remarks" tabindex="11"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="checkbox" id="chkIsAvailable" name="chkIsActive" data-ng-model="masterData.IsAvailable" data-ng-change="EnableDisableReceiveTab(masterData.IsAvailable)" tabindex="12"><label> Is Available?</label>
+                                                    <!-- <input type="checkbox" id="chkIsScrap" name="chkIsActive" data-ng-model="masterData.IsScrap"><label>Is Scrap?</label> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="cmbCategory">Category Name<span class="compulsary">*</span></label>
+                                                <select id="cmbCategory" data-ng-model="masterData.CategoryId" class="form-control"
+                                                    data-ng-required="true"
+                                                    data-ng-change="RetrieveSubCategories(masterData.CategoryId)"
+                                                    tabindex="7">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="c in categories"
+                                                        data-ng-selected="masterData.CategoryId==c.CategoryId" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+                                                </select>
+                                                <div data-ng-show="frmInventories.cmbCategory.$dirty && ValidateMasterCategory()" class="label label-danger">
+                                                    Invalid: Please select Category.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="cmbSubCategory">SubCategory Name<span class="compulsary">*</span></label>
+                                                <select id="cmbSubCategory" data-ng-model="masterData.SubCategoryId" class="form-control" data-ng-required="true" tabindex="8">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="sc in subCategories"
+                                                        data-ng-selected="masterData.SubCategoryId==sc.SubCategoryId"
+                                                        value="{{sc.SubCategoryId}}">{{sc.SubCategoryName}}</option>
+                                                </select>
+                                                <div data-ng-show="frmInventories.cmbSubCategory.$dirty && ValidateMasterSubCategory()" class="label label-danger">
+                                                    Invalid: <span data-ng-show="frmInventories.cmbSubCategory.$error.required">Please select SubCategory.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="cmbBrand">Brand Name<span class="compulsary">*</span></label>
+                                                <select id="cmbBrand" data-ng-model="masterData.BrandId" class="form-control" data-ng-required="true" tabindex="9">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="b in brands" data-ng-selected="b.BrandId==masterData.BrandId" value="{{b.BrandId}}">{{b.BrandName}}</option>
+                                                </select>
+                                                <div data-ng-show="frmInventories.cmbBrand.$dirty && ValidateMasterBrand()" class="label label-danger">
+                                                    Invalid: Please select Brand.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="txtSerialNumber">Serial Number</label>
+                                                <!-- <input type="text" class="form-control" id="txtSerialNumber" name="txtSerialNumber" data-ng-model="masterData.SerialNumber" placeholder="Enter Serial Number" maxlength="50" value="" required />
+                                                <div data-ng-show="frmInventories.txtSerialNumber.$dirty && frmInventories.txtSerialNumber.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="frmInventories.txtSerialNumber.$error.required">Tell us your Serial Number.</span>
+                                                </div> -->
+                                                <input type="text" class="form-control" id="txtSerialNumber" name="txtSerialNumber" data-ng-model="masterData.SerialNumber" placeholder="Enter Serial Number" maxlength="50" value="" tabindex="10" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                @{
+                                    if (hasInsertRights || ERPUtilities.HasAccessPermission(2, ctrl))
+                                    {
+                                    <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" tabindex="13" data-ng-disabled="frmInventories.$invalid || ValidateMasterVendor() || ValidateMasterLocation() || ValidateMasterBrand() || ValidateMasterCategory() || ValidateMasterSubCategory()"><i class="entypo-check"></i>{{SaveText}}</button>                                        
+                                    }       
+                                }
+                                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" tabindex="14" data-ng-click="ResetInventory(frmInventories)"><i class="entypo-erase"></i>Reset</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- / END INVENTORY -->
+
+                <!-- BEGIN INVENTORY DETAILS-->
+                <div data-tab disabled="!isDetailTabEnabled">
+                    <div data-tab-heading>
+                        <i class="glyphicon glyphicon-th-list"></i>Details
+                    </div>
+
+                    <div class="panel panel-default panel-shadow">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">{{modeDetail}} Inventory Detail</h3>
+                        </div>
+                        <div class="panel-body" style="min-height: 85px">
+                            <form role="form" data-ng-submit="CreateUpdateInventoriesDetail(detailData, frmInventoryDetails)" name="frmInventoryDetails" id="frmInventoryDetails">
+                                <input type="hidden" data-ng-model="detailData.SrNo" />
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <select id="_cmbCategory" data-ng-model="detailData.CategoryId" class="form-control input-sm" data-ng-required="true" data-ng-change="RetrieveSubCategoriesForDetail(detailData.CategoryId)">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="c in categories" data-ng-selected="detailData.CategoryId == c.CategoryId" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+                                                </select>
+                                                <div data-ng-show="frmInventoryDetails._cmbCategory.$dirty && ValidateDetailCategory()" class="label label-danger">
+                                                    Invalid: Please select Category.
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <select id="_cmbSubCategory" data-ng-model="detailData.SubCategoryId" class="form-control input-sm" data-ng-required="true">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="_sc in subCategoriesForDetail" data-ng-selected="detailData.SubCategoryId == _sc.SubCategoryId" value="{{_sc.SubCategoryId}}">{{_sc.SubCategoryName}}</option>
+                                                </select>
+                                                <div data-ng-show="frmInventoryDetails._cmbSubCategory.$dirty && ValidateDetailSubCategory()" class="label label-danger">
+                                                    Invalid: Please select SubCategory.
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <select id="_cmbBrand" data-ng-model="detailData.BrandId" class="form-control input-sm" data-ng-required="true">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="b in brands" value="{{b.BrandId}}">{{b.BrandName}}</option>
+                                                </select>
+                                                <div data-ng-show="frmInventoryDetails._cmbBrand.$dirty && ValidateDetailBrand()" class="label label-danger">
+                                                    Invalid: Please select Brand.
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <!-- <input type="text" class="form-control  input-sm" id="_txtSerialNumber" name="_txtSerialNumber" data-ng-model="detailData.SerialNumber" placeholder="Enter Serial Number" maxlength="50" value="" required />
+                                                <div data-ng-show="frmInventoryDetails._txtSerialNumber.$dirty && frmInventoryDetails._txtSerialNumber.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="frmInventoryDetails._txtSerialNumber.$error.required">Tell us your Serial Number.</span>
+                                                </div> -->
+                                                <input type="text" class="form-control  input-sm" id="_txtSerialNumber" name="_txtSerialNumber" data-ng-model="detailData.SerialNumber" placeholder="Enter Serial Number" maxlength="50" value="" />
+                                            </div>
+                                            <div class="form-group">
+                                                @{
+                                                    if (hasInsertRights)
+                                                    { 
+                                                    <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmInventoryDetails.$invalid || ValidateDetailBrand() || ValidateDetailCategory() || ValidateDetailSubCategory()"><i class="entypo-plus"></i>{{SaveTextDetail}} Detail</button>
+                                                    }
+                                                }
+                                                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetInventoryDetail(frmInventoryDetails)"><i class="entypo-erase"></i>Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="row" data-ng-show="isDetailGridVisible">
+                                <hr />
+                                <div class="col-sm-12">
+                                    <table class="table table-hover table-bordered table-striped table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 25px;">#</th>
+                                                <th>Category</th>
+                                                <th>SubCategory</th>
+                                                <th>Brand</th>
+                                                <th>Serial Number</th>
+                                                <th>Changed On</th>
+                                                <th style="width: 70px;">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="d in details | filter: {Status: 'I'}">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{d.tblCategory.CategoryName}}</td>
+                                                <td>{{d.tblSubCategory.SubCategoryName}}</td>
+                                                <td>{{d.tblBrand.BrandName}}</td>
+                                                <td>{{d.SerialNumber}}</td>
+                                                <td>{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                                                <td>
+                                                    @{
+                                                        if (ERPUtilities.HasAccessPermission(2, ctrl))
+                                                        {
+                                                        <a class="btn btn-primary btn-xs" data-ng-click="UpdateInventoryDetail(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                       
+                                                        }
+                                                        if (ERPUtilities.HasAccessPermission(3, ctrl))
+                                                        {
+                                                        <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteInventoryDetail(d)" data-message="Are you sure want to delete this record?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                      
+                                                        }                          
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / END INVENTORY DETAILS-->
+
+                <!-- BEGIN RECEIVE INVENTORY DETAILS-->
+                <div data-tab disabled="!isReceiveTabEnabled">
+                    <div data-tab-heading>
+                        <i class="glyphicon glyphicon-cloud-download"></i>Receive
+                    </div>
+                    <div class="panel panel-default panel-shadow">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Receive Inventory</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row" data-ng-show="isReceiveGridVisible">
+                                <div class="col-sm-12">
+                                    <table class="table table-hover table-bordered table-striped table-hover table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Category</th>
+                                                <th>SubCategory</th>
+                                                <th>Brand</th>
+                                                <th>Serial Number</th>
+                                                <th>Changed On</th>
+                                                <th style="width: 70px;">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr data-ng-repeat="d in details" data-ng-class="{'danger': d.IsScrap}">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{d.tblCategory.CategoryName}}</td>
+                                                <td>{{d.tblSubCategory.SubCategoryName}}</td>
+                                                <td>{{d.tblBrand.BrandName}}</td>
+                                                <td>{{d.SerialNumber}}</td>
+                                                <td>{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                                                <td>
+                                                    <a class="btn btn-primary btn-xs" data-ng-click="ReceiveInventoryDetail(d)" data-drc-tooltip="Receive" data-ng-hide="d.Status=='R' || d.IsScrap"><i class="entypo-export"></i></a>
+                                                    <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="ScarpInventoryDetail(d)" data-message="Are you sure want to move this inventory to Scrap?" data-drc-tooltip="Scrap" data-ng-hide="d.Status=='R' || d.IsScrap"><i class="entypo-trash"></i></a>
+                                                    <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="AddToStock(d)" data-message="Are you sure want to move this inventory to stock?" data-drc-tooltip="Remove from Scrap" data-ng-show="d.IsScrap"><i class="entypo-cancel"></i></a>
+                                                    <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="ChangeStatus(d)" data-message="Are you sure want to change status?" data-drc-tooltip="Undo Receive" data-ng-show="d.Status=='R' && !d.IsScrap"><i class="entypo-ccw"></i></a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / END RECEIVE INVENTORY DETAILS-->
+
+            </div>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    
+    @section Scripts{
+
+        <script src="@Url.Content("~/Areas/Inventory/Scripts/controllers/InventoriesCreateCtrl.js")"></script>
+        <script src="@Url.Content("~/Areas/Inventory/Scripts/services/InventoriesService.js")"></script>
+        <script src="~/Scripts/directives/checkbox.js"></script>
+        <script src="~/Scripts/directives/confirmbox.js"></script>
+        <script src="~/Scripts/directives/focus.js"></script>
+        <script src="~/Scripts/directives/drcInputMask.js"></script>
+
+    }
+</div>
+
+

@@ -1,0 +1,19 @@
+<div class="my-slider">
+  <div class="slide" data-ng-repeat="s in list" data-ng-show="s.visible">
+      <div style="padding:0;">
+        <a href="/{{s.mainPath}}/{{s.FileName}}" target="_blank" title="click to view original image"><h3>{{s.CaptionText}}</h3></a>
+    </div>
+    <img data-ng-src="/{{s.mainPath}}/{{s.FileName}}" title="{{s.CaptionText}}" style="max-width:100%" />
+  </div>
+  <div class="arrows">
+    <a href="#" data-ng-click="prev()" class="btn btn-xs btn-default" title="Prev">
+       <i class="entypo-left"></i>
+    </a>
+    <a href="#" data-ng-click="next()" class="btn btn-xs btn-default" title="Next">
+      <i class="entypo-right"></i>
+    </a>
+    <a href="#" data-ng-click="close()" class="btn btn-xs btn-danger" title="Close">
+        <i class="entypo-cancel"></i>
+    </a>
+  </div>
+</div>

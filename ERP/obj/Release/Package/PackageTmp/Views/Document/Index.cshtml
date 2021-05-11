@@ -1,0 +1,174 @@
+﻿@{
+    ViewBag.Title = "Manage Documents";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="DocumentCtrl">
+    
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Documents</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                         var ctrl = ViewBag.ctrlName;
+                          bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                    if (hasInsertRights) { 
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddDocument()">Add New</button>
+		                    }
+                    }
+                    
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateDocument(editData)" name="docform" id="docform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Document</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtDocumentName">Document Name</label>
+                                    <input type="text" class="form-control" id="txtDocumentName" name="docName" data-ng-model="editData.Documents" data-drc-focus="isFirstFocus" placeholder="Enter document name" maxlength="50" value="" required />
+                                    <div data-ng-show="docform.docName.$dirty && docform.docName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.docName.$error.required">Tell us your document name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label for="drpDocumentType">Document Type<span class="compulsary">*</span></label>
+                                        <select id="drpDocumentType" name="drpDocumentType" data-ng-model="editData.DocumentTypeId" class="form-control" required>
+                                            <option value="0">--Select--</option>
+                                            <option data-ng-repeat="t in DocumentType" data-ng-selected="t.Id == editData.DocumentTypeId" value="{{t.Id}}">{{t.Label}}</option>
+                                        </select>
+                                        <div data-ng-show="docform.drpDocumentType.$dirty && validateDropDocumentType()" class="label label-danger">
+                                            Invalid: Please select document type.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+		                    if (hasInsertRights) { 
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="docform.$invalid || validateDropDocumentType()"><i class="entypo-check"></i>{{saveText}}</button>
+		                    }
+                        }
+                        
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetDocument()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseDocument()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- <div class="row" style="text-align: right;">
+        <div class="col-sm-6" style="float: left;">
+            <div class="form-group">
+                <input type="text" data-ng-model="searchDocument.Documents" class="form-control" placeholder="Search" maxlength="50" value="" style="width: 200px;">
+            </div>
+        </div>
+        <div class="col-sm-6" style="float: right;">
+            <span data-drc-confirm-box="" data-callback="deleteAll()" data-message="Are you sure want to delete all selected record(s)?" style="cursor: pointer; font-size: 12px;">Delete Selected</span>
+        </div>
+    </div> -->
+
+    <!-- BEGING DOCUMENTS LIST -->
+    <div class="row" data-ng-init="RetrieveDocument()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <!--<td width="3%" style="text-align: left" data-title="'#'">
+                                    <input type="checkbox" data-ng-model="checkboxes.items[doc.Id]" />
+                                </td> -->
+
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to InActive '{{d.Documents}}' Document?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to Active '{{d.Documents}}' Document?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                    
+	                            }
+                            }
+                            <td data-title="'Documents'" data-filter="{ 'Documents': 'text' }" data-sortable="'Documents'">{{d.Documents}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @if (editPermission) {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateDocument(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                            
+                                        }
+                                        @if (deletePermission) {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteDocument(d.Id)" data-message="Are you sure want to delete '{{d.Documents}}' from Document?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any documents.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END DOCUMENTS LIST -->
+</div>
+
+@section Scripts{
+   @Scripts.Render("~/Scripts/documents")
+    }

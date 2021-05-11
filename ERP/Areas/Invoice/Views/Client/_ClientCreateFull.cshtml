@@ -1,0 +1,559 @@
+﻿
+
+<div data-tab ng-controller="ClientCreateFullCtrl" disabled="master.isFullTabDisabled" active="master.isFullTabActive" data-select="LoadFullData()">
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Create Full
+    </div>
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div ng-form="ccfform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{master.mode}} Client</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12 kyc-header">
+                                <h4>
+                                    Information about the company
+                                    <span data-ng-click="ShowLink = !ShowLink">
+                                        <a class="badge badge-default pull-right" data-ng-if="!ShowLink">Show KYC URL</a>
+                                        <a class="badge badge-default pull-right" data-ng-if="ShowLink">Hide KYC URL</a>
+                                    </span>
+                                </h4>
+                                <div class="row" style="padding:10px 0;" data-ng-if="ShowLink">
+                                    <div class="col-sm-12">
+                                        <b data-ng-if="editDataF.URLKey">Link : <a href="@ViewBag.lnkKYC{{editDataF.URLKey}}" target="_blank">@ViewBag.lnkKYC{{editDataF.URLKey}}</a></b>
+                                        <b data-ng-if="!editDataF.URLKey">-- No link generted yet --</b>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="txtFCompanyName">Company Name<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtFCompanyName" name="txtFCompanyName" tabindex="1"
+                                                   data-ng-model="editDataF.CompanyName" placeholder="Enter company name" maxlength="100" value="" required />
+                                            <div data-ng-show="ccfform.txtFCompanyName.$dirty && ccfform.txtFCompanyName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfform.txtFCompanyName.$error.required">Tell us your company name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="txtFClientCode">Client Code<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="txtFClientCode" name="txtFClientCode" tabindex="1"
+                                                   data-ng-model="editDataF.ClientCode" data-ng-blur="CheckClientCode(editDataF.ClientCode)"
+                                                   placeholder="Enter client code" maxlength="10" value="" required />
+                                            <div data-ng-show="ccfform.txtFClientCode.$dirty && ccfform.txtFClientCode.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfform.txtFClientCode.$error.required">Tell us your client code.</span>
+                                                <span data-ng-show="ccfform.txtFClientCode.$error.invalidCC">Please enter valid client code.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="chkFKYCApproved"></label>
+                                            <label class="checkbox">
+                                                <input type="checkbox" name="chkFKYCApproved" data-ng-model="editDataF.IsKYCApproved" tabindex="1" />
+                                                Is KYC Approved
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div>
+                                        <label for="txtFContactPerson">Contact Person<span class="compulsary">*</span></label>
+                                    </div>
+                                    <div class="col-sm-2" style="padding: 0px; max-width: 83px;">
+                                        <select class="form-control" name="drpCPrefix" data-ng-model="editDataF.CPrefix" tabindex="2">
+                                            <option selected="selected" value="Mr.">Mr.</option>
+                                            <option value="Ms.">Ms.</option>
+                                            <option value="Mrs.">Mrs.</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="txtFContactPerson" name="txtFContactPerson" tabindex="3"
+                                               data-ng-model="editDataF.ContactPerson" placeholder="Enter contact person" maxlength="50" value="" required />
+                                        <div data-ng-show="ccfform.txtFContactPerson.$dirty && ccfform.txtFContactPerson.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="ccfform.txtFContactPerson.$error.required">Tell us your contact person.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtFMobile">Mobile Number<span class="compulsary">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{{TelPrefix}}</span>
+                                        <input type="text" class="form-control" id="txtFMobile" name="txtFMobile" data-ng-pattern="/^[0-9]+$/"
+                                               data-ng-model="editDataF.MobileNo" placeholder="Enter mobile number" tabindex="4" maxlength="13" value="" required />
+                                        <div data-ng-show="ccfform.txtFMobile.$dirty && ccfform.txtFMobile.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="ccfform.txtFMobile.$error.required">Tell us your mobile number.</span>
+                                            <span data-ng-show="ccfform.txtFMobile.$error.pattern">Please enter only Numeric characters.</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="txtFComAddress">Company Address<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtFComAddress" name="txtFComAddress" tabindex="5"
+                                           data-ng-model="editDataF.CompanyAddress" placeholder="Enter company address" maxlength="500" value="" required />
+                                    <div data-ng-show="ccfform.txtFComAddress.$dirty && ccfform.txtFComAddress.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ccfform.txtFComAddress.$error.required">Tell us your company address.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpCountry">Country From<span class="compulsary">*</span></label>
+                                    <select id="drpCountry" name="drpCountry" data-ng-model="editDataF.CountryId" tabindex="6" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in Country" data-ng-selected="t.CountryId == editDataF.CountryId" value="{{t.CountryId}}">{{t.CountryName}}</option>
+                                    </select>
+                                    <div data-ng-show="ccfform.drpCountry.$dirty && validateDropCountry()" class="label label-danger">
+                                        Invalid: Please select client country.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpState">States<span class="compulsary">*</span></label>
+                                    <select id="drpState" name="drpState" data-ng-model="editDataF.StateId" tabindex="7" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in States" data-ng-selected="t.Id == editDataF.StateId" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="ccfform.drpState.$dirty && validateDropState()" class="label label-danger">
+                                        Invalid: Please select client state.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFCity">City</label>
+                                    <input type="text" class="form-control" id="txtFCity" name="txtFCity" tabindex="8"
+                                           data-ng-model="editDataF.City" placeholder="Enter city" maxlength="50" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFPostalcode">Postal Code<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <input type="text" class="form-control" id="txtFPostalcode" name="txtFPostalcode" tabindex="9"
+                                           data-ng-model="editDataF.PostalCode" placeholder="Enter postal code" maxlength="10" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                    <div data-ng-show="ccfform.txtFPostalcode.$dirty && ccfform.txtFPostalcode.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ccfform.txtFPostalcode.$error.required">Tell us your postal code.</span>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFTelephone">Telephone number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{{TelPrefix}}</span>
+                                        <input type="text" class="form-control" id="txtFTelephone" name="txtFTelephone" tabindex="10" data-ng-pattern="/^[0-9]+$/"
+                                               data-ng-model="editDataF.TelephoneNo" placeholder="Enter telephone number" maxlength="13" value="" />
+                                        <div data-ng-show="ccfform.txtFTelephone.$dirty && ccfform.txtFTelephone.$invalid" class="label label-danger">
+                                            Invalid:<span data-ng-show="ccfform.txtFTelephone.$error.pattern">Please enter only Numeric characters.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFFax">Fax number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon">{{TelPrefix}}</span>
+                                        <input type="text" class="form-control" id="txtFFax" name="txtFFax" tabindex="11" data-ng-pattern="/^[0-9]+$/"
+                                               data-ng-model="editDataF.FaxNo" placeholder="Enter fax number" maxlength="20" value="" />
+                                        <div data-ng-show="ccfform.txtFFax.$dirty && ccfform.txtFFax.$invalid" class="label label-danger">
+                                            Invalid:<span data-ng-show="ccfform.txtFFax.$error.pattern">Please enter only Numeric characters.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFEmail">Email<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <input type="email" class="form-control" id="txtFEmail" name="txtFEmail" tabindex="12"
+                                           data-ng-model="editDataF.Email" placeholder="Enter email" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                    <div data-ng-show="ccfform.txtFEmail.$dirty && ccfform.txtFEmail.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ccfform.txtFEmail.$error.required">Tell us your email.</span>
+                                        <span data-ng-show="ccfform.txtFEmail.$error.email">Please enter valid email address.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFWebsite">Website</label>
+                                    <input type="text" class="form-control" id="txtFWebsite" name="txtFWebsite" tabindex="13"
+                                           data-ng-model="editDataF.Website" placeholder="Enter website" maxlength="50" value="" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpBusinessType">Nature Of Business<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <select id="drpBusinessType" name="drpBusinessType" data-ng-model="editDataF.BusinessTypeId" tabindex="14" class="form-control" data-ng-required="editDataF.IsKYCApproved">
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in BusinessType" data-ng-selected="t.Id == editDataF.BusinessTypeId" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="ccfform.drpBusinessType.$dirty && validateDropBusinessType()" class="label label-danger">
+                                        Invalid: Please select client state.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFBEDate">Business Established Date<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="15" class="form-control" id="txtFBEDate" name="txtFBEDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editDataF.BusinessStartDate" data-ng-change="ValidateBusinessStartDate(editDataF.BusinessStartDate)" data-ng-required="editDataF.IsKYCApproved"/>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                    data-is-open="editDataF.calOpenBSDate"
+                                                    data-ng-model="editDataF.businessStartDate"
+                                                    data-min="minDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-click="calendarOpenDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="ccfform.txtFBEDate.$error.invalidBEDate" class="label label-danger">
+                                        Invalid: <span>Please enter valid date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpSource">Client Source<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <select id="drpSource" name="drpSource" data-ng-model="editDataF.SourceId" class="form-control" data-ng-required="editDataF.IsKYCApproved" tabindex="16">
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in ClientSource" data-ng-selected="t.Id == editDataF.SourceId" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="ccfform.drpSource.$dirty && validateDropSource()" class="label label-danger">
+                                        Invalid: Please select client source.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFTaxNo">Tax Number</label>
+                                    <input type="text" class="form-control" id="txtFTaxNo" name="txtFTaxNo" tabindex="17"
+                                           data-ng-model="editDataF.IncomeTaxNo" placeholder="Enter income tax number" maxlength="50" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFVATNo">VAT Number</label>
+                                    <input type="text" class="form-control" id="txtFVATNo" name="txtFVATNo" tabindex="18"
+                                           data-ng-model="editDataF.VATNo" placeholder="Enter VAT number" maxlength="50" value="" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFLicense">License Number</label>
+                                    <input type="text" class="form-control" id="txtFLicense" name="txtFLicense" tabindex="19"
+                                           data-ng-model="editDataF.LicenseNo" placeholder="Enter license number" maxlength="50" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Bank details-->
+                        <div class="row">
+                            <div class="col-sm-12 kyc-header">
+                                <h4>Bank Information</h4>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtFBankName">Bank Name<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <input type="text" class="form-control" id="txtFBankName" name="txtFBankName" tabindex="20"
+                                                data-ng-model="editDataF.BankName" placeholder="Enter bank name" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                            <div data-ng-show="ccfform.txtFBankName.$dirty && ccfform.txtFBankName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfform.txtFBankName.$error.required">Tell us your bank name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtFBankType">Bank Type<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <input type="text" class="form-control" id="txtFBankType" name="txtFBankType" tabindex="21"
+                                                data-ng-model="editDataF.BankType" placeholder="Enter bank type" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                            <div data-ng-show="ccfform.txtFBankType.$dirty && ccfform.txtFBankType.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfform.txtFBankType.$error.required">Tell us your bank type.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="txtFBranchAddress">Branch Address<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <input type="text" class="form-control" id="txtFBranchAddress" name="txtFBranchAddress" tabindex="22"
+                                        data-ng-model="editDataF.BranchAddress" placeholder="Enter branch address" maxlength="500" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                    <div data-ng-show="ccfform.txtFBranchAddress.$dirty && ccfform.txtFBranchAddress.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ccfform.txtFBranchAddress.$error.required">Tell us your branch address.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFAccntNo">Account Number<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                    <input type="text" class="form-control" id="txtFAccntNo" name="txtFAccntNo" tabindex="23" 
+                                        data-ng-model="editDataF.AccountNo" placeholder="Enter account number" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                    <div data-ng-show="ccfform.txtFAccntNo.$dirty && ccfform.txtFAccntNo.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="ccfform.txtFAccntNo.$error.required">Tell us your account number.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFIBANNo">IBAN Number</label>
+                                    <input type="text" class="form-control" id="txtFIBANNo" name="txtFIBANNo" tabindex="24"
+                                           data-ng-model="editDataF.IBANNumber" placeholder="Enter IBAN number" maxlength="50" value="" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFSwiftCode">Swift Code</label>
+                                    <input type="text" class="form-control" id="txtFSwiftCode" name="txtFSwiftCode" tabindex="25"
+                                           data-ng-model="editDataF.SwiftCode" placeholder="Enter swift code" maxlength="50" value="" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Director list-->
+                        <div class="row" ng-form="ccfdform" drc-omit-sub-form-validation>
+                            <div class="col-sm-12 kyc-header">
+                                <h4>
+                                    Contact Person List
+                                    <span style="color: #CC2424;font-weight: 400;font-size: 75%;float: right;" data-ng-hide="isDirectorFound" data-ng-if="editDataF.IsKYCApproved">Please add atleast one contact person</span>
+                                </h4>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div>
+                                                <label for="txtDName">FullName<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            </div>
+                                            <div class="col-sm-3" style="padding: 0px; max-width: 83px;">
+                                                <select class="form-control" name="drpDPrefix" data-ng-model="director.Prefix" tabindex="26">
+                                                    <option selected="selected" value="Mr.">Mr.</option>
+                                                    <option value="Ms.">Ms.</option>
+                                                    <option value="Mrs.">Mrs.</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="txtDName" name="txtDName" tabindex="27"
+                                                       data-ng-model="director.FullName" placeholder="Enter name" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                                <div data-ng-show="ccfdform.txtDName.$dirty && ccfdform.txtDName.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="ccfdform.txtDName.$error.required">Tell us your name.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="txtDDesignation">Designation<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <input type="text" class="form-control" id="txtDDesignation" name="txtDDesignation" tabindex="28"
+                                                   data-ng-model="director.Designation" placeholder="Enter designation" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                            <div data-ng-show="ccfdform.txtDDesignation.$dirty && ccfdform.txtDDesignation.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfdform.txtDDesignation.$error.required">Tell us your designation.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="txtDEmail">Email<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <input type="email" class="form-control" id="txtDEmail" name="txtDEmail" tabindex="29"
+                                                   data-ng-model="director.Email" placeholder="Enter email" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                            <div data-ng-show="ccfdform.txtDEmail.$dirty && ccfdform.txtDEmail.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfdform.txtDEmail.$error.required">Tell us your email.</span>
+                                                <span data-ng-show="ccfdform.txtDEmail.$error.email">Please enter valid email address.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="txtDMobile">Mobile<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">{{TelPrefix}}</span>
+                                                <input type="text" class="form-control" id="txtDMobile" name="txtDMobile" tabindex="30" data-ng-pattern="/^[0-9]+$/"
+                                                   data-ng-model="director.MobileNo" placeholder="Enter mobile no" maxlength="13" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                                <div data-ng-show="ccfdform.txtDMobile.$dirty && ccfdform.txtDMobile.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="ccfdform.txtDMobile.$error.required">Tell us mobile no.</span>
+                                                    <span data-ng-show="ccfdform.txtDMobile.$error.pattern">Please enter only Numeric characters.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="txtDIdentity">Identity Card<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <input type="text" style="display:none" data-ng-model="director.IdentityDocName" />
+                                            <select id="drpDIdentity" name="drpDIdentity" data-ng-model="director.IdentityDocId" class="form-control" tabindex="31" data-ng-required="editDataF.IsKYCApproved">
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="t in IdentityDocumentList" data-ng-selected="t.Id == director.IdentityDocId" value="{{t.Id}}">{{t.Documents}}</option>
+                                            </select>
+                                            <div data-ng-show="ccfdform.drpDIdentity.$dirty && validateIdentityDropDocuments()" class="label label-danger">
+                                                Invalid: Please select identity document.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label for="txtDIdentityNo">Identity Card No<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <input type="text" class="form-control" id="txtDIdentityNo" name="txtDIdentityNo" tabindex="32"
+                                                   data-ng-model="director.IdentityNo" placeholder="Enter identity card number" maxlength="50" value="" data-ng-required="editDataF.IsKYCApproved" />
+                                            <div data-ng-show="ccfdform.txtDIdentityNo.$dirty && ccfdform.txtDIdentityNo.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="ccfdform.txtDIdentityNo.$error.required">Tell us your identity card no.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2" style="line-height: 68px;">
+                                        <button type="button" class="btn btn-sm btn-info btn-icon icon-left" tabindex="32" ng-click="AddDirector(director)" data-ng-disabled="ccfdform.$invalid || validateIdentityDropDocuments()"><i class="entypo-check"></i>Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" ng-show="directorList.length > 0">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>####</th>
+                                            <th>FullName</th>
+                                            <th>Designation</th>
+                                            <th>Email</th>
+                                            <th>Mobile</th>
+                                            <th>Identity</th>
+                                            <th>Identity No</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="d in directorList">
+                                            <td>
+                                                <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteDirector($index)" title="delete"><i class="entypo-trash"></i></a>
+                                            </td>
+                                            <td>{{d.FullName}}</td>
+                                            <td>{{d.Designation}}</td>
+                                            <td>{{d.Email}}</td>
+                                            <td>{{d.MobileNo}}</td>
+                                            <td>{{d.IdentityDocName}}</td>
+                                            <td>{{d.IdentityNo}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!--Document list-->
+                        <div class="row" ng-form="ccfdlform" drc-omit-sub-form-validation>
+                            <div class="col-sm-12 kyc-header">
+                                <h4>
+                                    Document List
+                                    &nbsp;&nbsp;
+                                    <span style="font-weight: 400;font-size: 75%;">[I] = Identity Proof, [C] = Company Registration Proof</span>
+                                    <span style="color: #CC2424;font-weight: 400;font-size: 75%;float: right;"
+                                          data-ng-hide="isIdentityProofFound && isCompanyProofFound" data-ng-if="editDataF.IsKYCApproved">Please select atleast one identity and company registration proof</span>
+                                </h4>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="drpDLDocuments">Document Type<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <select id="drpDLDocuments" name="drpDLDocuments" data-ng-model="document.DocId" class="form-control" tabindex="33" data-ng-required="editDataF.IsKYCApproved">
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="t in DocumentList" data-ng-selected="t.Id == document.DocId" value="{{t.Id}}">{{t.DocumentTypeId == 1 ? '[I]' : '[C]'}} {{t.Documents}}</option>
+                                            </select>
+                                            <div data-ng-show="ccfdlform.drpDLDocuments.$dirty && validateDropDocuments()" class="label label-danger">
+                                                Invalid: Please select document type.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="drpDLUpload">Upload Document<span class="compulsary" data-ng-if="editDataF.IsKYCApproved">*</span></label>
+                                            <div upload-file data-filename="document.fileName" data-buttonclass="document-pic-upload-btn" data-id="document_pic" data-uploadhandler="/Invoice/Client/UploadDocument" data-ischanged="isChanged" data-ext="*.jpg; *.jpeg" data-filesize="512KB">
+                                                <input id="imageOne">
+                                            </div>
+                                            <input type="text" style="display: none" data-ng-model="document.fileName" data-ng-required="editDataF.IsKYCApproved" />
+                                            <div data-ng-show="ccfdlform.document.fileName.$dirty && validateImage()" class="label label-danger">
+                                                Invalid: Please select document to upload.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4" style="line-height: 68px;">
+                                        <button type="button" class="btn btn-sm btn-info btn-icon icon-left" tabindex="34" ng-click="AddDocument(document)" data-ng-disabled="ccfdlform.$invalid || validateDropDocumentType()"><i class="entypo-check"></i>Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="documentList.length > 0">
+                            <div class="col-sm-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>####</th>
+                                            <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="d in documentList">
+                                            <td style="width:100px;">
+                                                <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteDocument($index)" title="delete"><i class="entypo-trash"></i></a>
+                                                <a ng-show="d.PKDocId != 0" href="/@ViewBag.mainDocPath/{{d.fileName}}" target="_blank" title="view" class="btn btn-default btn-xs"><i class="entypo-eye"></i></a>
+                                                <a ng-show="d.PKDocId == 0" href="/@ViewBag.TempImagePath/{{d.fileName}}" target="_blank" title="view" class="btn btn-default btn-xs"><i class="entypo-eye"></i></a>
+                                            </td>
+                                            <td>{{d.DocName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        <button type="button" ng-click="CreateUpdateFullClient(editDataF)" tabindex="35" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="ccfform.$invalid || validateDropCountry() || validateDropState() || validateDropBusinessType() || validateDirectorForm() || validateDocumentForm() || validateDropSource()"><i class="entypo-check"></i>{{btnFSaveText}}</button>
+                        @*<button type="button" data-ng-if="master.mode == 'Edit' && !editDataF.IsKYCApproved" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ApproveKYC()"><i class="entypo-erase"></i>Approve KYC</button>
+                        <button type="button" data-ng-if="master.mode == 'Edit' && editDataF.IsKYCApproved" class="btn btn-sm btn-danger btn-icon icon-left" data-ng-click="ApproveKYC()"><i class="entypo-erase"></i>DisApprove KYC</button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+</div>

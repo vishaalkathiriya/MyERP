@@ -1,0 +1,230 @@
+﻿@{
+    ViewBag.Title = "Manage Machine";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRMachineCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Machine</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRMachine()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSRMachine(editData)" name="machineform" id="machineform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Machine</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtMachineName">Machine Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtMachineName" name="machineName" tabindex="1" data-ng-model="editData.MachineName" data-drc-focus="isFirstFocus" placeholder="Enter machine name" maxlength="50" value="" required />
+                                    <div data-ng-show="machineform.machineName.$dirty && machineform.machineName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="machineform.machineName.$error.required">Tell us Machine Name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtSerialNo">Serial No<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtSerialNo" name="serialNo" data-ng-model="editData.SerialNo" tabindex="2" placeholder="Enter serial no" maxlength="50" value="" required />
+                                    <div data-ng-show="machineform.serialNo.$dirty && machineform.serialNo.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="machineform.serialNo.$error.required">Tell us Serialno.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtIssueDate">Installation Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtIssueDate" name="txtIssueDate" placeholder="DD-MM-YYYY" maxlength="10" tabindex="3" value="" required data-ng-model="editData.InstallationDate" data-ng-change="ValidateIssuedDate(editData.InstallationDate)" />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="editData.calOpenIssueDate"
+                                                data-ng-model="issueDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenIssueDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="machineform.txtIssueDate.$dirty && machineform.txtIssueDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="machineform.txtIssueDate.$error.required">Please select Installation Date.</span>
+                                        <span data-ng-show="machineform.txtIssueDate.$error.invalidIssueDate">Please enter valid Date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpType">Type<span class="compulsary">*</span></label>
+                                    <select id="drpType" name="drpType"
+                                        data-ng-model="editData.TypeId"
+                                        class="form-control"
+                                        tabindex="4" 
+                                        required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRTypes" data-ng-selected="editData.TypeId==t.Id" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="machineform.drpType.$dirty && validateDropGroup()" class="label label-danger">
+                                        Invalid: Please select Type.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpSubType">Sub-Type<span class="compulsary">*</span></label>
+                                    <select id="drpSubType" name="drpSubType"
+                                        data-ng-model="editData.SubTypeId"
+                                        class="form-control"
+                                        tabindex="5" 
+                                        required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRSubTypes"
+                                            data-ng-selected="editData.SubTypeId==t.Id"
+                                            value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="machineform.drpSubType.$dirty && validateDropSubType()" class="label label-danger">
+                                        Invalid: Please select Sub-Type.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpParameter">Parameter<span class="compulsary">*</span></label>
+                                    <select id="drpParameter" name="drpParameter"
+                                        data-ng-model="editData.ParameterId"
+                                        class="form-control"
+                                        tabindex="6" 
+                                        required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRParameters" data-ng-selected="editData.ParameterId==t.Id" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="machineform.drpParameter.$dirty && validateDropParameter()" class="label label-danger">
+                                        Invalid: Please select Parameter.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtRemarks">Remarks</label>
+                            <textarea class="form-control" id="txtRemarks" name="remarks" data-ng-model="editData.Remarks" tabindex="7"  placeholder="Enter remark" maxlength="100"></textarea>
+                            <div data-ng-show="machineform.remarks.$dirty && machineform.remarks.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="machineform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" tabindex="8"  data-ng-disabled="machineform.$invalid || validateDropGroup() || validateDropSubType() || validateDropParameter()  "><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRParameter()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRParameter()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--Machine list-->
+    <div class="row" data-ng-init="RetrieveSRMachine()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="'Machine Name'" data-filter="{'MachineName': 'text' }" data-sortable="'MachineName'">{{d.MachineName}}</td>
+                            <td data-title="'Serial No'" data-filter="{'SerialNo': 'text'}" data-sortable="'SerialNo'">{{d.SerialNo}}</td>
+                            <td  style="width: 100px;"  data-title="'Date'" data-sortable="'InstallationDate'">{{d.InstallationDate | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Type'" data-filter="{'TypeName': 'text'}" data-sortable="'TypeName'">{{d.TypeName}}</td>
+                            <td data-title="'Sub-Type'" data-filter="{'SubTypeName': 'text'}" data-sortable="'SubTypeName'">{{d.SubTypeName}}</td>
+                            <td data-title="'Parameter'" data-filter="{'ParameterName': 'text'}" data-sortable="'ParameterName'">{{d.ParameterName}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRMachine(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRMachine(d.MachineId)" data-message="Are you sure want to delete '{{d.MachineName}}' from Machine?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            
+                            <td colspan="6">Your search did not match any Machine
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRMachine.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRMachineService.js")"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+}

@@ -1,0 +1,183 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab
+    data-ng-controller="FestivalCtrl"
+    data-select="SetFocus('Festival')">
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Festival
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByFestivalType(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Festival Type:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpFestivalType" data-ng-model="filterData.FestivalTypeId" class="form-control" style="width: 150px;" required>
+                            <option value="0">ALL</option>
+                            <option data-ng-repeat="t in FestivalType" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddFestival()">Add New</button>
+                            }
+                        }
+
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFestivalFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateFestival(editData)" name="fesform" id="fesform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Festival</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="form-group">
+                                    <label for="txtFName">Festival Name</label>
+                                    <input type="text" class="form-control" id="txtFName" name="festivalName" data-ng-model="editData.FestivalName" data-drc-focus="isFirstFocus" placeholder="Enter festival name" maxlength="50" value="" required />
+                                    <div data-ng-show="fesform.festivalName.$dirty && fesform.festivalName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="fesform.festivalName.$error.required">Tell us your festival type.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFDate">Festival Date</label>
+                                    <input id="txtFDate" name="txtFDate" data-drc-daterange-picker="" data-type="daterange" data-format="DD-MM-YYYY" data-ng-model="myDateRange" class="form-control" required readonly />
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="drpFType">Festival Type</label>
+                                    <select id="drpFType" name="drpFType"
+                                        data-ng-model="editData.FestivalTypeId"
+                                        class="form-control"
+                                        required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in FestivalType" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="fesform.drpFType.$dirty && validateDrop()" class="label label-danger">
+                                        Invalid: Please select festival type.
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="display: none;">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="fesform.$invalid || validateDrop()"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetFestival()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseFestival()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING FESTIVAL LIST -->
+    <div class="row" data-ng-init="RetrieveFestival()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <div class="table-scroll-view" style="overflow-y: auto;">
+                        <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                            <tr data-ng-repeat="d in $data">
+                                @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.FestivalGroupId, d.IsActive)" data-message="Are you sure want to InActive '{{d.FestivalName}}' Festival?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.FestivalGroupId, d.IsActive)" data-message="Are you sure want to Active '{{d.FestivalName}}' Festival?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>
+                                }
+                                }
+                                <td data-title="'Festival Name'" data-filter="{ 'FestivalName': 'text' }" data-sortable="'FestivalName'">{{d.FestivalName}}</td>
+                                <td style="width: 160px;" data-title="'Festival Date'" data-sortable="'FestivalDate'">{{d.FestivalDate}}</td>
+                                <td style="width: 30px; text-align: center;" data-title="'Days'">{{d.totalDays}}</td>
+                                <td style="width: 150px;" data-title="'Festival Type'" data-sortable="'FestivalType'">
+                                    <span class="badge" data-ng-style="{'background-color':'{{d.DisplayColorCode}}'}" style="padding: 5px;">{{d.FestivalType}}</span>
+                                </td>
+                                <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                                @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @if (Model.HasUpdateRights)
+                                    {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateFestival(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                        @if (Model.HasDeleteRights)
+                                    {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteFestival(d.FestivalGroupId)" data-message="Are you sure want to delete '{{d.FestivalName}}' from Festival?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                    </td>
+                                }
+                                }
+                            </tr>
+                            <tr data-ng-show="noRecord" style="text-align: center;">
+                                @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                                }
+                                <td colspan="4">
+                                    Your search - <b>{{filterText}}</b> - did not match any festival.
+                                </td>
+                                <td style="width: 125px;"></td>
+                                @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                                }
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END FESTIVAL LIST -->
+</div>
+

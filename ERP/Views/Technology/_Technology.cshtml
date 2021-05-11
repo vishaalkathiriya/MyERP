@@ -1,0 +1,168 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab
+    data-ng-controller="TechnologyCtrl"
+    data-select="SetFocus('Technology')"
+    >
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Technology
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByTechGroup(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Technology Group:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpTechGroupFilter" data-ng-model="filterData.TechnologyGroupId" class="form-control" style="width: 150px;" required>
+                            <option value="0">ALL</option>
+                            <option data-ng-repeat="t in TechnologyGroup" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            //var ctrl = ViewBag.ctrlName;
+                            //bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddTechnology()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateTechnology(editData)" name="techform" id="techform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Technology</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="techName">Technology Name</label>
+                            <input type="text" class="form-control" name="techName" data-ng-model="editData.Technologies" data-drc-focus="isFirstFocus" placeholder="Enter technology name" maxlength="50" value="" required />
+                            <div data-ng-show="techform.techName.$dirty && techform.techName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="techform.techName.$error.required">Tell us your technology name.</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="drpTechGroup">Technology Group</label>
+                            <select id="drpTechGroup" name="drpTechGroup"
+                                data-ng-model="editData.TechnologyGroupId"
+                                class="form-control"
+                                required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in TechnologyGroup" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="techform.drpTechGroup.$dirty && validateDrop()" class="label label-danger">
+                                Invalid: Please select technology group.
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="techform.$invalid || validateDrop()"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetTechnology()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseTechnology()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+
+    <!-- BEGING TECHNOLOGY LIST -->
+    <div class="row" data-ng-init="RetrieveTechnology()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                //var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                    <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to InActive '{{d.Technologies}}' Technology?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                    <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to Active '{{d.Technologies}}' Technology?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                </td>                                               
+                                }
+                            }
+
+                            <td data-title="'Technology'" data-filter="{ 'Technologies': 'text' }" data-sortable="'Technologies'">{{d.Technologies}}</td>
+                            <td data-title="'Technology Group'" data-filter="{ 'TechnologiesGroup': 'text' }" data-sortable="'TechnologiesGroup'">{{d.TechnologiesGroup}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                              //  var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateTechnology(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                        
+                                    }
+                                    @if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteTechnology(d.Id)" data-message="Are you sure want to delete '{{d.Technologies}}' from Technology?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                       
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="2">Your search did not match any technology.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END TECHNOLOGY LIST -->
+
+</div>
+

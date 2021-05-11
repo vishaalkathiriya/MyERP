@@ -1,0 +1,69 @@
+﻿
+html {
+    font-size: 100%; 
+}
+
+body {
+    font-size: 13px;
+}   
+
+table {
+    width: 100%;
+    font-size: 12px;
+    border: 0.1px solid #808080;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+    table tr {
+        height: 25px;
+    }
+
+        table tr td {
+            border: 0.1px solid #808080;
+        }
+
+.label {
+    background-color: #eaecee;
+    width: 27%;
+}
+
+.number {
+    background-color: #B8B8B8;
+    width: 30px;
+    text-align: center;
+}
+
+b {
+    color: darkgray;
+}
+
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.logo {
+    margin:0;
+}
+
+.alignleft {
+    float: left;
+    width: 300px;
+    text-align: left;
+}
+
+.aligncenter {
+    float: left;
+    width: 200px;
+}
+
+.alignright {
+    float: right;   
+    width: auto;
+}
+
+.upper{    
+    height:1052px;
+}

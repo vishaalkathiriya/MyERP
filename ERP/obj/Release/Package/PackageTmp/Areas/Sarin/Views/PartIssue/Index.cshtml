@@ -1,0 +1,219 @@
+﻿@{
+    ViewBag.Title = "Part Issue";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRPartIssueCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Issue Parts</h2>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRPartIssue()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSRPartIssue(editData)" name="partissueform" id="partissueform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Part Issue</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpMachine">Machine<span class="compulsary">*</span></label>
+                                    <select id="drpMachine" name="drpMachine"
+                                        data-ng-model="editData.MachineId"
+                                        class="form-control"
+                                        required
+                                        data-drc-focus="isFirstFocus"
+                                        >
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRMachines" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="partissueform.drpMachine.$dirty && validateDropMachine()" class="label label-danger">
+                                        Invalid: Please select machine
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpPart">Part Name<span class="compulsary">*</span></label>
+                                    <select id="drpPart" name="drpPart"
+                                        data-ng-model="editData.PartId"
+                                        class="form-control"
+                                        required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRParts" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="partissueform.drpPart.$dirty && validateDropPart()" class="label label-danger">
+                                        Invalid: Please select Part.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtIssueDate">Issue Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtIssueDate" name="txtIssueDate" placeholder="DD-MM-YYYY" maxlength="10" tabindex="8" value="" data-ng-model="editData.IssuedDate" data-ng-change="ValidateIssuedDate(editData.IssuedDate)" required />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="editData.calOpenIssueDate"
+                                                data-ng-model="issueDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenIssueDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="partissueform.txtIssueDate.$dirty && partissueform.txtIssueDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="partissueform.txtIssueDate.$error.required">Please select Issue Date.</span>
+                                        <span data-ng-show="partissueform.txtIssueDate.$error.invalidIssueDate">Please enter valid Date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtChallanNo">Challan No.<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtChallanNo" name="challanno" data-ng-model="editData.ChallanNo" required placeholder="Enter challan no" maxlength="50" value="" />
+                                    <div data-ng-show="partissueform.challanno.$dirty && partissueform.challanno.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="partissueform.challanno.$error.required">Tell us Challan no.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="drpIssueFrom">Issued From<span class="compulsary">*</span></label>
+                            <div>
+                                <!-- <div class="btn-group" data-toggle="buttons-radio">-->
+                                    <input type="radio" data-ng-model="editData.IssuedFrom" value="P" name="" />
+                                    Purchase
+                                                <input type="radio" data-ng-model="editData.IssuedFrom" value="S" name="" />
+                                    Stock
+                                <!--</div>-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtProblem">Problem<span class="compulsary">*</span></label>
+                            <textarea class="form-control" id="txtProblem" name="problem" data-ng-model="editData.Problem" placeholder="Enter problem" maxlength="100"></textarea>
+                            <div data-ng-show="partissueform.problem.$dirty && partissueform.problem.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="partissueform.problem.$error.required">Problem can have Maximum 100 character</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtRemarks">Remarks</label>
+                            <textarea class="form-control" id="txtRemarks" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                            <div data-ng-show="partissueform.remarks.$dirty && partissueform.remarks.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="partissueform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="partissueform.$invalid || validateDropMachine() || validateDropPart() || validateDropIssueFrom()"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRPartIssue()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRPartIssue()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--Part Issue list-->
+    <div class="row" data-ng-init="RetrieveSRPartIssue()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="'Machine'" data-filter="{'MachineName': 'text' }" data-sortable="'MachineName'">{{d.MachineName}}</td>
+                            <td data-title="'Part'" data-filter="{'PartName': 'text'}" data-sortable="'PartName'">{{d.PartName}}</td>
+                            <td data-title="'Issued From'" data-filter="{'IssuedFrom': 'text' }" data-sortable="'IssuedFrom'">{{d.IssuedFrom}}</td>
+                            <td data-title="'Issued Date'" data-sortable="'IssuedDate'">{{d.IssuedDate | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Challan No'" data-filter="{'ChallanNo': 'text' }" data-sortable="'ChallanNo'">{{d.ChallanNo}}</td>
+                            <td data-title="'Problem'" data-filter="{'Problem': 'text' }" data-sortable="'Problem'">{{d.Problem}}</td>
+
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRPartIssue(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRPartIssue(d.PartIssueId)" data-message="Are you sure want to delete '{{d.PartName}}' from Part Issue?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="6">Your search did not match any part issue entry
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRPartIssueCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRPartIssueService.js")"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+}

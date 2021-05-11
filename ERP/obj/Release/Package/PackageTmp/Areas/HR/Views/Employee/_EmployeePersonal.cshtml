@@ -1,0 +1,524 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab
+     data-ng-controller="EmployeeCreateCtrl"
+     data-ng-init="setEmpId(@ViewBag.ID)"
+     data-select="SetFocus()">
+    <div data-tab-heading active="isMasterActive">
+        <i class="entypo-vcard"></i>Personal
+    </div>
+
+    <form role="form" data-ng-submit="CreateUpdateEmployee(editData)" name="empform" id="empform">
+        <!-- BEGIN PERSONAL EMPLOYEE INFORMATION-->
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Personal Information</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtCFirstName">First Name<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="1" class="form-control" id="txtCFirstName" name="txtCFirstName"
+                                   data-drc-focus="isFirstFocus"
+                                   data-ng-model="editData.CandidateFirstName" placeholder="First name" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtCFirstName.$dirty && empform.txtCFirstName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtCFirstName.$error.required">Tell us your candidate first name.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtCMiddleName">Middle Name<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="2" class="form-control" id="txtCMiddleName" name="txtCMiddleName" data-ng-model="editData.CandidateMiddleName" placeholder="Middle name" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtCMiddleName.$dirty && empform.txtCMiddleName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtCMiddleName.$error.required">Tell us your candidate middle name.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtCLastName">Last Name<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="3" class="form-control" id="txtCLastName" name="txtCLastName" data-ng-model="editData.CandidateLastName" placeholder="Last name" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtCLastName.$dirty && empform.txtCLastName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtCLastName.$error.required">Tell us your candidate last name.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-3 col-md-4">
+                        <img data-ng-if="!fileName" src="~/Content/images/thumb_User.png" class="img-responsive" width="100%" title="Please select a profile picture" />
+                        <a href="#" data-ng-if="fileName" class="viewProPic" data-ng-click="ViewProfilePicture(fileName)">
+                            <img data-ng-if="fileName" src="~/{{ImagePath}}/{{fileName}}" title="{{fileName}}" class="img-responsive" width="100%" />
+                        </a>
+
+                        <div upload-file data-filename="fileName" data-buttonclass="profile-pic-upload-btn" data-id="profile_pic" data-uploadhandler="/HR/Employee/ProPic" data-ischanged="isChanged" data-ext="*.jpg; *.jpeg" data-filesize="512KB">
+                            <input id="imageOne">
+                        </div>
+                    </div>
+                    <div class="col-xs-9 col-md-8">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="txtEmpRegisterCode">Register Code<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="5" class="form-control" id="txtEmpRegisterCode" name="txtEmpRegisterCode"
+                                           data-ng-model="editData.EmployeeRegisterCode"
+                                           placeholder="Register code"
+                                           maxlength="10" value="" required />
+                                    <div data-ng-show="empform.txtEmpRegisterCode.$dirty && empform.txtEmpRegisterCode.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="empform.txtCFirstName.$error.required">Tell us your employee register code.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="txtDOB">Date Of Birth<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="6" class="form-control" id="txtDOB" name="txtDOB" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                               required data-ng-model="editData.BirthDate" data-ng-change="ValidateBirthDate(editData.BirthDate)" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                    data-is-open="editData.calOpenBirthDate"
+                                                    data-ng-model="editData.birthDate"
+                                                    data-min="minDate"
+                                                    data-max="maxDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-required="true"
+                                                    data-ng-click="calendarOpenBirthDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="empform.txtDOB.$dirty && empform.txtDOB.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="empform.txtDOB.$error.required">Please select your date of birth.</span>
+                                        <span data-ng-show="empform.txtDOB.$error.invalidBirthDate">Please enter valid date of birth.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="drpGender">Gender<span class="compulsary">*</span></label>
+                                    <select id="drpGender" tabindex="7" name="drpGender" data-ng-model="editData.Gender" class="form-control" required>
+                                        <option value="">--Select--</option>
+                                        <option value="M">Male</option>
+                                        <option value="F">Female</option>
+                                    </select>
+                                    <div data-ng-show="empform.drpGender.$dirty && validateDropGender()" class="label label-danger">
+                                        Invalid: Please select your gender.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-8">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Present Address Start-->
+            <div class="col-sm-4">
+                <h3>Present Address</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="txtPreHouseNo">No#<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="8" class="form-control" id="txtPreHouseNo" name="txtPreHouseNo" data-ng-model="editData.Present_HouseNo" placeholder="House Number" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPreHouseNo.$dirty && empform.txtPreHouseNo.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPreHouseNo.$error.required">Tell us your present house number.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            <label for="txtPreLocation">Location<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="9" class="form-control" id="txtPreLocation" name="txtPreLocation" data-ng-model="editData.Present_Location" placeholder="Enter location" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPreLocation.$dirty && empform.txtPreLocation.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPreLocation.$error.required">Tell us your present location.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPreArea">Present Area<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="10" class="form-control" id="txtPreArea" name="txtPreArea" data-ng-model="editData.Present_Area" placeholder="Enter present area" maxlength="100" value="" required />
+                            <div data-ng-show="empform.txtPreArea.$dirty && empform.txtPreArea.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPreArea.$error.required">Tell us your present area.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="drpPreCountry">Country<span class="compulsary">*</span></label>
+                            <select id="drpPreCountry" tabindex="11" name="drpPreCountry" data-ng-model="editData.Present_Country" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in Country" data-ng-selected="t.Id == editData.Permanent_Country" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="empform.drpPreCountry.$dirty && validateDropPreCountry()" class="label label-danger">
+                                Invalid: Please select present country.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="drpPreState">State<span class="compulsary">*</span></label>
+                            <select id="drpPreState" tabindex="12" name="drpPreState" data-ng-model="editData.Present_State" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in PresentStates" data-ng-selected="t.Id == editData.Present_State" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="empform.drpPreState.$dirty && validateDropPreState()" class="label label-danger">
+                                Invalid: Please select present state.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="txtPreCity">City<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="13" class="form-control" id="txtPreCity" name="txtPreCity" data-ng-model="editData.Present_City" placeholder="Enter city" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPreCity.$dirty && empform.txtPreCity.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPreCity.$error.required">Tell us your present city.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtPrePostalCode">Postal Code<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="14" class="form-control" id="txtPrePostalCode" name="txtPrePostalCode" data-ng-model="editData.Present_PostalCode" placeholder="Enter postal code" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPrePostalCode.$dirty && empform.txtPrePostalCode.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPrePostalCode.$error.required">Tell us your present postal code.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Present Address End-->
+            <!-- Permanent Address Start-->
+            <div class="col-sm-4">
+                <h3>
+                    Permanent Address (
+                    <input type="checkbox" tabindex="15" data-ng-model="copyAddress" id="chkCopyAdd" data-ng-change="CopyFromPresentAddress(copyAddress)" />
+                    <label for="chkCopyAdd">Copy</label>
+                    )
+                </h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="txtPerHouseNo">No#<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="16" class="form-control" id="txtPerHouseNo" name="txtPerHouseNo" data-ng-model="editData.Permanent_HouseNo" placeholder="Enter house number" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPerHouseNo.$dirty && empform.txtPerHouseNo.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPerHouseNo.$error.required">Tell us your permanent house number.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            <label for="txtPerLocation">Location<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="17" class="form-control" id="txtPerLocation" name="txtPerLocation" data-ng-model="editData.Permanent_Location" placeholder="Enter location" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPerLocation.$dirty && empform.txtPerLocation.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPerLocation.$error.required">Tell us your permanent location.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="txtPerArea">Permanent Area<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="18" class="form-control" id="txtPerArea" name="txtPerArea" data-ng-model="editData.Permanent_Area" placeholder="Enter permanent area" maxlength="100" value="" required />
+                            <div data-ng-show="empform.txtPerArea.$dirty && empform.txtPerArea.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPerArea.$error.required">Tell us your permanent area.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="drpPerCountry">Country<span class="compulsary">*</span></label>
+                            <select id="drpPerCountry" tabindex="19" name="drpPerCountry" data-ng-model="editData.Permanent_Country" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in Country" data-ng-selected="t.Id == editData.Permanent_Country" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="empform.drpPerCountry.$dirty && validateDropPerCountry()" class="label label-danger">
+                                Invalid: Please select permanent country.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="drpPerState">State<span class="compulsary">*</span></label>
+                            <select id="drpPerState" tabindex="20" name="drpPerState" data-ng-model="editData.Permanent_State" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in PermanentStates" data-ng-selected="t.Id == editData.Permanent_State" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="empform.drpPerState.$dirty && validateDropPerState()" class="label label-danger">
+                                Invalid: Please select permanent state.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="txtPerCity">City<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="21" class="form-control" id="txtPerCity" name="txtPerCity" data-ng-model="editData.Permanent_City" placeholder="Enter city" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPerCity.$dirty && empform.txtPerCity.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPerCity.$error.required">Tell us your permanent city.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtPerPostalCode">Postal Code<span class="compulsary">*</span></label>
+                            <input type="text" tabindex="22" class="form-control" id="txtPerPostalCode" name="txtPerPostalCode" data-ng-model="editData.Permanent_PostalCode" placeholder="Enter postal code" maxlength="50" value="" required />
+                            <div data-ng-show="empform.txtPerPostalCode.$dirty && empform.txtPerPostalCode.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empform.txtPerPostalCode.$error.required">Tell us your permanent postal code.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Permanent Address End-->
+        </div>
+        <!-- / END PERSONAL EMPLOYEE INFORMATION-->
+        <!-- BEGIN OTHER EMPLOYEE INFORMATION-->
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Other Information</h3>
+                <hr />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtCompanyEmail">Company Email<span class="compulsary">*</span></label>
+                    <input type="email" tabindex="23" class="form-control"
+                           id="txtCompanyEmail" name="txtCompanyEmail" data-ng-model="editData.CompanyEmailId" placeholder="Enter company email" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtCompanyEmail.$dirty && empform.txtCompanyEmail.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtCompanyEmail.$error.required">Tell us your company email address.</span>
+                        <span data-ng-show="empform.txtCompanyEmail.$error.email">Please enter valid email address.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtCompanyMobile">Company Mobile</label>
+                    <input type="text" tabindex="24" class="form-control" id="txtCompanyMobile" name="txtCompanyMobile" data-ng-model="editData.CompanyMobile" placeholder="Enter company mobile" maxlength="50" value="" />
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtPersonalEmail">Personal Email<span class="compulsary">*</span></label>
+                    <input type="email" tabindex="25" class="form-control" id="txtPersonalEmail" name="txtPersonalEmail"
+                           data-ng-model="editData.PersonalEmailId"
+                           placeholder="Enter personal email" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtPersonalEmail.$dirty && empform.txtPersonalEmail.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtPersonalEmail.$error.required">Tell us your personal email address.</span>
+                        <span data-ng-show="empform.txtPersonalEmail.$error.email">Please enter valid email address.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtPersonalEmail">Personal Mobile Number<span class="compulsary">*</span></label>
+                    <input type="text" tabindex="26" class="form-control" id="txtPersonalMobile" name="txtPersonalMobile" data-ng-model="editData.PersonalMobile" placeholder="Enter personal mobile number" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtPersonalMobile.$dirty && empform.txtPersonalMobile.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtPersonalMobile.$error.required">Tell us your personal mobile number.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtNomineeMobile">Nominee Mobile Number<span class="compulsary">*</span></label>
+                    <input type="text" tabindex="27" class="form-control" id="txtNomineeMobile" name="txtNomineeMobile" data-ng-model="editData.NomineeMobile" placeholder="Enter nominee mobile number" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtNomineeMobile.$dirty && empform.txtNomineeMobile.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtNomineeMobile.$error.required">Tell us your nominee mobile number.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="drpMaritalStatus">Marital Status</label>
+                    <select id="drpMaritalStatus" tabindex="28" name="drpMaritalStatus" data-ng-model="editData.MaritalStatus" class="form-control">
+                        <option value="">--Select--</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Divorced">Divorced</option>
+                        <option value="Widow">Widow</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-4" data-ng-if="editData.MaritalStatus == 'Married'">
+                <div class="form-group">
+                    <label for="txtMarriageAnniversaryDate">Marriage Anniversary Date<span class="compulsary">*</span></label>
+                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="29" class="form-control" id="txtMarriageAnniversaryDate" name="txtMarriageAnniversaryDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                               required data-ng-model="editData.MarriageAnniversaryDate" data-ng-change="ValidateMrgAnniversaryDate(editData.MarriageAnniversaryDate)" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                    data-is-open="editData.calOpenMrgDate"
+                                    data-ng-model="editData.marriageAnniversaryDate"
+                                    data-min="minDate"
+                                    data-datepicker-options="dateOptions"
+                                    data-close-text="Close"
+                                    data-ng-required="editData.MaritalStatus == 'Married'"
+                                    data-ng-click="calendarOpenMrgDate($event)">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span>
+                    </p>
+                    <div data-ng-show="empform.txtMarriageAnniversaryDate.$dirty && empform.txtMarriageAnniversaryDate.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtMarriageAnniversaryDate.$error.required">Please select your marriage anniversary date.</span>
+                        <span data-ng-show="empform.txtMarriageAnniversaryDate.$error.invalidMrgAnniDate">Please enter valid marriage anniversary date.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtDrivingLicenceNo">Driving Licence Number</label>
+                    <input type="text" tabindex="30" class="form-control" id="txtDrivingLicenceNo" name="txtDrivingLicenceNo" data-ng-model="editData.DrivingLicenceNumber" placeholder="Enter driving licence number" maxlength="50" value="" />
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtPANNumber">PAN Number</label>
+                    <input type="text" tabindex="31" class="form-control" id="txtPANNumber" name="txtPANNumber" data-ng-model="editData.PANCardNumber" placeholder="Enter pan number" maxlength="50" value="" />
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtAdharNumber">Adhar Card Number</label>
+                    <input type="text" tabindex="32" class="form-control" id="txtAdharNumber" name="txtAdharNumber" data-ng-model="editData.AdharNumber" placeholder="Enter adhar number" maxlength="50" value="" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtPassportNumber">Passport Number</label>
+                    <input type="text" tabindex="33" class="form-control" id="txtPassportNumber" name="txtPassportNumber" data-ng-model="editData.PassportNumber" placeholder="Enter passport number" maxlength="50" value="" />
+                </div>
+            </div>
+            <div class="col-sm-4" data-ng-if="editData.PassportNumber">
+                <div class="form-group">
+                    <label for="txtPassportExpiryDate">Passport Expiry Date<span class="compulsary">*</span></label>
+                    <p class="input-group" style="margin-bottom: 0;" id="p3">
+                        <input type="text" data-parentid="p3" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="34" class="form-control" id="txtPassportExpiryDate" name="txtPassportExpiryDate" placeholder="DD-MM-YYYY"
+                               maxlength="10" value="" required data-ng-model="editData.PassportExpiryDate"
+                               data-ng-change="ValidatePassExpDate(editData.PassportExpiryDate)" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                    data-is-open="editData.calOpenPassExpDate"
+                                    data-ng-model="editData.passportExpiryDate"
+                                    data-min="minDate"
+                                    data-datepicker-options="dateOptions"
+                                    data-close-text="Close"
+                                    data-ng-required="editData.PassportNumber"
+                                    data-ng-click="calendarOpenPassExpDate($event)">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span>
+                    </p>
+                    <div data-ng-show="empform.txtPassportExpiryDate.$dirty && empform.txtPassportExpiryDate.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtPassportExpiryDate.$error.required">Please select your passport expiry date.</span>
+                        <span data-ng-show="empform.txtPassportExpiryDate.$error.invalidPassExpDate">Please enter valid passport expiry date.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="drpBloodGroup">Blood Group</label>
+                    <select id="drpBloodGroup" tabindex="35" name="drpBloodGroup" data-ng-model="editData.BloodGroup" class="form-control">
+                        <option value="0">--Select--</option>
+                        <option data-ng-repeat="t in BloodGroupList" data-ng-selected="t.Label == editData.BloodGroup" value="{{t.Label}}">{{t.Label}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!-- / END OTHER EMPLOYEE INFORMATION-->
+        <!-- BEGIN GARDIAN INFORMATION-->
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Guardian Information</h3>
+                <hr />
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtGFirstName">Guardian First Name<span class="compulsary">*</span></label>
+                    <input type="text" tabindex="36" class="form-control" id="txtGFirstName" name="txtGFirstName" data-ng-model="editData.GuardianFirstName" placeholder="Enter guardian first name" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtGFirstName.$dirty && empform.txtGFirstName.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtGFirstName.$error.required">Tell us your guardian first name.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtGMiddleName">Guardian Middle Name<span class="compulsary">*</span></label>
+                    <input type="text" tabindex="37" class="form-control" id="txtGMiddleName" name="txtGMiddleName" data-ng-model="editData.GuardianMiddleName" placeholder="Enter guardian middle name" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtGMiddleName.$dirty && empform.txtGMiddleName.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtGMiddleName.$error.required">Tell us your guardian middle name.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="txtGLastName">Guardian Last Name<span class="compulsary">*</span></label>
+                    <input type="text" tabindex="38" class="form-control" id="txtGLastName" name="txtGLastName" data-ng-model="editData.GuardianLastName" placeholder="Enter guardian last name" maxlength="50" value="" required />
+                    <div data-ng-show="empform.txtGLastName.$dirty && empform.txtGLastName.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="empform.txtGLastName.$error.required">Tell us your guardian last name.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / END GARDIAN INFORMATION-->
+
+        <div class="row" style="display: none;">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active
+                    </label>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                @{
+                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                    {
+                        <button type="submit" tabindex="39" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="empform.$invalid || validateDropGender() || validateDropPreCountry() || validateDropPreState() || validateDropPerCountry() || validateDropPerState()"><i class="entypo-check"></i>{{saveText}}</button>
+                    }
+                }
+                <button type="button" tabindex="40" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetEmployee()"><i class="entypo-erase"></i>Reset</button>
+            </div>
+        </div>
+    </form>
+</div>

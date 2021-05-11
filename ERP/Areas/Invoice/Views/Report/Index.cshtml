@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Invoice Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@using ERP.Utilities
+
+@{
+    var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+    bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+    bool hasUpdateRights = ERPUtilities.HasAccessPermission(2, ctrl);
+    bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+    var hasAccessViewModel = new ERP.Models.HasAccessViewModel()
+    {
+        HasInsertRights = hasInsertRights,
+        HasUpdateRights = hasUpdateRights,
+        HasDeleteRights = hasDeleteRights
+    };
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Report</h2>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN REPORT TABS -->
+<div class="row">
+    <div class="col-sm-12 employee-tabs">
+        <div data-tabset>
+            @Html.Partial("_InvoiceReport", hasAccessViewModel)
+        </div>
+    </div>
+</div>
+<!-- / END REPORT TABS -->
+
+
+
+@section Scripts {
+    @Scripts.Render("~/Area/Invoice/Scripts/Report")
+}

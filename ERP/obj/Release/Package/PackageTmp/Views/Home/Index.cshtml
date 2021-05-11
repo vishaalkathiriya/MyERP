@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+@*<div class="row" data-ng-controller="DesignationGroupCtrl">*@
+<div class="row">
+
+    <div class="col-sm-12">
+
+        <form data-ng-submit="savePeople(pp)" name="designationform">
+            <input type="email" class="form-control" data-ng-model="pp.firstname" name="uEmail" value="" required />
+
+            <div data-ng-show="designationform.uEmail.$dirty && designationform.uEmail.$invalid">
+                Invalid:
+                <span data-ng-show="designationform.uEmail.$error.required">Tell us your email.</span>
+                <span data-ng-show="designationform.uEmail.$error.email">This is not a valid email.</span>
+            </div>
+
+            <input type="text" class="form-control" data-ng-model="pp.age" value="" required />
+            <button class="btn btn-info" data-ng-disabled="designationform.$invalid">Add</button>
+        </form>
+
+
+        <ul>
+            <li data-ng-repeat="p in people">{{p.name}} - {{p.age}}</li>
+        </ul>
+
+
+        <button class="btn btn-info" data-ng-click="loadAllValues()">Load Data</button>
+
+
+        <div data-ng-show="isLoading">
+            Please wait data loading
+        </div>
+
+        <div data-ng-repeat="value in values">
+            {{value.Documents}} - {{value.IsActive}}
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Scripts{
+    <script>
+        $(function () {
+            //Custom Script block
+        });
+    </script>
+}

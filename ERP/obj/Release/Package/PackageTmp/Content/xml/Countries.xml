@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<countries>
+  <country countryCode="AF" countryName="Afghanistan" />
+  <country countryCode="AL" countryName="Albania" />
+  <country countryCode="DZ" countryName="Algeria" />
+  <country countryCode="AD" countryName="Andorra" />
+  <country countryCode="AS" countryName="American Samoa" />
+  <country countryCode="AO" countryName="Angola" />
+  <country countryCode="AI" countryName="Anguilla" />
+  <country countryCode="AQ" countryName="Antarctica" />
+  <country countryCode="AG" countryName="Antigua and Barbuda" />
+  <country countryCode="AR" countryName="Argentina" />
+  <country countryCode="AM" countryName="Armenia" />
+  <country countryCode="AW" countryName="Aruba" />
+  <!--<country countryCode="AT" countryName="Ashmore and Cartier Islands" />-->
+  <country countryCode="AU" countryName="Australia" />
+  <country countryCode="AT" countryName="Austria" />
+  <country countryCode="AZ" countryName="Azerbaijan" />
+
+  <country countryCode="BS" countryName="Bahamas" />
+  <country countryCode="BH" countryName="Bahrain" />
+  <country countryCode="BD" countryName="Bangladesh" />
+  <country countryCode="BB" countryName="Barbados" />
+  <country countryCode="BY" countryName="Belarus" />
+  <country countryCode="BE" countryName="Belgium" />
+  <country countryCode="BZ" countryName="Belize" />
+  <country countryCode="BJ" countryName="Benin" />
+  <country countryCode="BM" countryName="Bermuda" />
+  <country countryCode="BT" countryName="Bhutan" />
+  <country countryCode="BO" countryName="Bolivia" />
+  <country countryCode="BA" countryName="Bosnia and Herzegovina" />
+  <country countryCode="BW" countryName="Botswana" />
+  <country countryCode="BR" countryName="Brazil" />
+  <country countryCode="VG" countryName="British Virgin Islands" />
+  <country countryCode="BN" countryName="Brunei" />
+  <country countryCode="BG" countryName="Bulgaria" />
+  <country countryCode="BF" countryName="Burkina Faso" />
+  <country countryCode="MM" countryName="Burma" />
+  <country countryCode="BI" countryName="Burundi" />
+
+  <country countryCode="KH" countryName="Cambodia" />
+  <country countryCode="CM" countryName="Cameroon" />
+  <country countryCode="CA" countryName="Canada" />
+  <country countryCode="CV" countryName="Cape Verde" />
+  <country countryCode="KY" countryName="Cayman Islands" />
+  <country countryCode="CF" countryName="Central African Republic" />
+  <country countryCode="TD" countryName="Chad" />
+  <country countryCode="CL" countryName="Chile" />
+  <country countryCode="CN" countryName="China" />
+  <country countryCode="CX" countryName="Christmas Island" />
+  <country countryCode="IP" countryName="Clipperton Island" />
+  <country countryCode="CC" countryName="Cocos [Keeling] Islands" />
+  <country countryCode="CO" countryName="Colombia" />
+  <country countryCode="KM" countryName="Comoros" />
+  <country countryCode="CG" countryName="Congo" />
+  <country countryCode="CK" countryName="Cook Islands" />
+  <country countryCode="CR" countryName="Costa Rica" />
+  <country countryCode="CI" countryName="Cote d'Ivoire" />
+  <country countryCode="HR" countryName="Croatia" />
+  <country countryCode="CU" countryName="Cuba" />
+  <country countryCode="CY" countryName="Cyprus" />
+  <country countryCode="CZ" countryName="Czech Republic" />
+  <country countryCode="CW" countryName="Curacao" />
+  
+  <country countryCode="DK" countryName="Denmark" />
+  <country countryCode="DJ" countryName="Djibouti" />
+  <country countryCode="DM" countryName="Dominica" />
+  <country countryCode="DO" countryName="Dominican Republic" />
+
+  <country countryCode="EC" countryName="Ecuador" />
+  <country countryCode="EG" countryName="Egypt" />
+  <country countryCode="SV" countryName="El Salvador" />
+  <country countryCode="GQ" countryName="Equatorial Guinea" />
+  <country countryCode="ER" countryName="Eritrea" />
+  <country countryCode="EE" countryName="Estonia" />
+  <country countryCode="ET" countryName="Ethiopia" />
+  <country countryCode="EU" countryName="Europa Island" />
+
+  <country countryCode="FK" countryName="Falkland Islands (Islas Malvinas)" />
+  <country countryCode="FO" countryName="Faroe Islands" />
+  <country countryCode="FJ" countryName="Fiji" />
+  <country countryCode="FI" countryName="Finland" />
+  <country countryCode="FR" countryName="France" />
+  <country countryCode="GF" countryName="French Guiana" />
+  <country countryCode="PF" countryName="French Polynesia" />
+  <country countryCode="TF" countryName="French Southern and Antarctic Lands" />
+
+  <country countryCode="GA" countryName="Gabon" />
+  <country countryCode="GM" countryName="Gambia" />
+  <country countryCode="GZ" countryName="Gaza Strip" />
+  <country countryCode="GE" countryName="Georgia" />
+  <country countryCode="DE" countryName="Germany" />
+  <country countryCode="GH" countryName="Ghana" />
+  <country countryCode="GI" countryName="Gibraltar" />
+  <country countryCode="GO" countryName="Glorioso Islands" />
+  
+  <country countryCode="GR" countryName="Greece" />
+  <country countryCode="GL" countryName="Greenland" />
+  <country countryCode="GD" countryName="Grenada" />
+  <country countryCode="GP" countryName="Guadeloupe" />
+  <country countryCode="GU" countryName="Guam" />
+  <country countryCode="GT" countryName="Guatemala" />
+  <country countryCode="GG" countryName="Guernsey" />
+  <country countryCode="GN" countryName="Guinea" />
+  <country countryCode="GW" countryName="Guinea-Bissau" />
+  <country countryCode="GY" countryName="Guyana" />
+
+  <country countryCode="HT" countryName="Haiti" />
+  <country countryCode="HM" countryName="Heard Island and McDonald Islands" />
+  <country countryCode="VA" countryName="Holy See (Vatican City)" />
+  <country countryCode="HN" countryName="Honduras" />
+  <country countryCode="HK" countryName="Hong Kong" />
+  <country countryCode="HQ" countryName="Howland Island" />
+  <country countryCode="HU" countryName="Hungary" />
+
+  <country countryCode="IS" countryName="Iceland" />
+  <country countryCode="IN" countryName="India" />
+  <country countryCode="ID" countryName="Indonesia" />
+  <country countryCode="IR" countryName="Iran" />
+  <country countryCode="IQ" countryName="Iraq" />
+  <country countryCode="IE" countryName="Ireland" />
+  <country countryCode="IL" countryName="Israel" />
+  <country countryCode="IM" countryName="Isle of Man" />
+  <country countryCode="IT" countryName="Italy" />
+
+  <country countryCode="JM" countryName="Jamaica" />
+  <country countryCode="SJ" countryName="Jan Mayen" />
+  <country countryCode="JP" countryName="Japan" />
+  <country countryCode="DQ" countryName="Jarvis Island" />
+  <country countryCode="JE" countryName="Jersey" />
+  <country countryCode="JQ" countryName="Johnston Atoll" />
+  <country countryCode="JO" countryName="Jordan" />
+  <country countryCode="JU" countryName="Juan de Nova Island" />
+
+  <country countryCode="KZ" countryName="Kazakhstan" />
+  <country countryCode="KE" countryName="Kenya" />
+  <country countryCode="KI" countryName="Kiribati" />
+  <country countryCode="KP" countryName="Korea North" />
+  <country countryCode="KR" countryName="Korea South" />
+  <country countryCode="KW" countryName="Kuwait" />
+  <country countryCode="KG" countryName="Kyrgyzstan" />
+  <country countryCode="XK" countryName="Kosovo" />
+
+  <country countryCode="LA" countryName="Laos" />
+  <country countryCode="LV" countryName="Latvia" />
+  <country countryCode="LB" countryName="Lebanon" />
+  <country countryCode="LS" countryName="Lesotho" />
+  <country countryCode="LR" countryName="Liberia" />
+  <country countryCode="LY" countryName="Libya" />
+  <country countryCode="LI" countryName="Liechtenstein" />
+  <country countryCode="LT" countryName="Lithuania" />
+  <country countryCode="LU" countryName="Luxembourg" />
+
+  <country countryCode="MO" countryName="Macao" />
+  <country countryCode="MK" countryName="Macedonia" />
+  <country countryCode="MG" countryName="Madagascar" />
+  <country countryCode="MW" countryName="Malawi" />
+  <country countryCode="MY" countryName="Malaysia" />
+  <country countryCode="MV" countryName="Maldives" />
+  <country countryCode="ML" countryName="Mali" />
+  <country countryCode="MT" countryName="Malta" />
+  <country countryCode="MH" countryName="Marshall Islands" />
+  <country countryCode="MQ" countryName="Martinique" />
+  <country countryCode="MR" countryName="Mauritania" />
+  <country countryCode="MU" countryName="Mauritius" />
+  <country countryCode="YT" countryName="Mayotte" />
+  <country countryCode="MX" countryName="Mexico" />
+  <country countryCode="FM" countryName="Micronesia" />
+  <country countryCode="MQ" countryName="Midway Islands" />
+  <country countryCode="MD" countryName="Moldova" />
+  <country countryCode="MC" countryName="Monaco" />
+  <country countryCode="MN" countryName="Mongolia" />
+  <country countryCode="MS" countryName="Montserrat" />
+  <country countryCode="MA" countryName="Morocco" />
+  <country countryCode="MZ" countryName="Mozambique" />
+  <country countryCode="ME" countryName="Montenegro" />
+  
+  <country countryCode="NA" countryName="Namibia" />
+  <country countryCode="NR" countryName="Nauru" />
+  <country countryCode="NP" countryName="Nepal" />
+  <country countryCode="NL" countryName="Netherlands" />
+  <!--Netherlands Antilles-->
+  <country countryCode="NC" countryName="New Caledonia" />
+  <country countryCode="NZ" countryName="New Zealand" />
+  <country countryCode="NI" countryName="Nicaragua" />
+  <country countryCode="NE" countryName="Niger" />
+  <country countryCode="NG" countryName="Nigeria" />
+  <country countryCode="NU" countryName="Niue" />
+  <country countryCode="NF" countryName="Norfolk Island" />
+  <!--No Man's Island-->
+  <country countryCode="MP" countryName="Northern Mariana Islands" />
+  <country countryCode="NO" countryName="Norway" />
+
+  <country countryCode="OM" countryName="Oman" />
+  <country countryCode="PK" countryName="Pakistan" />
+  <country countryCode="PW" countryName="Palau" />
+  <country countryCode="PA" countryName="Panama" />
+  <country countryCode="PG" countryName="Papua New Guinea" />
+  <country countryCode="PY" countryName="Paraguay" />
+  <country countryCode="PE" countryName="Peru" />
+  <country countryCode="PH" countryName="Philippines" />
+  <country countryCode="PN" countryName="Pitcairn Islands" />
+  <country countryCode="PS" countryName="Palestine" />
+  <!--Pitcaim Islands-->
+  <country countryCode="PL" countryName="Poland" />
+  <country countryCode="PT" countryName="Portugal" />
+  <country countryCode="PR" countryName="Puerto Rico" />
+  <country countryCode="QA" countryName="Qatar" />
+  <country countryCode="RE" countryName="Reunion" />
+  <country countryCode="RO" countryName="Romania" />
+  <country countryCode="RU" countryName="Russia" />
+  <country countryCode="RW" countryName="Rwanda" />
+
+  <country countryCode="SH" countryName="Saint Helena" />
+  <country countryCode="KN" countryName="Saint Kitts and Nevis" />
+  <country countryCode="LC" countryName="Saint Lucia" />
+  <country countryCode="PM" countryName="Saint Pierre and Miquelon" />
+  <country countryCode="VC" countryName="Saint Vincent and the Grenadines" />
+  <country countryCode="WS" countryName="Samoa" />
+  <country countryCode="SM" countryName="San Marino" />
+  <country countryCode="ST" countryName="Sao Tome and Principe" />
+  <country countryCode="SA" countryName="Saudi Arabia" />
+  <country countryCode="MF" countryName="Saint Martin" />
+  <!--Scotland-->
+  <country countryCode="SN" countryName="Senegal" />
+  <!--Serbia and Monterago-->
+  <country countryCode="SC" countryName="Seychelles" />
+  <country countryCode="SL" countryName="Sierra Leone" />
+  <country countryCode="SG" countryName="Singapore" />
+  <country countryCode="SK" countryName="Slovakia" />
+  <country countryCode="SI" countryName="Slovenia" />
+  <country countryCode="SB" countryName="Solomon Islands" />
+  <country countryCode="SO" countryName="Somalia" />
+  <country countryCode="ZA" countryName="South Africa" />
+  <country countryCode="GS" countryName="South Georgia and the South Sandwich Islands" />
+  <country countryCode="ES" countryName="Spain" />
+  <country countryCode="RS" countryName="Serbia" />
+  <!--Spratly Islands-->
+  <country countryCode="LK" countryName="Sri Lanka" />
+  <country countryCode="SD" countryName="Sudan" />
+  <country countryCode="SR" countryName="Suriname" />
+  <country countryCode="SJ" countryName="Svalbard" />
+  <country countryCode="SZ" countryName="Swaziland" />
+  <country countryCode="SE" countryName="Sweden" />
+  <country countryCode="CH" countryName="Switzerland" />
+  <country countryCode="SY" countryName="Syria" />
+  <country countryCode="TW" countryName="Taiwan" />
+  <country countryCode="TJ" countryName="Tajikistan" />
+  <country countryCode="TZ" countryName="Tanzania" />
+  <country countryCode="TH" countryName="Thailand" />
+  <country countryCode="TT" countryName="Trinidad and Tobago" />
+  <country countryCode="TG" countryName="Togo" />
+  <country countryCode="TK" countryName="Tokelau" />
+  <country countryCode="TO" countryName="Tonga" />
+  <country countryCode="TN" countryName="Tunisia" />
+  <country countryCode="TR" countryName="Turkey" />
+  <country countryCode="TM" countryName="Turkmenistan" />
+  <country countryCode="TC" countryName="Turks and Caicos Island" />
+  <country countryCode="TV" countryName="Tuvalu" />
+  <country countryCode="UG" countryName="Uganda" />
+  <country countryCode="UA" countryName="Ukraine" />
+  <country countryCode="AE" countryName="United Arab Emirates" />
+  <country countryCode="GB" countryName="United Kingdom" />
+  <country countryCode="UY" countryName="Uruguay" />
+  <country countryCode="US" countryName="United States" />
+  <country countryCode="UZ" countryName="Uzbekistan" />
+  <country countryCode="VU" countryName="Vanuatu" />
+  <country countryCode="VE" countryName="Venezuela" />
+  <country countryCode="VN" countryName="Vietnam" />
+  <country countryCode="VI" countryName="Virgin Islands" />
+  <!--Wales-->
+  <country countryCode="WF" countryName="Wallis and Futuna" />
+  <country countryCode="WE" countryName="West Bank" />
+  <country countryCode="EH" countryName="Western Sahara" />
+  <country countryCode="YE" countryName="Yemen" />
+  <!--Yugoslavia-->
+  <country countryCode="ZM" countryName="Zambia" />
+  <country countryCode="ZW" countryName="Zimbabwe" />
+</countries>

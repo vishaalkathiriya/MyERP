@@ -1,0 +1,570 @@
+﻿@{
+    ViewBag.Title = "Manage Masters";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="MastersMainController">
+    <div>
+        <!-- BEGIN HEADER SECTION -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2 style="text-transform: capitalize">
+                        <i class="entypo-doc-text"></i>Manage Masters
+                        <span style="float: right;">
+                            @{
+                                var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                                bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                                bool editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                bool deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                            }
+                        </span>
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <!-- / END HEADER SECTION -->
+        <!-- BEGIN FORM SECTION -->
+        <div class="row">
+            <div class="col-sm-12 employee-tabs">
+                <div data-tabset>
+
+                    <!-- BEGIN SR-TYPE INFORMATION -->
+                    <div data-tab data-ng-controller="SRTypeCtrl" data-select="SetFocus('Type')">
+                        <div data-tab-heading>
+                            <i class="entypo-doc-text"></i>Type
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="well well-sm">
+                                    <form class="form-inline">
+                                        @{
+                                            if (hasInsertRights)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRType()">Add New</button>
+                                            }
+                                        }
+
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-danger">Download</button>
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                                <i class="entypo-down"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                                <li>
+                                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <form role="form" data-ng-submit="CreateUpdateSRType(editData)" name="typeForm" id="typeForm" data-ng-show="isTypeFormVisible">
+                            <div class="panel panel-default panel-shadow">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{mode}} Machine Type</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="txtTypeName">Type<span class="compulsary">*</span></label>
+                                                <input type="text" class="form-control" id="txtTypeName" name="typeName" data-ng-model="editData.TypeName" data-drc-focus="isFirstFocus" placeholder="Enter type name" maxlength="50" value="" required />
+                                                <div data-ng-show="typeForm.typeName.$dirty && typeForm.typeName.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="typeForm.typeName.$error.required">Tell us Type Name</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="txtPrefix">Prefix<span class="compulsary">*</span></label>
+                                                <input type="text" class="form-control" id="txtPrefix" name="prefixName" data-ng-model="editData.TypePrefix" placeholder="Enter prefix for type name" maxlength="50" value="" required />
+                                                <div data-ng-show="typeForm.prefixName.$dirty && typeForm.prefixName.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="typeForm.prefixName.$error.required">Tell us Type Prefix.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtRemarks">Remarks</label>
+                                        <textarea class="form-control" id="txtRemarksT" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                                        <div data-ng-show="typeForm.remarks.$dirty && typeForm.remarks.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="typeForm.remarks.$error.required">Remark can have Maximum 100 character</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @{
+                                        if (hasInsertRights)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="typeForm.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                                        }
+                                    }
+                                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRType()"><i class="entypo-erase"></i>Reset</button>
+                                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRType()"><i class="entypo-cancel"></i>Close</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!--SR-Type list-->
+                        <div class="row" data-ng-init="RetrieveSRType()">
+                            <div class="col-sm-12">
+                                <div data-loading-container="tableParams.settings().$loading">
+                                    <div class="table-responsive">
+                                        <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                            <tr data-ng-repeat="d in $data">
+                                                <td data-title="'Type Name'" data-filter="{ 'TypeName': 'text' }" data-sortable="'TypeName'">{{d.TypeName}}</td>
+                                                <td data-title="'Type Prefix'" data-filter="{ 'TypePrefix': 'text' }" data-sortable="'TypePrefix'">{{d.TypePrefix}}</td>
+                                                <td data-title="'Remarks'" data-sortable="'Remarks'">{{d.Remarks}}</td>
+                                                <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                                            @if (editPermission)
+                                                            {
+                                                                <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRType(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                                            }
+                                                            @if (deletePermission)
+                                                            {
+                                                                <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRType(d.TypeId)" data-message="Are you sure want to delete '{{d.TypeName}}' from Machine Type?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                                            }
+                                                        </td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr data-ng-show="noRecord" style="text-align: center;">
+                                                <td colspan="3">
+                                                    Your search - <b>{{filterText}}</b> - did not match any Machine Type.
+                                                </td>
+                                                <td style="width: 125px;"></td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px;"></td>
+                                                    }
+                                                }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / END SR-TYPE INFORMATION -->
+                    <!-- BEGIN SR-SUB-TYPE INFORMATION -->
+                    <div data-tab data-ng-controller="SRSubTypeCtrl" data-select="SetFocus('SubType')">
+                        <div data-tab-heading>
+                            <i class="entypo-doc-text"></i>Sub-Type
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="well well-sm">
+                                    <form class="form-inline">
+                                        @{
+                                            if (hasInsertRights)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRSubType()">Add New</button>
+                                            }
+                                        }
+
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-danger">Download</button>
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                                <i class="entypo-down"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                                <li>
+                                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <form role="form" data-ng-submit="CreateUpdateSRSubType(editData)" name="subtypeform" id="subtypeform" data-ng-show="isSubTypeFormVisible">
+                            <div class="panel panel-default panel-shadow">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{mode}} Sub-Type</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="txtSubTypeName">Sub-Type Name<span class="compulsary">*</span></label>
+                                                <input type="text" class="form-control" id="txtSubTypeName" name="subTypeName" data-ng-model="editData.SubTypeName" data-drc-focus="isFirstFocus" placeholder="Enter sub-type name" maxlength="50" value="" required />
+                                                <div data-ng-show="subtypeform.subTypeName.$dirty && subtypeform.subTypeName.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="subtypeform.subTypeName.$error.required">Tell us your Sub-type name.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="drpType">Type Name<span class="compulsary">*</span></label>
+                                                <select id="drpType" name="drpType"
+                                                        data-ng-model="editData.TypeId"
+                                                        class="form-control"
+                                                        required>
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="t in SRTypes" value="{{t.Id}}">{{t.Label}}</option>
+                                                </select>
+                                                <div data-ng-show="subtypeform.drpType.$dirty && validateDropGroup()" class="label label-danger">
+                                                    Invalid: Please select Type.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="drpSelection">Selection<span class="compulsary">*</span></label>
+                                                <select id="drpSelection" name="drpSelection" data-ng-model="editData.Selection" class="form-control" required>
+                                                    <option value="">--Select--</option>
+                                                    <option value="S">Single</option>
+                                                    <option value="M">Multiple</option>
+                                                </select>
+                                                <div data-ng-show="subtypeform.drpSelection.$dirty && validateDropSelection()" class="label label-danger">
+                                                    Invalid: Please select Selection
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtRemarks">Remarks</label>
+                                        <textarea class="form-control" id="txtRemarksS" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="500"></textarea>
+                                        <div data-ng-show="subtypeform.remarks.$dirty && subtypeform.remarks.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="subtypeform.remarks.$error.required">Remark can have Maximum 500 character</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @{
+                                        if (hasInsertRights)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="subtypeform.$invalid || validateDropGroup() || validateDropSelection() "><i class="entypo-check"></i>{{saveText}}</button>
+                                        }
+                                    }
+                                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRSubType()"><i class="entypo-erase"></i>Reset</button>
+                                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRSubType()"><i class="entypo-cancel"></i>Close</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!--SR-Sub-Type list-->
+                        <div class="row" data-ng-init="RetrieveSRSubType()">
+                            <div class="col-sm-12">
+                                <div data-loading-container="tableParams.settings().$loading">
+                                    <div class="table-responsive">
+                                        <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                            <tr data-ng-repeat="d in $data">
+
+                                                <td data-title="'Type'" data-filter="{'TypeName': 'text' }" data-sortable="'TypeName'">{{d.TypeName}}</td>
+                                                <td data-title="'Sub Type'" data-filter="{'SubTypeName': 'text'}" data-sortable="'SubTypeName'">{{d.SubTypeName}}</td>
+                                                <td data-title="'Selection'" data-filter="{'Selection': 'text' }" data-sortable="'Selection'">{{d.Selection}}</td>
+                                                <td data-title="'Remarks'" data-sortable="'Remarks'">{{d.Remarks}}</td>
+                                                <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                                            @if (editPermission)
+                                                            {
+                                                                <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRSubType(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>
+                                                            }
+                                                            @if (deletePermission)
+                                                            {
+                                                                <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRSubType(d.SubTypeId)" data-message="Are you sure want to delete '{{d.SubTypeName}}' from Sub-Type?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                                            }
+                                                        </td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr data-ng-show="noRecord" style="text-align: center;">
+                                                <td colspan="4">
+                                                    Your search did not match any sub type.
+                                                </td>
+                                                <td style="width: 125px;"></td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px;"></td>
+                                                    }
+                                                }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / END SR-SUB-TYPE INFORMATION -->
+                    <!-- BEGIN SR-PARAMETER INFORMATION -->
+                    <div data-tab data-ng-controller="SRParameterCtrl" data-select="SetFocus('Parameter')">
+                        <div data-tab-heading>
+                            <i class="entypo-doc-text"></i>Parameter
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="well well-sm">
+                                    <form class="form-inline">
+                                        @{
+                                            if (hasInsertRights)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRParameter()">Add New</button>
+                                            }
+                                        }
+
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-danger">Download</button>
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                                <i class="entypo-down"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                                <li>
+                                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <form role="form" data-ng-submit="CreateUpdateSRParameter(editData)" name="parameterform" id="parameterform" data-ng-show="isParameterFormVisible">
+                            <div class="panel panel-default panel-shadow">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{mode}} Sub-Type Parameter</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="txtParameter">Parameter Name<span class="compulsary">*</span></label>
+                                                <input type="text" class="form-control" id="txtParameter" name="parameterName" data-ng-model="editData.ParameterName" data-drc-focus="isFirstFocus" placeholder="Enter parameter name" maxlength="50" value="" required />
+                                                <div data-ng-show="parameterform.parameterName.$dirty && parameterform.parameterName.$invalid" class="label label-danger">
+                                                    Invalid: <span data-ng-show="parameterform.parameterName.$error.required">Tell us your Parameter name.</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="drpSubType">Sub-Type Name<span class="compulsary">*</span></label>
+                                                <select id="drpSubType" name="drpSubType"
+                                                        data-ng-model="editData.SubTypeId"
+                                                        class="form-control"
+                                                        required>
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="t in SRSubTypes" value="{{t.Id}}">{{t.Label}}</option>
+                                                </select>
+                                                <div data-ng-show="parameterform.drpSubType.$dirty && validateDropGroup()" class="label label-danger">
+                                                    Invalid: Please select Sub-Type.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtRemarks">Remarks</label>
+                                        <textarea class="form-control" id="txtRemarksP" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                                        <div data-ng-show="parameterform.remarks.$dirty && parameterform.remarks.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="parameterform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @{
+                                        if (hasInsertRights)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="parameterform.$invalid || validateDropGroup() "><i class="entypo-check"></i>{{saveText}}</button>
+                                        }
+                                    }
+                                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRParameter()"><i class="entypo-erase"></i>Reset</button>
+                                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRParameter()"><i class="entypo-cancel"></i>Close</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!--SR-Parameter list-->
+                        <div class="row" data-ng-init="RetrieveSRParameter()">
+                            <div class="col-sm-12">
+                                <div data-loading-container="tableParams.settings().$loading">
+                                    <div class="table-responsive">
+                                        <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                            <tr data-ng-repeat="d in $data">
+
+                                                <td data-title="'Parameter'" data-filter="{'ParameterName': 'text' }" data-sortable="'ParameterName'">{{d.ParameterName}}</td>
+                                                <td data-title="'Sub Type'" data-filter="{'SubTypeName': 'text'}" data-sortable="'SubTypeName'">{{d.SubTypeName}}</td>
+                                                <td data-title="'Remarks'" data-sortable="'Remarks'">{{d.Remarks}}</td>
+                                                <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                                            @if (editPermission)
+                                                            {
+                                                                <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRParameter(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>
+                                                            }
+                                                            @if (deletePermission)
+                                                            {
+                                                                <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRParameter(d.ParameterId)" data-message="Are you sure want to delete '{{d.ParameterName}}' from Parameter?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                                            }
+                                                        </td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr data-ng-show="noRecord" style="text-align: center;">
+                                                <td colspan="3">
+                                                    Your search did not match any Parameter
+                                                </td>
+                                                <td style="width: 125px;"></td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px;"></td>
+                                                    }
+                                                }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / END SR-PARAMETER INFORMATION -->
+                    <!-- BEGIN SR-PARTS INFORMATION -->
+                    <div data-tab data-ng-controller="SRPartCtrl" data-select="SetFocus('Parts')">
+                        <div data-tab-heading>
+                            <i class="entypo-doc-text"></i>Parts
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="well well-sm">
+                                    <form class="form-inline">
+                                        @{
+                                            if (hasInsertRights)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRPart()">Add New</button>
+                                            }
+                                        }
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-danger">Download</button>
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                                <i class="entypo-down"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                                <li>
+                                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <form role="form" data-ng-submit="CreateUpdateSRPart(editData)" name="partform" id="partform" data-ng-show="isPartFormVisible">
+                            <div class="panel panel-default panel-shadow">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">{{mode}} Part</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <label for="txtPartName">Part Name<span class="compulsary">*</span></label>
+                                        <input type="text" class="form-control" id="txtPartName" name="partName" data-ng-model="editData.PartName" data-drc-focus="isFirstFocus" placeholder="Enter part name" maxlength="50" value="" required />
+                                        <div data-ng-show="partform.partName.$dirty && partform.partName.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="partform.partName.$error.required">Tell us Part Name</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="txtRemarks">Remarks</label>
+                                        <textarea class="form-control" id="txtRemarksPts" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                                        <div data-ng-show="partform.remarks.$dirty && partform.remarks.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="partform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @{
+                                        if (hasInsertRights)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="partform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                                        }
+                                    }
+                                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRPart()"><i class="entypo-erase"></i>Reset</button>
+                                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRPart()"><i class="entypo-cancel"></i>Close</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!--SR-Part list-->
+                        <div class="row" data-ng-init="RetrieveSRPart()">
+                            <div class="col-sm-12">
+                                <div data-loading-container="tableParams.settings().$loading">
+                                    <div class="table-responsive">
+                                        <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                            <tr data-ng-repeat="d in $data">
+                                                <td data-title="'Part Name'" data-filter="{ 'PartName': 'text' }" data-sortable="'PartName'">{{d.PartName}}</td>
+                                                <td data-title="'Remarks'" data-sortable="'Remarks'">{{d.Remarks}}</td>
+                                                <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                                                @{
+
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                                            @if (editPermission)
+                                                            {
+                                                                <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRPart(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                                            }
+                                                            @if (deletePermission)
+                                                            {
+                                                                <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRPart(d.PartId)" data-message="Are you sure want to delete '{{d.PartName}}' from Parts?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                                            }
+                                                        </td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr data-ng-show="noRecord" style="text-align: center;">
+                                                <td colspan="2">
+                                                    Your search - <b>{{filterText}}</b> - did not match any Part.
+                                                </td>
+                                                <td style="width: 125px;"></td>
+                                                @{
+                                                    if (editPermission || deletePermission)
+                                                    {
+                                                        <td style="width: 80px;"></td>
+                                                    }
+                                                }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / END SR-PARTS INFORMATION -->
+
+                </div>
+            </div>
+        </div>
+        <!-- / END FORM SECTION -->
+
+    </div>
+</div>
+
+
+@section Scripts{
+<script src="~/Areas/Sarin/Scripts/controllers/MastersMainController.js"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRTypeCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRTypeService.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRSubTypeCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRSubTypeService.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRParametersCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRParametersService.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRPartsCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRPartsService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#txtRemarksT').elastic();
+            $('#txtRemarksS').elastic();
+            $('#txtRemarksP').elastic();
+            $('#txtRemarksPts').elastic();
+        })
+    </script>
+}

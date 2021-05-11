@@ -1,0 +1,4 @@
+ADD BELOW KEYS TO web.config IF YOU GET ANY CONFIGURATION ERROR:
+
+<add key ="invProposalUploads" value="Content/uploads/Invoice/Proposals"/>
+<add key="invProposalThumbnails" value="Content/uploads/Invoice/Proposals/thumbnails"/>

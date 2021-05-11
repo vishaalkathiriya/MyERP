@@ -1,0 +1,39 @@
+﻿@{
+  ViewBag.Title = "Employee Organizational Chart";
+  Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div data-ng-controller="EmpOrgChartCtrl">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="page-header main-page-header">
+        <h2><i class="entypo-doc-text"></i>Employee Organizational Chart</h2>
+
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+    </div>
+  </div>
+  <div class="row">
+
+    <div class="col-sm-12">
+
+      <div class="org-chart-wrapper">
+        <div id="infovis-container">
+          <div id="infovis"></div>
+        </div>
+        <div id="org-chart-log"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+@section Scripts{
+    @Scripts.Render("~/Area/HR/Scripts/employeeOrgChart")
+ 
+}

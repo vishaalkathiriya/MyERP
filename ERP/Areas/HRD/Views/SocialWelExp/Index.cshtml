@@ -1,0 +1,289 @@
+﻿@{
+    ViewBag.Title = "Manage Social Welfare Expense";
+     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@using ERP.Utilities
+
+<div data-ng-controller="SocialWelExpCtrl">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Social Welfare Expense </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+                    <!--<div class="form-group">
+                        <select name="drpHospitalName" data-ng-model="filterData.drpHospitalName" class="form-control" style="width: 150px;" required>
+                            <option value="0">ALL</option>
+                            <option data-ng-repeat="t in MedicalHelpType" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>-->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSocialWelExp()">Add New</button>
+
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12  ng-hide " data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSocialWelExp(editData)" name="SocialWelExpform" id="SocialWelExpform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Social Welfare Expense</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtProgramName">Program Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="ProgramName" name="ProgramName" data-drc-focus="isFirstFocus" data-ng-pattern="/^[A-Za-z ]*$/" data-ng-model="editData.ProgrammeName" placeholder="Enter Program Name" maxlength="75" value="" tabindex="1" required />
+                                    <div data-ng-show="SocialWelExpform.ProgramName.$dirty && SocialWelExpform.ProgramName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="SocialWelExpform.ProgramName.$error.required">Tell us Program Name.</span>
+                                        <span data-ng-show="SocialWelExpform.ProgramName.$error.pattern">Please enter only Alphabet characters.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtVenue">Venue <span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="Venue" name="Venue" data-ng-model="editData.Venue" placeholder="Enter Venue Information" maxlength="100" value="" tabindex="2" required />
+                                    <div data-ng-show="SocialWelExpform.txtVenue.$dirty && SocialWelExpform.txtVenue.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="SocialWelExpform.txtVenue.$error.required">Tell us Venue.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtTime">Venue Time<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="Time" name="Time" data-ng-model="editData.Time" placeholder="Start time - End time" maxlength="20" value="" tabindex="3" required />
+                                    <div data-ng-show="SocialWelExpform.Time.$dirty && SocialWelExpform.Time.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="SocialWelExpform.Time.$error.required">Please enter start time and end time.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="txtGuestName">Guest Name<span class="compulsary">*</span></label>
+                                            <textarea class="form-control" id="GuestName" name="GuestName" data-ng-model="editData.GuestName" placeholder="Guest Name" value="" rows="4" cols="60" style="max-width: 100%;" tabindex="4" required></textarea>
+                                            <div data-ng-show="SocialWelExpform.GuestName.$dirty && SocialWelExpform.GuestName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="SocialWelExpform.GuestName.$error.required">Tell us Guest Name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                               <!--     <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtExpAmount">Expense Amount<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="ExpAmount" name="ExpAmount" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.ExpenseAmount" placeholder="Enter Expense Amount" maxlength="15" value="" required />
+                                            <div data-ng-show="SocialWelExpform.ExpAmount.$dirty && SocialWelExpform.ExpAmount.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="SocialWelExpform.ExpAmount.$error.required">Tell us Expense Amount.</span>
+                                                <span data-ng-show="SocialWelExpform.ExpAmount.$error.pattern" class="">Please enter only Numeric characters.</span>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="txtSocialWelExpDate">Date<span class="compulsary">*</span></label>
+                                            <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                                <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtSocialWelExpDate" name="txtSocialWelExpDate" placeholder="DD-MM-YYYY" maxlength="10" value="" required
+                                                    data-ng-model="editData.SocialWelExpDate"
+                                                    data-ng-change="ValidateSocialWelExpdDate(editData.SocialWelExpDate,SocialWelExpform)" tabindex="5" />
+
+                                                <span class="input-group-btn" style="position: initial;">
+                                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                        data-is-open="editData.calOpenSocialWelExpDate"
+                                                        data-ng-model="socialWelExpDate"
+                                                        data-datepicker-options="dateOptions"
+                                                        data-close-text="Close"
+                                                        data-ng-required="true"
+                                                        data-ng-click="calendarOpenSocialWelExpDate($event)">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </p>
+                                            <div data-ng-show="SocialWelExpform.txtSocialWelExpDate.$dirty && SocialWelExpform.txtSocialWelExpDate.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="SocialWelExpform.txtSocialWelExpDate.$error.required">Please select your  Date.</span>
+                                                <span data-ng-show="SocialWelExpform.txtSocialWelExpDate.$error.SocialWelExpDate">Please enter valid Date.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-sm-12">
+                                        <div upload-file data-filename="editData.Attachment" data-buttonclass="document-pic-upload-btn" data-id="document_pic" tabindex="6" data-uploadhandler="/SocialWelExp/SocialWelExpDocument" data-ischanged="ischanged" data-ext="*.pdf" style="display: inline-block; width: 90%;">
+                                            <input id="imageOne">
+                                        </div>
+                                        <input type="text" style="display: none" data-ng-model="editData.Attachment" />
+
+                                        <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Add'"   href="/@ViewBag.tempDocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                        <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Edit'"   href="/@ViewBag.DocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" tabindex="7" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="SocialWelExpform.$invalid || validateDrop()"><i class="entypo-check"></i>{{saveText}}</button>
+                        <button type="button" tabindex="8" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSocialWelExp()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" tabindex="9" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSocialWelExp()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING SOCIAL WELFARE EXPENSE LIST -->
+    <div class="row" data-ng-init="RetrieveSocialWelExp()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="" style="width: 50px;"><a ng-if="d.Attachment != NULL && d.Attachment != '' "  target="_blank"    href="@ViewBag.DocPdf/{{d.Attachment}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+                            <td data-title="'Program Name'" data-filter="{ 'ProgrammeName': 'text' }" data-sortable="'ProgrammeName'">{{d.ProgrammeName}}</td>
+                            <td data-title="'Date'" data-sortable="'Date'">{{d.Date | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Time'" data-sortable="'Time'">{{d.Time}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                             
+                                <td style="width: 128px; text-align: center;" data-title="'Actions'">
+                                    <a class="btn btn-info btn-xs" data-ng-click="ShowSocialWelExp(d)" ><i class="entypo-eye"></i></a>
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSocialWelExp(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSocialWelExp(d.SrNo)" data-message="Are you sure want to delete '{{d.ProgrammeName}}' from issued documents?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+                                
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any record.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END SOCIAL WELFARE EXPENSE LIST -->
+</div>
+
+<!-- BEGIN MODEL SECTION -->
+<script type="text/ng-template" id="SocialWelExpPopup.html">
+        <div class="modal-body">
+        <h4>Social Welfare Expense Information</h4>
+        <table class="table table-striped">
+            <tr>
+                <td style='width: 124px;' ><b>Programme Name:</b></td>
+                <td>{{items.ProgrammeName}}</td>
+            </tr>
+            <tr>
+                <td style='width: 124px;'><b>GuestName:</b></td>
+                <td>{{items.GuestName}}</td>
+            </tr>
+            <tr>
+                <td style='width: 124px;'><b>Venue:</b></td>
+                <td>{{items.Venue}}</td>
+           </tr>
+           <tr>
+                <td style='width: 124px;'><b>Date:</b></td>
+                <td>{{items.Date  | date:'dd-MMM-yyyy'}}</td>
+          </tr>
+          <tr>
+                <td style='width: 124px;'><b>Time:</b></td>
+                <td>{{items.Time}}</td>
+            </tr>
+         </table>       
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="Close()">Close</button>
+    </div>
+</script>
+<!-- END MODEL SECTION -->
+
+
+@*@section Scripts{
+    @Scripts.Render("~/Scripts/hrdSocialWelfareExpense")
+}*@
+
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/HRD/Scripts/controllers/HRDSocialWelExpCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/services/HRDSocialWelExpService.js")"></script>
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Content/js/jquery.uploadify.js"></script>
+    <script src="~/Scripts/directives/uploadFile.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+}

@@ -1,0 +1,411 @@
+﻿@{
+    ViewBag.Title = "Manage Vendors";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+
+<div data-ng-controller="VendorsCtrl">
+
+     <!-- BEGIN PAGE TITLE -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Vendor</h2>
+            </div>
+        </div>
+    </div>
+    <!-- / END PAGE TITLE -->
+
+   <!--  BEGIN HEADER SECTION  -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                          bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                    if (hasInsertRights) { 
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddVendor()">Add New</button>
+		                    }
+                    }
+                   
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Export To Excel</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- END HEADER SECTION  -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="SaveVendor(editData)" name="frmVendor" id="frmVendor">
+                <input type="hidden" data-ng-model="editData.VendorId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Vendor</h3>
+                    </div>
+                    <div class="panel-body">
+
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3>Vendor Info</h3>
+
+                                <hr />
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtVendorName">Vendor Name</label>
+                                            <input type="text" class="form-control" id="txtVendorName" name="txtVendorName" data-drc-focus="isFirstFocus" data-ng-model="editData.VendorName" placeholder="Enter Vendor Name" maxlength="50" value="" required />
+                                            <div data-ng-show="frmVendor.txtVendorName.$dirty && frmVendor.txtVendorName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtVendorName.$error.required">Tell us your Vendor Name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtCompanyName">Vedor Company Name</label>
+                                            <input type="text" class="form-control" id="txtCompanyName" name="txtCompanyName" data-ng-model="editData.CompanyName" placeholder="Enter Vendor Company Name" maxlength="50" value="" required />
+                                            <div data-ng-show="frmVendor.txtCompanyName.$dirty && frmVendor.txtCompanyName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtCompanyName.$error.required">Tell us your Company Name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtEmail">Email</label>
+                                            <input type="email" class="form-control" id="txtEmail" name="txtEmail" data-ng-model="editData.Email" placeholder="Enter Email" maxlength="50" value="" />
+                                            <div data-ng-show="frmVendor.txtEmail.$dirty && frmVendor.txtEmail.$invalid" class="label label-danger">
+                                                Invalid: 
+                                        <span data-ng-show="frmVendor.txtEmail.$error.email">Please Enter correct email.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtWebsite">Website</label>
+                                            <input type="text" class="form-control" id="txtWebsite" name="txtWebsite" data-ng-model="editData.Website" placeholder="Enter Website" maxlength="50" value="" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtMobile">Mobile</label>
+                                            <input type="text" class="form-control" id="txtMobile" name="txtMobile" data-ng-model="editData.Mobile" placeholder="Enter Mobile" maxlength="20" value="" required />
+                                            <div data-ng-show="frmVendor.txtMobile.$dirty && frmVendor.txtMobile.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtMobile.$error.required">Tell us your Mobile.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtPhoneNo">PhoneNo</label>
+                                            <input type="text" class="form-control" id="txtPhoneNo" name="txtPhoneNo" data-ng-model="editData.PhoneNo" placeholder="Enter PhoneNo" maxlength="20" value="" required />
+                                            <div data-ng-show="frmVendor.txtPhoneNo.$dirty && frmVendor.txtPhoneNo.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtPhoneNo.$error.required">Tell us your PhoneNo.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtServices">Services</label>
+                                           <!-- <input type="text" class="form-control tagsinput" id="txtServices" name="txtServices" data-ng-model="editData.Services" placeholder="Enter Services" maxlength="500" value="" required /> -->
+                                            @*<div data-tags-input="" data-ng-model="editData.Services">
+                                            </div>*@
+
+                                            <tags-input data-ng-model="editData.Services">
+                                            </tags-input>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="txtRating">Rating</label>
+                                            <div style="height: 8px;" class="clearfix">
+                                            </div>
+                                            <!-- <div data-drc-rating data-rating-value="editData.Rating" data-max="5" data-on-rating-selected="saveRatingToServer(editData.Rating)" data-mg-model="editData.Rating"></div> -->
+                                            <div data-rating="" data-value="editData.Rating" data-max="starMax" data-readonly="isReadonly" data-on-hover="hoveringOver(value)" data-on-leave="overStar = null"></div>
+                                            <!-- <input type="text" class="form-control" id="txtRating" name="txtRating" data-ng-model="editData.Rating" placeholder="Enter Rating" maxlength="50" value="" required />
+                                            <div data-ng-show="frmVendor.Rating.$dirty && frmVendor.Rating.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.Rating.$error.required">Tell us your Rating.</span>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <h3>Vendor Address</h3>
+
+                                <hr />
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="txtHouseNo">HouseNo</label>
+                                            <input type="text" class="form-control" id="txtHouseNo" name="txtHouseNo" data-ng-pattern="/^\d+$/" data-ng-model="editData.HouseNo" placeholder="No." maxlength="5" value="" />
+                                            <div data-ng-show="frmVendor.txtHouseNo.$dirty && frmVendor.txtHouseNo.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtHouseNo.$invalid">Enter Valid HouseNo.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="form-group">
+                                            <label for="txtLocation">Location</label>
+                                            <input type="text" class="form-control" id="txtLocation" name="txtLocation" data-ng-model="editData.Location" placeholder="Enter Location" maxlength="50" value="" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="txtArea">Area</label>
+                                            <input type="text" class="form-control" id="txtArea" name="txtArea" data-ng-model="editData.Area" placeholder="Enter Area" maxlength="50" value="" />
+                                            <!-- <div data-ng-show="frmVendor.txtArea.$dirty && frmVendor.txtArea.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtArea.$error.required">Tell us your Area.</span>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="cmbCountry">Country</label>
+                                            <select id="cmbCountry" name="cmbCountry" data-ng-model="editData.Country" data-ng-change="GetStatesByCountry()" class="form-control" required>
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="c in Contries" value="{{c.CountryName}}">{{c.CountryName}}</option>
+                                            </select>
+                                            <div data-ng-show="frmVendor.cmbCountry.$dirty && frmVendor.cmbCountry.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.cmbCountry.$error.required">Tell us yourCountry.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="cmbState">State</label>
+                                            <select id="cmbState" name="cmbState" data-ng-model="editData.State" class="form-control" required>
+                                                <option value="0">--Select--</option>
+                                                <option data-ng-repeat="c in States" value="{{c.StateName}}">{{c.StateName}}</option>
+                                            </select>
+                                            <div data-ng-show="frmVendor.cmbState.$dirty && frmVendor.cmbState.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.cmbState.$error.required">Please select State.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="txtCity">City</label>
+                                            <input type="text" class="form-control" id="txtCity" name="txtCity" data-ng-model="editData.City" placeholder="Enter City" maxlength="50" value="" required />
+                                            <div data-ng-show="frmVendor.txtCity.$dirty && frmVendor.txtCity.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtCity.$error.required">Tell us your City.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="txtPostalCode">PostalCode</label>
+                                            <input type="text" class="form-control" id="txtPostalCode" name="txtPostalCode" data-ng-pattern="/^\d+$/" data-ng-model="editData.PostalCode" placeholder="PostalCode" maxlength="10" value="" />
+                                            <div data-ng-show="frmVendor.txtPostalCode.$dirty && frmVendor.txtPostalCode.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmVendor.txtPostalCode.$invalid">Enter Valid PostalCode.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group" style="display: none;">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        @{
+		                    if (hasInsertRights) { 
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmVendor.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+		                    }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="reset(editData)"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="cancel()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGIN SUBCATEGORIES LIST -->
+    <div class="row" data-ng-init="loadAllVendors()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="vendor in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td data-title="'Status'" style="width: 50px; text-align: center;">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{vendor.IsActive}}" data-drc-confirm-box="" data-callback="IsActive(vendor)" data-message="Are you sure want to InActive '{{vendor.VendorName}}'  Vendor?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!vendor.IsActive}}" data-drc-confirm-box="" data-callback="IsActive(vendor)" data-message="Are you sure want to Active '{{vendor.VendorName}}'  Vendor?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                               
+	                            }
+                            }
+                            <td data-title="'Vendor Name'" data-filter="{ 'VendorName': 'text' }" data-sortable="'VendorName'">{{vendor.VendorName}}</td>
+                            <td data-title="'Company Name'" data-filter="{ 'CompanyName': 'text' }" data-sortable="'CompanyName'">{{vendor.CompanyName}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{vendor.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            <td data-title="'Actions'" style="width: 128px; text-align: center;">
+                                <a class="btn btn-info btn-xs" data-ng-click="ShowVendor(vendor)"><i class="entypo-eye"></i></a>
+                                @{
+                                    if (editPermission) {
+                                        <a class="btn btn-primary btn-xs" data-ng-click="EditVendor(vendor)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                
+	                                }
+                                    if (ERPUtilities.HasAccessPermission(3, ctrl)) {
+                                        <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteVendor(vendor)" data-message="Are you sure want to delete '{{vendor.VendorName}}' from 'Vendors'?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                          
+	                                }                            
+                                }
+                            </td>
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td></td>   
+                                }
+                            }
+                            <td colspan="2">Your search did not match with any record.</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END SUBCATEGORIES LIST -->
+
+    <!-- BEGIN VENDOR DETAIL POPUP -->
+    <script type="text/ng-template" id="VendorPopup.html">
+        <div class="modal-body">
+        <h4>Vendor Info</h4>
+        <table class="table table-striped">
+            <tr>
+                <td><b>Vendor Name:</b></td>
+                <td>{{items.VendorName}}</td>
+                <td><b>Company Name:</b></td>
+                <td>{{items.CompanyName}}</td>
+            </tr>
+         <tr>
+                <td><b>Email:</b></td>
+                <td>{{items.Email}}</td>
+                <td><b>Website:</b></td>
+                <td>{{items.Website}}</td>
+            </tr>
+         <tr>
+                <td><b>Mobile:</b></td>
+                <td>{{items.VendorName}}</td>
+                <td><b>PhoneNo:</b></td>
+                <td>{{items.PhoneNo}}</td>
+            </tr>
+        <tr>
+                <td><b>Services:</b></td>
+                <td>{{items.Services}}</td>
+                <td><b>Rating:</b></td>
+                <td>
+                    <i class="glyphicon glyphicon-star" data-ng-repeat="i in range(items.Rating) track by $index">
+                    </span>
+                </td>
+                
+            </tr>
+         </table>
+         <h4>Vendor Address</h4>
+           <table class="table table-striped">
+         <tr>
+                <td><b>HouseNo:</b></td>
+                <td>{{items.HouseNo}}</td>
+                <td></td>
+                <td></td>
+        </tr>
+         <tr>
+                <td><b>Location:</b></td>
+                <td>{{items.Location}}</td>
+                <td><b>Area:</b></td>
+                <td>{{items.Area}}</td>
+            </tr>
+        <tr>
+                <td><b>Country:</b></td>
+                <td>{{items.Country}}</td>
+                <td><b>State:</b></td>
+                <td>{{items.State}}</td>
+            </tr>
+        <tr>
+                <td><b>City:</b></td>
+                <td>{{items.City}}</td>
+                <td><b>PostalCode:</b></td>
+                <td>{{items.PostalCode}}</td>
+            </tr>
+         <tr>
+                <td><b>IsActive:</b></td>
+                <td>{{items.IsActive}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="Close()">Close</button>
+    </div>
+    </script>
+    <!-- END VENDOR DETAIL POPUP -->
+
+ @*  
+    @section Scripts{
+        @Scripts.Render("~/Area/Inventory/Scripts/vendors")
+    }*@
+
+    
+    
+@section Scripts{
+
+    <script src="@Url.Content("~/Areas/Inventory/Scripts/controllers/VendorsCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Inventory/Scripts/services/VendorsService.js")"></script>
+    <script src="~/Scripts/directives/checkbox.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>  
+}
+
+
+
+</div>

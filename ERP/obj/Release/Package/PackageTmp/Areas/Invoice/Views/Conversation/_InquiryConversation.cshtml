@@ -1,0 +1,706 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="InquiryConversationCtrl" disabled="false" data-select="SetOpenedTab('Inquiry');">
+    <div data-tab-heading>
+        <i class="entypo-megaphone"></i>Inquiry
+    </div>
+
+    <div data-ng-if="master.filterData.ClientId == 0">
+        <div class="alert text-center text-danger">
+            <strong>
+                Please select client to load the data...
+            </strong>
+        </div>
+    </div>
+    <div class="timeline-centered">
+    </div>
+
+    <!--BEGIN CLIENT INFORMATION-->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12">
+            <div class="kyc-section">
+                <div class="row">
+                    <div class="col-sm-12 kyc-header">
+                        <h3>
+                            Client Information
+                            <span class="pull-right">
+                                <a class="badge" href="/Invoice/Client/OverView/{{ClientInfo.PKClientId}}" target="_blank"><i class="fa fa-eye"></i> View Full Client</a>
+                                @{
+                                    if (Model.HasInsertRights)
+                                    {
+                                        <a class="badge" data-ng-click="AddInquiry()"><i class="fa fa-plus"></i> Add New Inquiry</a>
+                                    }
+                                }
+                            </span>
+                        </h3>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Company Name : </label>
+                                    <span>{{ClientInfo.CompanyName}}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Contact Person : </label>
+                                    <span>{{ClientInfo.CPrefix}} {{ClientInfo.ContactPerson}}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Client Code : </label>
+                                    <span>{{ClientInfo.ClientCode}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Email : </label>
+                            <span>{{ClientInfo.Email}}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Mobile No. : </label>
+                            <span>{{ClientInfo.MobileNo}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--END CLIENT INFORMATION-->
+    <!-- BEGIN ENTRY FORM -->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12 ng-hide" data-ng-show="isInquiryFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateInquiry(editDataI, frmInquiry)" name="frmInquiry" id="frmInquiry">
+                <input type="hidden" data-ng-model="editDataI.PKInquiryId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{Inquiry.mode}} Inquiry</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="txtInquiryTitle">Title<span class="compulsary">*</span></label>
+                                    <input type="text" data-drc-focus="isFirstInquiryFocus" tabindex="1" class="form-control" id="txtInquiryTitle" name="txtInquiryTitle" data-ng-model="editDataI.InquiryTitle" placeholder="Enter inquiry title" maxlength="50" value="" required />
+                                    <div data-ng-show="frmInquiry.txtInquiryTitle.$dirty && frmInquiry.txtInquiryTitle.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmInquiry.txtInquiryTitle.$error.required">Tell us your title.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="txtRemarks">Short Description</label>
+                                    <textarea class="form-control" id="txtRemarks" name="txtRemarks" placeholder="Enter Short Description" data-ng-model="editDataI.Remarks" tabindex="2"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-sm-12">
+                                <div class="form-group">
+                                    <label for="drpStatus">Inquiry Status<span class="compulsary">*</span></label>
+                                    <select name="drpStatus" data-ng-model="editDataI.InquiryStatus" class="form-control" data-ng-required="true" tabindex="3" required ng-disabled="Inquiry.mode == 'Add'">
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="s in status" data-ng-selected="s.Id==editDataI.InquiryStatus" value="{{s.Id}}">{{s.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="frmInquiry.drpStatus.$dirty && ValidateStatus()" class="label label-danger">
+                                        Invalid: Please select Vendor.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-12">
+                                <div class="form-group">
+                                    <label for="txtInquiryDate">Received On<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtInquiryDate" name="txtInquiryDate" tabindex="4"
+                                               data-ng-model="editDataI.InquiryDate"
+                                               data-ng-change="ValidateInquiryDate(editDataI.InquiryDate, frmInquiry)"
+                                               placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default"
+                                                    data-datepicker-popup="{{format}}"
+                                                    data-is-open="isInquiryDateOpened"
+                                                    data-ng-model="editDataI.iDate"
+                                                    data-max="maxDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-click="OpenInquiryDateCalender($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="frmInquiry.txtInquiryDate.$error.invalidInquiryDate" class="label label-danger">
+                                        Invalid: <span>Please enter valid date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-12">
+                                <div class="form-group">
+                                    <label>Technologies</label>
+                                    <tags-input data-ng-model="filterTechnologies"
+                                                add-from-autocomplete-only="true"
+                                                placeholder="Select technology"
+                                                replace-spaces-with-dashes="false"
+                                                class="sm">
+                                        <auto-complete source="loadTags($query)"
+                                                       min-length="0"
+                                                       highlight-matched-text="true">
+                                        </auto-complete>
+                                    </tags-input>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-12">
+                                <div class="form-group">
+                                    <label>Upload Documents</label>
+                                    <div upload-multi-file data-filename="editDataI.multiFileList" data-buttonclass="profile-pic-upload-btn" data-oldmultifilelist="oldMultifilelistInquiry"
+                                         data-id="comment_files_inquiry" data-uploadhandler="/Invoice/Inquiry/UploadDocument"
+                                         data-ext="*.jpg; *.jpeg;*.png;*.txt;*.csv;*.pdf;*.xls;*.xlsx;*.doc;*.docx;*.mp4" data-filesize="0">
+                                        <input id="imageOne">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        @*<div class="row">
+                                <div class="col-lg-4 col-sm-12">
+                                    <div class="form-group">
+                                        <label>Upload Documents</label>
+                                        <div upload-multi-file data-filename="editDataI.multiFileList" data-buttonclass="profile-pic-upload-btn"
+                                             data-oldmultifilelist="oldMultifilelistInquiry"
+                                             data-id="comment_files_inquiry_list" data-uploadhandler="/Invoice/Inquiry/UploadDocument"
+                                             data-ext="*.jpg; *.jpeg;*.png;*.txt;*.csv;*.pdf;*.xls;*.xlsx;*.doc;*.docx;*.mp4" data-filesize="0">
+                                            <input id="imageOne">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="txtRemarks">Remarks</label>
+                                        <textarea class="form-control" id="txtRemarks" name="txtRemarks" placeholder="Enter Remarks" data-ng-model="editDataI.Remarks" tabindex="6"></textarea>
+                                    </div>
+                                </div>
+                            </div>*@
+
+                        <div class="row" style="display:none;">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editDataI.IsActive" tabindex="5"><label> IsActive</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div data-ng-repeat="s in editDataI.multiFileList" data-ng-form="subform">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-sm-2" style="line-height: 29px;">
+                                    <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteUploadedInquiryFile($index, editDataI.multiFileList)"><i class="entypo-trash"></i>delete</a>
+                                    <a class="btn btn-primary btn-xs" data-ng-if="s.PKDocId > 0" href="@ViewBag.InvInquiryImagePath/{{s.file}}" target="_blank"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                                    <a class="btn btn-primary btn-xs" data-ng-if="s.PKDocId == 0" href="@ViewBag.TempUploadPath/{{s.file}}" target="_blank"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                                </div>
+                                <div class="col-sm-10">
+                                    <input type="text" style="margin-left: -50px;" class="form-control" data-ng-model="editDataI.multiFileList[$index].caption" name="txtCaption" placeholder="caption text" value="{{s.caption}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmInquiry.$invalid || ValidateStatus()"><i class="entypo-check"></i>{{Inquiry.SaveText}}</button>
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetInquiry(frmInquiry)"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseInquiry(frmInquiry)"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END ENTRY FORM -->
+    <!--  BEGIN INQUIRY LIST -->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="inquiry in $data">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <td data-title="'Status'" style="width: 50px; text-align: center;">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{inquiry.IsActive}}" data-drc-confirm-box="" data-callback="ChangeInquiryStatus(inquiry)" data-message="Are you sure want to InActive '{{inquiry.InquiryTitle}}' inquiry?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!inquiry.IsActive}}" data-drc-confirm-box="" data-callback="ChangeInquiryStatus(inquiry)" data-message="Are you sure want to Active '{{inquiry.InquiryTitle}}' inquiry?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>
+                                }
+                            }
+                            <td data-title="'Code'" data-filter="{ 'Code': 'text' }" data-sortable="'Code'">{{inquiry.InquiryCode}}</td>
+                            <td data-title="'Title'" data-filter="{ 'Title': 'text' }" data-sortable="'Title'">{{inquiry.InquiryTitle}}</td>
+                            <td data-title="'Status'" data-filter="{ 'Status': 'select' }"
+                                filter-data="InquiryStatusType($column)">
+                                {{inquiry.InquiryStatusName}}
+                            </td>
+                            <td data-title="'Actions'" style="width: 170px; text-align: center;">
+                                <a class="btn btn-info btn-xs" data-ng-click="ViewProposals(inquiry)" data-drc-tooltip="Proposal"><i class="entypo-docs"></i></a>
+                                @{
+                                    if (Model.HasUpdateRights)
+                                    {
+                                        <a class="btn btn-warning btn-xs" data-ng-click="UploadFileDirectly(inquiry)" data-drc-tooltip="Upload Document"><i class="entypo-attach"></i></a>
+                                        <a class="btn btn-primary btn-xs" data-ng-click="UpdateInquiry(inquiry)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                }
+                                <a class="btn btn-default btn-xs" data-ng-click="ViewInquiryConversation(inquiry.PKInquiryId)" data-drc-tooltip="Conversation"><i class="entypo-flow-cascade"></i></a>
+                                @{
+                                    if (Model.HasDeleteRights)
+                                    {
+                                        <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteInquiry(inquiry.PKInquiryId)"
+                                           data-message="Are you sure want to delete this record?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td colspan="3">Your search did not match any record.</td>
+                            <td style="width: 170px;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END INQUIRY LIST  -->
+    <!-- BEGIN CONVERSATION LIST -->
+    <div class="row" style="margin-top:15px;" data-ng-if="master.filterData.ClientId > 0 && IsConversationListDisplay">
+        <div class="col-sm-12">
+            @{
+                if (Model.HasInsertRights)
+                {
+                    <a class="badge pull-right" data-ng-click="AddInquiryConversation()"><i class="fa fa-plus"></i> Add Conversation</a>
+                }
+            }
+        </div>
+    </div>
+
+    <div class="row" data-ng-if="master.filterData.ClientId > 0 && IsConversationListDisplay">
+        <div class="timeline-load-more-item" data-ng-if="conversationList.length > 0">
+            <button type="button" class="btn btn-sm btn-success">
+                started on {{conversationList[0].ConversationDate | date:'dd-MMM-yyyy h:mm a'}}
+            </button>
+        </div>
+        <div class="col-sm-12">
+            <div data-ng-if="conversationList.length > 0">
+                <ul class="timeline">
+                    <li data-ng-repeat="conversation in conversationList " data-ng-class="{'timeline-inverted': conversation.ContentType == 'FC' ? 0 : 1}">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-panel" id="#{{conversation.PKConversationId}}">
+                            <div class="timeline-heading">
+                                <h3 class="timeline-title">
+                                    {{conversation.TempConversationTitle}}
+                                    <div style="font-size: 10px;padding-top: 5px;color: #000;">{{conversation.ConversationDate | date:'dd-MMM-yyyy h:mm a' }}</div>
+                                </h3>
+                            </div>
+
+                            <div class="timeline-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <span data-ng-bind-html="conversation.TempConversationDescription"></span>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="row" data-ng-if="conversation.DocumentList.length > 0">
+                                    <div class="col-sm-12">
+                                        <span data-ng-repeat="doc in conversation.DocumentList">
+                                            <a class="badge badge-comments" href="/@ViewBag.InvConversationImagePath/{{doc.DocName}}" target="_blank">{{doc.DocRemark}}</a>
+                                        </span>
+                                        <br /> <br />
+                                    </div>
+                                </div>
+                            </div>
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <a class="badge badge-primary" data-ng-click="UpdateConversation(conversation)" title="Edit"><i class="entypo-pencil"></i></a>
+                                }
+                            }
+                            @{
+                                if (Model.HasDeleteRights)
+                                {
+                                    <a class="badge badge-danger" data-drc-confirm-box="" title="Delete"
+                                       data-callback="DeleteConversation(conversation.PKConversationId)"
+                                       data-message="Are you sure want to delete conversation?"><i class="entypo-trash"></i></a>
+                                }
+                            }
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div data-ng-if="conversationList.length == 0 && master.filterData.ClientId > 0">
+                <div class="alert text-center text-danger">
+                    <strong>
+                        Conversation(s) not found!
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END CONVERSATION LIST -->
+    <!-- BEGIN CONVERSATION FORM -->
+    <div class="row" data-ng-if="master.filterData.ClientId > 0">
+        <div class="col-sm-12 ng-hide" data-ng-show="isConversationFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateConversation(editDataC, frmConversation)" name="frmConversation" id="frmConversation">
+                <input type="hidden" data-ng-model="editDataC.PKConversationId" />
+                <input type="hidden" data-ng-model="editDataC.FKClientId" />
+                <input type="hidden" data-ng-model="editDataC.ConversationType" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{master.mode}} Convresation</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtTitle">Title<span class="compulsary">*</span></label>
+                            <input type="text" data-drc-focus="isFirstConversationFocus" class="form-control" id="txtTitle" name="title" data-ng-model="editDataC.ConversationTitle" placeholder="Enter conversation title" maxlength="50" value="" required />
+                            <div data-ng-show="frmConversation.title.$dirty && frmConversation.title.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmConversation.title.$error.required">Tell us your title.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="txtDescription">Description</label>
+                            <div text-angular="text-angular" name="description_conversation" data-ng-model="editDataC.ConversationDescription" ta-disabled='disabled'></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Type</label>
+                            <label class="radio-inline" data-ng-repeat="ct in contentTypes">
+                                <input type="radio" name="type" data-ng-value="ct.Value" data-ng-model="editDataC.ContentType">{{ct.Label}}
+                            </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtConversationDate">Date</label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtConversationDate" name="txtConversationDate" tabindex="4"
+                                               data-ng-model="editDataC.ConversationDate"
+                                               data-ng-change="ValidateConversationDate(editDataC.ConversationDate, frmConversation)"
+                                               placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default"
+                                                    data-datepicker-popup="{{format}}"
+                                                    data-is-open="isConversationDateOpened"
+                                                    data-ng-model="editDataC.cDate"
+                                                    data-max="maxDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-click="OpenConversationDateCalender($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="frmConversation.txtConversationDate.$error.invalidConversationDate" class="label label-danger">
+                                        Invalid: <span>Please enter valid date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1 col-sm-1">
+                                <div class="form-group">
+                                    <label>Hours</label>
+                                    <input type="text" class="form-control" id="txtHours" name="hours" data-ng-model="editDataC.ConversationHours" data-ng-pattern="/^([01]?[0-9]|2[0-3])$/" placeholder="Hr" maxlength="2" value="" required />
+                                    <div data-ng-show="(frmConversation.hours.$dirty && frmConversation.hours.$invalid) || frmConversation.hours.$error.pattern" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmConversation.hours.$error.required">Tell us your hours.</span><span data-ng-show="frmConversation.hours.$error.pattern">Enter valid input</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1 col-sm-1">
+                                <div class="form-group">
+                                    <label>Minutes</label>
+                                    <input type="text" class="form-control" id="txtMinutes" name="minutes" data-ng-model="editDataC.ConversationMinutes" data-ng-pattern="/^[0-5][0-9]$/" placeholder="Min" maxlength="2" value="" required />
+                                    <div data-ng-show="(frmConversation.minutes.$dirty && frmConversation.minutes.$invalid) || frmConversation.minutes.$error.pattern" class="label label-danger">
+                                        Invalid: <span data-ng-show="frmConversation.minutes.$error.required">Tell us your minutes.</span><span data-ng-show="frmConversation.minutes.$error.pattern">Enter valid input</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label>Upload Documents</label>
+                                    <div upload-multi-file data-filename="editDataC.multiFileList" data-buttonclass="profile-pic-upload-btn" data-oldmultifilelist="oldMultifilelistConversation"
+                                         data-id="comment_files_conversation" data-uploadhandler="/Invoice/Conversation/UploadDocument"
+                                         data-ext="*.jpg; *.jpeg;*.png;*.txt;*.csv;*.pdf;*.xls;*.xlsx;*.doc;*.docx;*.mp4" data-filesize="0">
+                                        <input id="imageOne">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div data-ng-repeat="s in editDataC.multiFileList" data-ng-form="subform">
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-sm-2" style="line-height: 29px;">
+                                    @{
+                                        if (Model.HasDeleteRights)
+                                        {
+                                            <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteUploadedConversationFile($index, editDataC.multiFileList)"><i class="entypo-trash"></i>delete</a>
+                                        }
+                                    }
+                                    <a class="btn btn-primary btn-xs"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                                </div>
+                                <div class="col-sm-10">
+                                    <input type="text" style="margin-left: -50px;" class="form-control" data-ng-model="editDataC.multiFileList[$index].caption" name="txtCaption" placeholder="caption text" value="{{s.caption}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (Model.HasInsertRights || Model.HasUpdateRights)
+                            {
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmConversation.$invalid"><i class="entypo-check"></i>{{master.SaveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetConversation(frmConversation)"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseConversation(frmConversation)"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- END CONVERSATION FORM -->
+    <!-- BEGIN PROPSAL POPUP TEMPLATE -->
+    <script type="text/ng-template" id="Proposal.html">
+        <div class="modal-header">
+            <h3>{{inquiry.InquiryTitle}}</h3>
+        </div>
+        <div class="modal-body">
+            <!-- BEGIN FORM -->
+            @{
+                if (Model.HasInsertRights)
+                {
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="well well-sm">
+                                <div class="form-inline">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddProposal()" data-ng-disabled="!inquiry.IsActive || isInquiryLocked">Add New</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            <div class="row">
+                <div class="col-sm-12" data-ng-show="isProposalFormVisible">
+                    <form role="form" data-ng-submit="CreateUpdateProposal(formData, frmProposal)" name="frmProposal" id="frmProposal">
+                        <input type="hidden" data-ng-model="formData.PKProposalId" />
+                        <input type="hidden" data-ng-model="formData.FKInquiryId" />
+                        <div class="panel panel-default panel-shadow">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{Proposal.mode}} Proposal</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label for="txtProposalTitle">Title<span class="compulsary">*</span></label>
+                                            <input type="text" data-drc-focus="isProposalFirstFocus" tabindex="500" class="form-control" id="txtProposalTitle" name="txtProposalTitle" data-ng-model="formData.ProposalTitle" placeholder="Enter inquiry title" maxlength="50" value="" required />
+                                            <div data-ng-show="frmProposal.txtProposalTitle.$dirty && frmProposal.txtProposalTitle.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmProposal.txtProposalTitle.$error.required">Tell us your title.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-12 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="txtRemarks">Remarks</label>
+                                            <textarea class="form-control" id="txtRemarks" name="txtRemarks" placeholder="Enter Short Description" data-ng-model="formData.Remarks" tabindex="501"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label for="txtProposalDate">Proposed On<span class="compulsary">*</span></label>
+                                            <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                                <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtProposalDate" name="txtProposalDate" tabindex="502"
+                                                       data-ng-model="formData.ProposalDate"
+                                                       data-ng-change="ValidateProposalDate(formData.ProposalDate, frmProposal)"
+                                                       placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default"
+                                                            data-datepicker-popup="{{format}}"
+                                                            data-is-open="isProposalDateOpened"
+                                                            data-ng-model="formData.pDate"
+                                                            data-max="maxDate"
+                                                            data-datepicker-options="dateOptions"
+                                                            data-close-text="Close"
+                                                            data-ng-click="OpenProposalDateCalender($event)">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </p>
+                                            <div data-ng-show="frmProposal.txtProposalDate.$error.invalidProposalDate" class="label label-danger">
+                                                Invalid: <span>Please enter valid date.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12">
+                                        <div class="form-group">
+                                            <label>Upload Documents</label>
+                                            <div upload-multi-file data-filename="formData.multiFileList" data-buttonclass="profile-pic-upload-btn" data-oldmultifilelist="oldMultifilelistProposal"
+                                                 data-id="comment_files_proposal" data-uploadhandler="/Invoice/Inquiry/UploadDocument"
+                                                 data-ext="*.jpg; *.jpeg;*.png;*.txt;*.csv;*.pdf;*.xls;*.xlsx;*.doc;*.docx;*.mp4" data-filesize="0" tabindex="503">
+                                                <input id="imageOne">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="display:none;">
+                                    <div class="col-lg-12 col-sm-12">
+                                        <div class="form-group">
+                                            <input type="checkbox" id="chkIsFinalized" name="chkIsFinalized" data-ng-model="formData.IsFinalized" tabindex="504"><label> Is Finalized</label>
+                                            @*<input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="formData.IsActive" tabindex="7"><label> IsActive</label>*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-ng-repeat="s in formData.multiFileList" data-ng-form="subform">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-sm-4" style="line-height: 29px;">
+                                            @{
+                                                if (Model.HasDeleteRights)
+                                                {
+                                                    <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteUploadedProposalFile($index, formData.multiFileList)" tabindex="505"><i class="entypo-trash"></i>delete</a>
+                                                }
+                                            }
+
+                                            <a class="btn btn-primary btn-xs" data-ng-if="s.PKDocId > 0" href="@ViewBag.InvProposalImagePath/{{s.file}}" target="_blank" tabindex="506"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                                            <a class="btn btn-primary btn-xs" data-ng-if="s.PKDocId == 0" href="@ViewBag.TempUploadPath/{{s.file}}" target="_blank" tabindex="507"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" data-ng-model="formData.multiFileList[$index].caption" name="txtCaption" placeholder="caption text" value="{{s.caption}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                @{
+                                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                                    {
+                                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmProposal.$invalid" tabindex="508"><i class="entypo-check"></i>{{Proposal.saveText}}</button>
+                                    }
+                                }
+                                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetProposal(frmProposal)" tabindex="509"><i class="entypo-erase"></i>Reset</button>
+                                <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseProposal(frmProposal)" tabindex="510"><i class="entypo-cancel"></i>Close</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <!-- / END FORM -->
+            <!-- BEGIN PROPOSAL LIST -->
+            <table class="table table-bordered table-condensed" data-ng-show="proposals.length > 0" tabindex="511">
+                <thead>
+                    <tr>
+                        @{
+                            if (Model.HasUpdateRights)
+                            {
+                                <th><b>Finalized</b></th>
+                            }
+                        }
+                        <th><b>Title</b></th>
+                        <th><b>Date</b></th>
+                        <th><b>Changed On</b></th>
+                        <th style="width: 70px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="p in proposals">
+                        @{
+                            if (Model.HasUpdateRights)
+                            {
+                                <td data-title="'Status'" style="width: 50px; text-align: center;">
+                                    <a href="#" class="btn btn-success btn-xs" data-ng-show="{{p.IsFinalized}}" data-drc-confirm-box="" data-callback="ChangeProposalStatus(p.PKProposalId)" data-message="Are you sure want to not finalize '{{p.ProposalTitle}}' proposal?" data-drc-tooltip="Inactive" data-ng-disabled="!inquiry.IsActive || isInquiryLocked"><i class="entypo-check"></i></a>
+                                    <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!p.IsFinalized}}" data-drc-confirm-box="" data-callback="ChangeProposalStatus(p.PKProposalId)" data-message="Are you sure want to finalize' {{p.ProposalTitle}}' proposal?" data-drc-tooltip="Active" data-ng-disabled="!inquiry.IsActive || isInquiryLocked"><i class="entypo-cancel"></i></a>
+                                </td>
+                            }
+                        }
+
+                        <td>{{p.ProposalTitle}}</td>
+                        <td>{{p.ProposalDate  | date:'dd-MMM-yyyy'}}</td>
+                        <td>{{p.ChgDate | date:'dd-MMM-yyyy hh:mm'}}</td>
+                        <td>
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                    <a class="btn btn-primary btn-xs" data-ng-click="UpdateProposal(p)" data-drc-tooltip="Edit" data-ng-disabled="!inquiry.IsActive || isInquiryLocked"><i class="entypo-pencil"></i></a>
+                                }
+                            }
+                            @{
+                                if (Model.HasDeleteRights)
+                                {
+                                    <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteProposal(p.PKProposalId,p.IsFinalized)" data-message="Are you sure want to delete this proposal?" data-drc-tooltip="Delete" data-ng-disabled="!inquiry.IsActive || isInquiryLocked"><i class="entypo-trash"></i></a>
+                                }
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- / END PROPOSAL LIST -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-primary" ng-click="Close()">Close</button>
+        </div>
+    </script>
+    <!-- / END PROPSAL POPUP TEMPLATE -->
+    <!-- BEGIN FILE UPLOAD TEMPLATE -->
+    <script type="text/ng-template" id="FileUpload.html">
+        <div class="modal-header">
+            <h3>{{uploadData.Inquiry.InquiryTitle}}</h3>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label>Upload Documents</label>
+                        <div upload-multi-file data-filename="uploadData.multiFileList" data-buttonclass="profile-pic-upload-btn" data-oldmultifilelist="oldMultifilelistUploadDirectly"
+                             data-id="comment_files_inquiry_upload_directly" data-uploadhandler="/Invoice/Inquiry/UploadDocument"
+                             data-ext="*.jpg; *.jpeg;*.png;*.txt;*.csv;*.pdf;*.xls;*.xlsx;*.doc;*.docx;*.mp4" data-filesize="0">
+                            <input id="imageOne">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div data-ng-repeat="s in uploadData.multiFileList" data-ng-form="subform">
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-sm-4" style="line-height: 29px;">
+                        <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteUploadedFileDirectly($index, uploadData.multiFileList)"><i class="entypo-trash"></i>delete</a>
+                        <a class="btn btn-primary btn-xs" data-ng-if="s.PKDocId > 0" href="@ViewBag.InvProposalImagePath/{{s.file}}" target="_blank"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                        <a class="btn btn-primary btn-xs" data-ng-if="s.PKDocId == 0" href="@ViewBag.TempUploadPath/{{s.file}}" target="_blank"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                    </div>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" data-ng-model="uploadData.multiFileList[$index].caption" name="txtCaption" placeholder="caption text" value="{{s.caption}}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-info" ng-click="SaveDirectlyUploadedFile()">Save</button>
+            <button class="btn btn-sm btn-primary" ng-click="Close()">Close</button>
+        </div>
+    </script>
+    <!-- / END FILE UPLOAD TEMPLATE -->
+</div>

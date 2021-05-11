@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "Conversation";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<style>
+    .ta-editor {
+        min-height: 300px;
+        height: auto;
+        overflow: auto;
+        font-family: inherit;
+        font-size: 100%;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Conversation</h2>
+        </div>
+    </div>
+</div>
+
+<div data-ng-controller="ConversationMasterCtrl">
+    @{
+        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+        bool hasUpdateRights = ERPUtilities.HasAccessPermission(2, ctrl);
+        bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+        var hasAccessViewModel = new ERP.Models.HasAccessViewModel(){
+            HasInsertRights = hasInsertRights,
+            HasUpdateRights = hasUpdateRights,
+            HasDeleteRights = hasDeleteRights 
+        };
+    }
+
+    <!-- BEGIN HEADER SECTION -->
+    @*<div class="row" data-ng-init="LoadData('@ViewBag.ClientId', '@ViewBag.ConversationId', '@ViewBag.Action')">*@
+    <div class="row" data-ng-init="LoadClientList()">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline" data-ng-submit="FilterByClient(master.ClientId)" name="filterform" role="form">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Client:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpClientList" data-ng-model="master.ClientId" class="form-control" style="width: 300px;" required>
+                            <option value="0">--Select--</option>
+                            <option data-ng-repeat="t in ClientList" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button data-ng-disabled="ClientId == 0" type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <div class="row">
+        <div class="col-sm-12 employee-tabs">
+            <div data-tabset>
+                <!-- BEGIN OPEN CONVERSATION -->
+                @if (ERPUtilities.HasAccessPermission(14, ctrl))
+                { 
+                    @Html.Partial("_OpenConversation", hasAccessViewModel)
+                }
+                <!-- / END OPEN CONVERSATION -->
+                
+                <!-- BEGIN INQUIRY CONVERSATION -->
+                @if (ERPUtilities.HasAccessPermission(15, ctrl))
+                { 
+                    @Html.Partial("_InquiryConversation", hasAccessViewModel)                
+                }
+                <!-- / END INQUIRY CONVERSATION -->
+
+                <!-- BEGIN PROJECT CONVERSATION -->
+                @if (ERPUtilities.HasAccessPermission(16, ctrl))
+                { 
+                    @Html.Partial("_ProjectConversation", hasAccessViewModel)
+                }
+                <!-- / END PROJECT CONVERSATION -->
+
+                <!-- BEGIN MILESTONE -->
+                @if (ERPUtilities.HasAccessPermission(17, ctrl))
+                { 
+                    @Html.Partial("_Milestone", hasAccessViewModel)                
+                }
+                <!-- / END MILESTONE -->
+
+                <!-- BEGIN INVOICE -->
+                @if (ERPUtilities.HasAccessPermission(18, ctrl))
+                { 
+                    @Html.Partial("_Invoice", hasAccessViewModel)                
+                }
+                <!-- / END INVOICE -->
+
+                <!-- BEGIN PAYMENT RECEIVED -->
+                @if (ERPUtilities.HasAccessPermission(19, ctrl))
+                { 
+                    @Html.Partial("_PaymentReceived", hasAccessViewModel)                    
+                }
+                <!--  / END PAYMENT RECEIVED -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/Area/Invoice/Scripts/Conversation");
+}

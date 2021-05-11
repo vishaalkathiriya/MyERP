@@ -1,0 +1,278 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="EmpQualificationCtrl" disabled="!master.Mode == 'Edit' || master.Mode == 'Add'" data-select="RetrieveEmpQualification();SetFocus()">
+    <div data-tab-heading>
+        <i class="entypo-trophy"></i>Qualification
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateQualification(qualification)" name="empQform" id="empQform">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Qualification Information</h3>
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="drpQAcedamic">Acedamic</label>
+                            <select id="drpQAcedamic" name="drpQAcedamic" data-drc-focus="isFirstFocus" data-ng-model="qualification.Acedamic" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in QAcedamic" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="empQform.drpQAcedamic.$dirty && validateDropQAcedamic()" class="label label-danger">
+                                Invalid: Please select your Acedamic Qualification.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="drpQDegree">Degree</label>
+                            <select id="drpQDegree" name="drpQDegree" data-ng-model="qualification.Degree" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in QDegree" data-ng-selected="qualification.Degree==t.Id" value="{{t.Id}}">{{t.Label}}</option>
+                                <option value="-1">Other</option>
+                            </select>
+                            <div data-ng-show="empQform.drpQDegree.$dirty && validateDropQDegree()" class="label label-danger">
+                                Invalid: Please select your Degree.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4" data-ng-if="qualification.Degree == -1">
+                        <div class="form-group">
+                            <label for="txtDegreeOther">Degree Name</label>
+                            <input type="text" class="form-control" id="txtDegreeOther" name="txtDegreeOther" data-ng-model="qualification.DegreeOther" placeholder="Enter your degree name" maxlength="50" value="" required />
+                            <div data-ng-show="empQform.txtDegreeOther.$dirty && empQform.txtDegreeOther.$invalid" class="label label-danger">
+                                <span data-ng-show="empQform.txtDegreeOther.$error.required">Invalid: Tell us your degree name.</span>
+                                <span data-ng-show="empQform.txtDegreeOther.$error.errorDegreeOther">Invalid: Please enter valid degree name.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="drpQDiscipline">Discipline</label>
+                            <select id="drpQDiscipline" name="drpQDiscipline" data-ng-model="qualification.Discipline" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in QDiscipline" data-ng-selected="qualification.Discipline==t.Id" value="{{t.Id}}">{{t.Label}}</option>
+                                <option value="-1">Other</option>
+                            </select>
+                            <div data-ng-show="empQform.drpQDiscipline.$dirty && validateDropDiscipline()" class="label label-danger">
+                                Invalid: Please select your Discipline.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4" data-ng-if="qualification.Discipline == -1">
+                        <div class="form-group">
+                            <label for="txtDisciplineOther">Discipline Name</label>
+                            <input type="text" class="form-control" id="txtDisciplineOther" name="txtDisciplineOther" data-ng-model="qualification.DisciplineOther" placeholder="Enter your discipline name" maxlength="50" value="" required />
+                            <div data-ng-show="empQform.txtDisciplineOther.$dirty && empQform.txtDisciplineOther.$invalid" class="label label-danger">
+                                <span data-ng-show="empQform.txtDisciplineOther.$error.required">Invalid: Tell us your discipline name.</span>
+                                <span data-ng-show="empQform.txtDisciplineOther.$error.errorDisciplineOther">Invalid: Please enter valid discipline name.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="drpQUniversity">University</label>
+                            <select id="drpQUniversity" name="drpQUniversity" data-ng-model="qualification.University" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in QUniversity" data-ng-selected="qualification.University==t.Id" value="{{t.Id}}">{{t.Label}}</option>
+                                <option value="-1">Other</option>
+                            </select>
+                            <div data-ng-show="empQform.drpQUniversity.$dirty && validateDropUniversity()" class="label label-danger">
+                                Invalid: Please select your University.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3" data-ng-if="qualification.University == -1">
+                        <div class="form-group">
+                            <label for="txtUniversityOther">University Name</label>
+                            <input type="text" class="form-control" id="txtUniversityOther" name="txtUniversityOther" data-ng-model="qualification.UniversityOther" placeholder="Enter your university name" maxlength="100" value="" required />
+                            <div data-ng-show="empQform.txtUniversityOther.$dirty && empQform.txtUniversityOther.$invalid" class="label label-danger">
+                                <span data-ng-show="empQform.txtUniversityOther.$error.required">Invalid: Tell us your university name.</span>
+                                <span data-ng-show="empQform.txtUniversityOther.$error.errorUniversityOther">Invalid: Please enter valid university name.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="drpQInstitute">Institute</label>
+                            <select id="drpQInstitute" name="drpQInstitute" data-ng-model="qualification.Institute" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in QInstitute" data-ng-selected="qualification.Institute==t.Id" value="{{t.Id}}">{{t.Label}}</option>
+                                <option value="-1">Other</option>
+                            </select>
+                            <div data-ng-show="empQform.drpQInstitute.$dirty && validateDropInstitute()" class="label label-danger">
+                                Invalid: Please select your Institute.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3" data-ng-if="qualification.Institute == -1">
+                        <div class="form-group">
+                            <label for="txtInstituteOther">Institute Name</label>
+                            <input type="text" class="form-control" id="txtInstituteOther" name="txtInstituteOther" data-ng-model="qualification.InstituteOther" placeholder="Enter your institute name" maxlength="100" value="" required />
+                            <div data-ng-show="empQform.txtInstituteOther.$dirty && empQform.txtInstituteOther.$invalid" class="label label-danger">
+                                <span data-ng-show="empQform.txtInstituteOther.$error.required">Invalid: Tell us your institute name.</span>
+                                <span data-ng-show="empQform.txtInstituteOther.$error.errorInstituteOther">Invalid: Please enter valid institute name.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpQPassingMonth">Passing Month</label>
+                                    <select id="drpQPassingMonth" name="drpQPassingMonth" data-ng-model="qualification.PassingMonth" class="form-control" required>
+                                        <option value="">--Select--</option>
+                                        <option value="1">Jan</option>
+                                        <option value="2">Feb</option>
+                                        <option value="3">Mar</option>
+                                        <option value="4">Apr</option>
+                                        <option value="5">May</option>
+                                        <option value="6">Jun</option>
+                                        <option value="7">Jul</option>
+                                        <option value="8">Aug</option>
+                                        <option value="9">Sep</option>
+                                        <option value="10">Oct</option>
+                                        <option value="11">Nov</option>
+                                        <option value="12">Dec</option>
+                                    </select>
+                                    <div data-ng-show="empQform.drpQPassingMonth.$dirty && validateDropPassingMonth()" class="label label-danger">
+                                        Invalid: Please select your passing month.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpQPassingYear">Passing Year</label>
+                                    <select id="drpQPassingYear" name="drpQPassingYear" data-ng-model="qualification.PassingYear" class="form-control" required>
+                                        <option value="">--Select--</option>
+                                        <option data-ng-repeat="t in years" data-ng-selected="qualification.PassingYear==t" value="{{t}}">{{t}}</option>
+                                    </select>
+                                    <div data-ng-show="empQform.drpQPassingYear.$dirty && validateDropPassingYear()" class="label label-danger">
+                                        Invalid: Please select your passing year.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="txtQPercentage">Percentage(%)</label>
+                            <input type="text" class="form-control" id="txtQPercentage" name="txtQPercentage" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="qualification.Percentage" placeholder="Enter your percentage" maxlength="6" value="" required />
+                            <div data-ng-show="empQform.txtQPercentage.$dirty && empQform.txtQPercentage.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="empQform.txtQPercentage.$error.required">Tell us your percentage.</span>
+                                <span data-ng-show="empQform.txtQPercentage.$error.pattern">Please enter valid percentage.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3" style="display: none;">
+                        <div class="form-group">
+                            <label class="checkbox">
+                                <input type="checkbox" data-ng-model="qualification.IsActive">Active
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                @{
+                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                    {
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="empQform.$invalid || validateDropQAcedamic() || validateDropQDegree() || validateDropDiscipline() || validateDropUniversity() || validateDropInstitute() || validateDropPassingMonth() || validateDropPassingYear()"><i class="entypo-check"></i>{{saveText}}</button>
+                    }
+                }
+                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetQualification()"><i class="entypo-erase"></i>Reset</button>
+                <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="ResetForm()"><i class="entypo-cancel"></i>Clear</button>
+            </div>
+        </div>
+
+        <br />
+        <div class="row">
+            <div class="col-sm-12">
+                <div data-loading-container="tableParams.settings().$loading">
+                    <div class="table-responsive">
+                        <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                            <tr data-ng-repeat="d in $data">
+                                @{
+                                    if (Model.HasUpdateRights)
+                                    {
+                                        <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                            <a class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatusEmpQualification(d.SrNo, d.IsActive)" data-message="Are you sure want to InActive '{{d.AcedamicName}}' Qualification?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                            <a class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatusEmpQualification(d.SrNo, d.IsActive)" data-message="Are you sure want to Active '{{d.AcedamicName}}' Qualification?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                        </td>
+                                    }
+                                }
+
+                                <td data-title="'Academic Status'" data-filter="{ 'AcedamicName': 'text' }" data-sortable="'AcedamicName'">{{d.AcedamicName}}</td>
+                                <td data-title="'Degree'" data-sortable="'DegreeName'">{{d.DegreeName}}</td>
+                                <td data-title="'Discipline'">{{d.DisciplineName}}</td>
+                                <td data-title="'University'">{{d.UniversityName}}</td>
+                                <td data-title="'Institute'">{{d.InstituteName}}</td>
+                                <td data-title="'Passing Year'">{{d.PassingMonth}} - {{d.PassingYear}}</td>
+                                <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                                @{
+                                    if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                    {
+                                        <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                            @{
+                                        if (Model.HasUpdateRights)
+                                        {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateEmpQualification(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                        }
+                                            }
+                                            @{
+                                        if (Model.HasDeleteRights)
+                                        {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteEmpQualification(d.SrNo)" data-message="Are you sure want to delete '{{d.AcedamicName}}' from Qualification?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                        }
+                                            }
+                                        </td>
+                                    }
+                                }
+
+                            </tr>
+                            <tr data-ng-show="noRecord" style="text-align: center;">
+                                @{
+                                    if (Model.HasUpdateRights)
+                                    {
+                                        <td style="width: 50px;"></td>
+                                    }
+                                }
+
+                                <td colspan="6">
+                                    Your search did not match any qualification.
+                                </td>
+                                <td style="width: 125px;"></td>
+                                @{
+                                    if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                    {
+                                        <td style="width: 80px;"></td>
+                                    }
+                                }
+
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

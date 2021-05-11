@@ -1,0 +1,321 @@
+﻿@{
+    ViewBag.Title = "Manage Press Media Expense";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+
+<div data-ng-controller="PressMediaExpCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Press Media Expense </h2>
+            </div>
+        </div>
+    </div>
+
+     <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form role="form" class="form-inline" data-ng-submit="FilterByIssueDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+                    <!-- <div class="form-group">
+                        <select name="drpHospitalName" data-ng-model="filterData.drpHospitalName" class="form-control" style="width: 150px;" required>
+                            <option value="0">ALL</option>
+                            <option data-ng-repeat="t in MedicalHelpType" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div> -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddPressMediaExp()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+     <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12  ng-hide " data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdatePressMediaExp(editData)" name="PressMediaExpform" id="PressMediaExpform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Press Media Expense</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="NameOfPressMedia">Name of Media <span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="NameOfPressMedia" name="NameOfPressMedia" data-ng-model="editData.NameOfPressMedia" placeholder="Enter Media Name" maxlength="50" tabindex="1" value="" required />
+                                    <div data-ng-show="PressMediaExpform.NameOfPressMedia.$dirty && PressMediaExpform.NameOfPressMedia.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="PressMediaExpform.NameOfPressMedia.$error.required">Tell us media name.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="RepresentativeName">Representative Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="RepresentativeName" name="RepresentativeName" data-ng-model="editData.RepresentativeName" placeholder="Enter Representative Name" maxlength="50" tabindex="2" value="" required />
+                                    <div data-ng-show="PressMediaExpform.RepresentativeName.$dirty && PressMediaExpform.RepresentativeName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="PressMediaExpform.RepresentativeName.$error.required">Tell us representative name.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="Occasion">Occasion<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="Occasion" name="Occasion" data-ng-model="editData.Occasion" placeholder="Occasion" maxlength="50" tabindex="3" value="" required />
+                                    <div data-ng-show="PressMediaExpform.Occasion.$dirty && PressMediaExpform.Occasion.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="PressMediaExpform.Occasion.$error.required">Tell us Patient Name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="ApprovedBy">Approved By<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="ApprovedBy" name="ApprovedBy" data-ng-pattern="/^[A-Za-z ]*$/" data-ng-model="editData.ApprovedBy" placeholder="Enter Approved By" tabindex="4" maxlength="50" value="" />
+                                            <div data-ng-show="PressMediaExpform.ApprovedBy.$dirty && PressMediaExpform.ApprovedBy.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="PressMediaExpform.ApprovedBy.$error.required">Tell us ApprovedBy.</span>
+                                                <span data-ng-show="PressMediaExpform.ApprovedBy.$error.pattern">Please enter only alphabet characters.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="Amount">Amount<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="Amount" name="Amount" data-ng-pattern="/^\d*\.?\d*$/" data-ng-model="editData.Amount" placeholder="Enter Amount" maxlength="15" tabindex="5" value="" required />
+                                            <div data-ng-show="PressMediaExpform.Amount.$dirty && PressMediaExpform.Amount.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="PressMediaExpform.Amount.$error.required">Tell us Amount.</span>
+                                                <span data-ng-show="PressMediaExpform.Amount.$error.pattern" class="">Please enter only numeric characters.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtIssueDate">Date<span class="compulsary">*</span></label>
+                                            <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                                <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtIssueDate" name="txtIssueDate" placeholder="DD-MM-YYYY" maxlength="10" value="" required data-ng-model="editData.IssueDate" tabindex="6" data-ng-change="ValidateIssuedDate(editData.IssueDate)" />
+                                                <span class="input-group-btn" style="position: initial;">
+                                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                        data-is-open="editData.calOpenIssueDate"
+                                                        data-ng-model="issueDate"
+                                                        data-datepicker-options="dateOptions"
+                                                        data-close-text="Close"
+                                                        data-ng-required="true"
+                                                        data-ng-click="calendarOpenIssueDate($event)">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </p>
+                                            <div data-ng-show="PressMediaExpform.txtIssueDate.$dirty && PressMediaExpform.txtIssueDate.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="PressMediaExpform.txtIssueDate.$error.required">Please select your Cheque Issue Date.</span>
+                                                <span data-ng-show="PressMediaExpform.txtIssueDate.$error.invalidIssueDate">Please enter valid Date.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="MobileNumber">Mobile No.<span class="compulsary">*</span></label>
+                                            <input type="text" class="form-control" id="MobileNumber" name="MobileNumber" data-ng-pattern="/^[0-9]{10,}$/" data-ng-model="editData.MobileNumber" placeholder="Enter Mobile Number" maxlength="12" tabindex="7" value="" required />
+                                            <div data-ng-show="PressMediaExpform.MobileNumber.$dirty && PressMediaExpform.MobileNumber.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="PressMediaExpform.MobileNumber.$error.required">Tell us mobile number.</span>
+                                                <span data-ng-show="PressMediaExpform.MobileNumber.$error.pattern">Please enter only numeric characters.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row">
+                                    <div class="col-sm-10">
+
+                                        <img  src="~/Content/images/thumb_Document.png" class="img-responsive" width="33%" title="Please select a Document" style="margin-left:25%;" />
+                                        <div upload-file data-filename="editData.Attachment" data-buttonclass="document-pic-upload-btn" data-id="document_pic" data-uploadhandler="/PressMediaExp/pressMediaExpDocument" data-ischanged="ischanged" data-ext="*.pdf" style="display: inline-block; width: 87%;">
+                                        
+                                                <input id="imageOne">
+                                        </div>
+                                        
+                                        <input type="text" style="display: none" data-ng-model="editData.Attachment"/>
+                                        
+                                        <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Add'"   href="/@ViewBag.TempDocPdfMediaExp/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                        <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Edit'"   href="/@ViewBag.DocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+
+
+                                    </div>
+                                    <div class="col-sm-2">
+                                         
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="PressMediaExpform.$invalid || validateDrop()" tabindex="9"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetPressMediaExp()" tabindex="10"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="ClosePressMediaExp()" tabindex="11"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING PRESS MEDIA EXPENSE LIST -->
+    <div class="row" data-ng-init="RetrievePressMediaExp()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped" >
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="" style="width: 50px;"><a ng-if="d.Attachment != NULL && d.Attachment != '' "  href="@ViewBag.DocPdf/{{d.Attachment}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+                            <td data-title="'Media Name'" data-filter="{ 'NameOfPressMedia': 'text' }" data-sortable="'NameOfPressMedia'">{{d.NameOfPressMedia}}</td>
+                            <td data-title="'Occasion'" data-filter="{ 'Occasion': 'text' }" data-sortable="'Occasion'">{{d.NameOfPressMedia}}</td>
+                            <td data-title="'Date'" data-sortable="'Date'">{{d.Date | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Expense'" align="right" data-sortable="'Amount'">{{d.Amount}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                              <td style="width: 128px; text-align: center;" data-title="'Actions'">
+                                    <a class="btn btn-info btn-xs" data-ng-click="ShowPressMediaExpens(d)"><i class="entypo-eye"></i></a>
+                              
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdatePressMediaExp(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeletePressMediaExp(d.SrNo)" data-message="Are you sure want to delete '{{d.ProgrammeName}}' from issued documents?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+                              
+                            }
+                        </tr>
+
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="3">Your search did not match any press media expense Information. 
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END PRESS MEDIA EXPENSE LIST -->
+
+</div>
+
+<!-- BEGIN MODEL SECTION -->
+<script type="text/ng-template" id="PressMediaExpensPopup.html">
+        <div class="modal-body">
+        <h4> Press Media Expens Information</h4>
+        <table class="table table-striped">
+            <tr>
+                <td style="width: 150px;"><b> Media Name:</b></td>
+                <td>{{items.NameOfPressMedia}}</td>
+            </tr>
+            <tr>
+                <td zstyle="width: 150px;"><b>Re-Presentative Name:</b></td>
+                <td>{{items.RepresentativeName}}</td>
+            </tr>
+            <tr>
+                <td style="width: 150px;"><b>Date:</b></td>
+                <td>{{items.Date | date:'dd-MMM-yyyy'}}</td>
+           </tr>
+           <tr>
+                <td style="width: 150px;"><b>ApprovedBy:</b></td>
+                <td>{{items.ApprovedBy}}</td>
+          </tr>
+          <tr>
+                <td style="width: 150px;"><b>Amount:</b></td>
+                <td>{{items.Amount}}</td>
+            </tr>
+        <tr>
+                <td style="width: 150px;"><b>Mobile Number:</b></td>
+                <td>{{items.MobileNumber}}</td>
+            </tr>
+         </table>       
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="Close()">Close</button>
+    </div>
+</script>
+<!-- / END MODEL SECTION -->
+
+
+
+
+@*@section Scripts{
+   @Scripts.Render("~/Scripts/hrdPressMedia")
+}*@
+
+@section Scripts{
+
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/controllers/HRDPressMediaExpCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/HRD/Scripts/services/HRDPressMediaExpService.js")"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Content/js/jquery.uploadify.js"></script>
+    <script src="~/Scripts/directives/uploadFile.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+}

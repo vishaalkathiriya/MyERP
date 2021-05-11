@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.Title = "Manage Projects";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="PMSProjectCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Projects</h2>
+            </div>
+        </div>
+    </div>
+
+    @{
+        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+        bool hasEditRights = ERPUtilities.HasAccessPermission(2, ctrl);
+        if (hasInsertRights)
+        {
+            <div class="well well-sm well-project-filters">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h4 style="display: inline-block; font-weight:bold; margin-bottom: 0; margin-right: 10px; margin-top: 4px; color: #6D4C41;">Filter Projects:</h4>
+                        <div>&nbsp;</div>
+                        @*<hr style="margin:5px;" />*@
+                    </div>
+                </div>
+                <div class="row">
+                    @*<div class="col-md-2">
+                        <label style="display: inline-block; margin-right: 10px; margin-top: 4px; color: #212121;">Project Type:</label>
+                    </div>*@
+                    <div class="col-md-2">
+                        <select name="drpFilterData" id="drpFilterData" data-ng-model="filterData" class="form-control input-sm" required>
+                            <option data-ng-repeat="s in StatusList" data-ng-selected="filterData == s.Id" value="{{s.Id}}">{{s.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        @*<tags-input data-ng-model="filterTechnologies"
+                                    add-from-autocomplete-only="true"
+                                    placeholder="Select technology"
+                                    replace-spaces-with-dashes="false"
+                                    class="sm">
+                            <auto-complete source="loadTags($query)"
+                                            min-length="0"
+                                            max-results-to-show="1000"
+                                            highlight-matched-text="true">
+                            </auto-complete>
+                        </tags-input>*@
+
+                        <tags-input data-ng-model="filterTechnologies"
+                                    add-from-autocomplete-only="true"
+                                    placeholder="Select technology Group"
+                                    replace-spaces-with-dashes="false"
+                                    class="sm">
+                            <auto-complete source="loadTechnoGroup($query)"
+                                           min-length="0"
+                                           max-results-to-show="1000"
+                                           highlight-matched-text="true">
+                            </auto-complete>
+                        </tags-input>
+
+
+                    </div>
+                    <div class="col-md-3">
+                        <select name="drpProjectType" id="drpFilterProjectType" data-ng-model="filterProjectType" class="form-control input-sm" required>
+                            <option value="0">Select type</option>
+                            <option data-ng-repeat="pt in ProjectTypeList" data-ng-selected="filterProjectType == pt.Id" value="{{pt.Id}}">{{pt.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="drpUserList" id="drpfilterUserList" data-ng-model="filterUserList" class="form-control input-sm" required>
+                            <option value="0"> Select Employee</option>
+                            <option data-ng-repeat="user in ProjectUserList" data-ng-selected="filterUserList == user.Id" value="{{user.Id}}">{{user.Label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div>&nbsp;</div>
+                        @*<hr style="margin:5px;" />*@
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-info" data-ng-click="AddPMSProject()">Add New Project</button>
+                            <button type="button" class="btn btn-primary" data-ng-click="FilterProject()">Filter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*<div class="row">
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            <tags-input data-ng-model="filterTechnologies"
+                                        min-length="100"
+                                        add-from-autocomplete-only="true"
+                                        placeholder="Select technology">
+                                <auto-complete source="loadTags($query)"
+                                               min-length="0"
+                                               max-results-to-show="1000"
+                                               highlight-matched-text="true">
+                                </auto-complete>
+                            </tags-input>
+                        </div>
+
+                    </div>
+
+                </div>*@
+        }
+    }
+
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateProject(editData)" name="projectform" id="projectform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Project</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtProjectName">Project Name<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtProjectName" name="txtProjectName" tabindex="1" data-ng-model="editData.ProjectName" data-drc-focus="isFirstFocus" placeholder="Enter project name" maxlength="100" value="" required />
+                                    <div data-ng-show="projectform.txtProjectName.$dirty && projectform.txtProjectName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="projectform.txtProjectName.$error.required">Tell us your project name.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="drpTechnologies">Technologies</label>
+                                        <select name="drpTechnologies" id="drpTechnologies" tabindex="2" data-ng-model="editData.Technologies" class="form-control" required>
+                                            <option value="0">--Select--</option>
+                                            <option data-ng-repeat="s in technologiesList" data-ng-selected="editData.Technologies == s.Id" value="{{s.Id}}">{{s.Label}}</option>
+                                        </select>
+                                    </div>
+                                </div>*@
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpTechnologies">Technologies</label>
+                                    @*<select name="drpTechnologies" id="drpTechnologies" tabindex="2" data-ng-model="editData.Technologies" class="form-control" required>
+                                            <option value="0">--Select--</option>
+                                            <option data-ng-repeat="s in technologiesList" data-ng-selected="editData.Technologies == s.Id" value="{{s.Id}}">{{s.Label}}</option>
+                                        </select>*@
+
+                                    @*<div data-tags-input="" data-ng-model="S">
+                                            <auto-complete source="~($query)"></auto-complete>
+                                        </div>*@
+
+                                    @*<data-tags-input ng-model="Services">
+                                            <auto-complete source="loadTags($query)"></auto-complete>
+                                        </data-tags-input>*@
+                                    <tags-input ng-model="editData.Technologies" add-from-autocomplete-only="true" tabindex="2">
+                                        <auto-complete source="loadTags($query)"
+                                                       min-length="0"
+                                                       max-results-to-show="1000"
+                                                       highlight-matched-text="true"></auto-complete>
+                                    </tags-input>
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpProjectType">Project Type</label>
+                                    <select name="drpProjectType" id="drpProjectType" tabindex="3" data-ng-model="editData.ProjectType" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="pt in ProjectTypeList" data-ng-selected="editData.ProjectType == pt.Id" value="{{pt.Id}}">{{pt.Label}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtStartDate">Start Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="4" class="form-control" id="txtStartDate" name="txtStartDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                               data-ng-model="editData.StartDate" data-ng-change="ValidateStartDate(editData.StartDate)" />
+
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                    data-is-open="calOpenStartDate"
+                                                    data-ng-model="startDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-required="true"
+                                                    data-ng-click="calendarOpenStartDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="projectform.txtStartDate.$dirty && projectform.txtStartDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="projectform.txtStartDate.$error.invalidStartDate">Please enter valid start date.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtEndDate">End Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="5" class="form-control" id="txtEndDate" name="txtEndDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                               data-ng-model="editData.EndDate" data-ng-change="ValidateEndDate(editData.EndDate)" />
+
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                    data-is-open="calOpenEndDate"
+                                                    data-ng-model="endDate"
+                                                    data-min="minDate"
+                                                    data-datepicker-options="dateOptions"
+                                                    data-close-text="Close"
+                                                    data-ng-required="true"
+                                                    data-ng-click="calendarOpenEndDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="projectform.txtEndDate.$dirty && projectform.txtEndDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="projectform.txtEndDate.$error.invalidEndDate">Please enter valid end date.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtEstDays">Total Estimated Days<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtEstDays" name="txtEstDays" tabindex="6" data-ng-model="editData.TotalEstDays" placeholder="Enter estimated days" maxlength="5" value="" required />
+                                    <div data-ng-show="projectform.txtEstDays.$dirty && projectform.txtEstDays.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="projectform.txtEstDays.$error.required">Tell us your estimated days.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpStatus">Status</label>
+                                    <select name="drpStatus" id="drpStatus" tabindex="7" data-ng-model="editData.Status" class="form-control" required>
+                                        <option data-ng-repeat="s in StatusList" value="{{s.Id}}">{{s.Label}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="checkbox">
+                                        <input type="checkbox" data-ng-model="editData.IsArchived" tabindex="8">Is Archived
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="txtDescription">Short Introduction</label>
+                                    <textarea class="form-control" id="txtDescription" name="txtDescription" tabindex="9" data-ng-model="editData.Description" placeholder="Enter project description" maxlength="500"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="drpTL">Team Lead</label>
+                                    <select id="drpTL" name="drpTL" data-ng-model="editData.TeamLeadId" class="form-control" data-ng-change="loadUserList(editData.TeamLeadId)">
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in TeamLeadList" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-7" data-ng-if="editData.TeamLeadId">
+                                <label class="checkbox" data-ng-repeat="u in UserList">
+                                    <input type="checkbox" data-ng-model="UserList[$index].IsSelected">{{u.Label}}
+                                </label>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group" style="margin-top: 25px;">
+                                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-disabled="!editData.TeamLeadId || editData.TeamLeadId == 0" data-ng-click="AssignUsers()"><i class="entypo-erase"></i>Assign</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" data-ng-repeat="r in DisplayAssignedUserList" style="margin-top: 10px;">
+                            <div class="col-sm-1">
+                                <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteAssignedEntry($index)"><i class="entypo-trash"></i></a>
+                            </div>
+                            <div class="col-sm-2">
+                                {{r.LeadName}}
+                            </div>
+                            <div class="col-sm-9">
+                                <div data-ng-repeat="r2 in r.SelectedUsers">
+                                    <div>{{r2.Label}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights || hasEditRights)
+                            {
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="projectform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetProject()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseProject()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END  FORM SECTION -->
+    <!-- BEGIN PROJECT LIST -->
+    <div style="padding: 0 10px;">
+        <div class="ajax-progress-pms" data-ng-show="IsAjaxLoadingPMS">Please wait while loading...</div>
+        <div class="row" data-ng-hide="IsAjaxLoadingPMS" data-ng-repeat="temp in ProjectList">
+            <div class="todo-state-title-wrapper todo-hold-wrapper">
+                <div><h4 class="todo-hold-title">{{listOfProjectTypes[temp[0].ProjectType]}}</h4><h4 class="todo-hold-title">{{temp.length}}</h4></div>
+            </div>
+            <div class="col-sm-4 col-md-4 col-lg-3 col-xl-2" data-ng-repeat="p in temp | orderBy: 'ProjectName'">
+                @*<a ng-href="/PMS/Module/{{p.ProjectId}}" class="project-box" >*@
+                <div class="project-box" data-ng-click="RedirectToModulePage(p.ProjectId)">
+                    <h3 class="project-title animated fadeInDown"><a ng-href="/PMS/Module/{{p.ProjectId}}">{{p.ProjectName}}</a></h3>
+                    <span>{{p.TechnologyName}} </span>
+                    <h5>Duration (hrs): {{p.Hours || 0}} / {{p.AssignedHours || 0}}</h5>
+                    <h5>Todo: {{p.finishTaskCount || 0}} / {{p.totalTaskCount || 0}}</h5>
+
+                    <div class="project-timestamp">Last updated on {{p.ChgDate | date:'dd-MM-yyyy hh:mm:ss'}}</div>
+                    <br />
+                    <div class="user-list">
+                        <span data-ng-repeat="l in p.SelectedUsers">
+                            <img src="/{{l.ProfilePix}}" title="{{l.LeadName}}" data-drc-tooltip="{{l.LeadName}}" alt="" class="img-circle img-circle-style" />
+                            <img data-ng-repeat="u in l.SelectedUsers" title="{{u.Label}}" data-drc-tooltip="{{u.Label}}" src="/{{u.ProfilePix}}" alt="" class="img-circle img-circle-style" />
+                        </span>
+                    </div>
+                    @{
+                        if (hasEditRights)
+                        {
+                    <div class="option-panel">
+                        <a href="#" class="link-edit-project" data-ng-click="UpdateProject(p);$event.stopPropagation()">
+                            <i class="fa fa-pencil"></i>
+                            <span class="edit-text">Edit</span>
+                        </a>
+                    </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div data-ng-if="ProjectList.length == 0">
+            <p class="lead text-danger text-center">
+                Record not found!
+            </p>
+        </div>
+    </div>
+    <!-- / END PROJECT LIST -->
+</div>
+@section Scripts{
+
+    @Scripts.Render("~/Areas/PMS/Scripts/pmsProject")
+    <script src="/Project/GetProjectTypes"></script>
+    <script>
+        ; (function () {
+            $(function () {
+                $('.main-content').addClass('project-overview-content');
+            });
+        })();
+    </script>
+}

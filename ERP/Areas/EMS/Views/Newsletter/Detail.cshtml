@@ -1,0 +1,169 @@
+﻿<div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2 ng-bind="vm.title"></h2>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Start: Email Preview Section -->
+    <div class="row" ng-show="vm.isPreviewShow">
+        <div class="col-sm-12">
+             <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Email Preview
+                    </h3>
+                    <div class="pull-right" style="padding: 6px;">
+                        <a href class="btn btn-sm btn-info" ng-click="vm.closePreview()">Close Preview</a>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <iframe id="emailPreviewIframe" frameborder="0" width="99%" height="100%"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: Email Preview Section -->
+
+
+    <!-- Start: Email Form Section -->
+    <div class="row" ng-show="!vm.isPreviewShow">
+        <div class="col-sm-9">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Add New Email
+                    </h3>
+                    <div class="pull-right" style="padding: 6px;">
+                        <a class="btn btn-sm btn-info" ng-href="#/overview">Back to overview page</a>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form>
+                        <div class="form-group">
+                            <label>Title:</label>
+                            <input type="text" class="form-control" placeholder="Enter title" ng-model="vm.newsletter.Subject" />
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>From Name:</label>
+                                    <input type="text" class="form-control" placeholder="Enter from name" ng-model="vm.newsletter.FromName" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>From Email:</label>
+                                    <input type="text" class="form-control" placeholder="Enter from email" ng-model="vm.newsletter.FromEmail" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>To Emails:</label>
+                            <tags-input data-ng-model="vm.newsletter.selectedGroups" display-property="Name" class="ti-input-sm">
+                                <auto-complete source="vm.loadGroups($query)" min-length="0"></auto-complete>
+                            </tags-input>
+                        </div>
+                        <div class="form-group">
+                            <label>Email content:</label>
+                            <textarea ckeditor="vm.editorOptions" ng-model="vm.newsletter.HTML"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Actions
+                    </h3>
+                </div>
+                <div class="list-group">
+                    <a href="" class="list-group-item" ng-click="vm.saveNewsletter()">Save Newsletter</a>
+                    <ems-email-preview html="vm.newsletter.HTML" bodywrapper="" header="" footer="" is-preview-show="vm.isPreviewShow" preview-iframe-id="emailPreviewIframe"></ems-email-preview>
+                    <a ng-if="vm.newsletter.NewsletterID > 0" href="" class="list-group-item" ng-click="vm.scheduleNewsletter()">Schedule Newsletter</a>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Open Rate
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="padding-lg text-center">
+                                TOTAL SENT
+                                <h3 class="text-muted">100</h3>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="padding-lg text-center">
+                                TOTAL OPEN
+                                <h3 class="text-muted">60</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 60%;">60%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: Email Form Section -->
+
+
+    <!-- Start: Email Schedule Modal -->
+    <script type="text/ng-template" id="scheduleNewsletterModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Schedule Newsletter</h3>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h4>{{ newsletter.Subject }}</h4>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-xs-12">
+                    <form name="formschedulenewsletter">
+                        <div class="form-group">
+                            <label>Select Schedule Date</label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                <input type="text" class="form-control"
+                                       datepicker-popup="dd-MM-yyyy" ng-model="dt" is-open="opened" min-date="minDate"
+                                       max-date="'2015-06-22'" datepicker-options="dateOptions" ng-required="true"
+                                       close-text="Close" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Schedule Time</label>
+                            <timepicker ng-model="scheduleTime" hour-step="1" minute-step="1" show-meridian="false"></timepicker>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-info" ng-click="scheduleNewsletter()">Schedule</button>
+            <button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+    <!-- End: Email Schedule Modal -->
+
+</div>

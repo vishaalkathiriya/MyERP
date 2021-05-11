@@ -1,0 +1,267 @@
+﻿@{
+    ViewBag.Title = "Manage ToDo Comments";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<style>
+    .ta-editor {
+        min-height: 300px;
+        height: auto;
+        overflow: auto;
+        font-family: inherit;
+        font-size: 100%;
+    }
+
+    .modal-dialog {
+        width: 70%;
+    }
+</style>
+<div data-ng-controller="PMSTodoCommentCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage ToDo Comments</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row" style="padding: 0 10px;" data-ng-init="setTodoId('@ViewBag.ID','@ViewBag.mainPath'); setTodoStatus('@ViewBag.ID'); getStatusList();">
+        <div class="col-sm-12">
+            <form role="form" data-ng-submit="isDisabled = 'false';SaveComment(editData)" name="comform">
+                <!--Navigation Panel-->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <ol class="breadcrumb bc-3">
+                            <li>
+                                <a href="/PMS/Module/{{projectId}}"><i class="entypo-left-open-big"></i>Back to Module List</a>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12" data-ng-init="setModuleName('@ViewBag.ID')">
+                        <p class="lead">
+                            From the module: <a href="/PMS/ModuleTodo/{{moduleId}}">{{moduleName}}</a>
+                        </p>
+                        <div class="module-header">
+                            <h3 class="module-title module-todo-header">{{todoCommentText}}</h3>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div data-ng-show="todoStatus == 1 && todoIsArchived == false">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+
+                        if (hasInsertRights)
+                        {
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <!--Add Comment-->
+                                    <div data-tabset>
+                                        <!-- Tab: Add Comment Start-->
+                                        <div data-tab>
+                                            <div data-tab-heading>
+                                                <i class="entypo-vcard"></i>Comment
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div>
+                                                        <div text-angular="text-angular" name="htmlcontent" data-ng-model="editData.htmlcontent" ta-disabled='disabled'></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row" style="margin-top: 10px;">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="txtHours">Hours<span class="compulsary">*</span></label>
+                                                        <input type="number" min="0" class="form-control" id="txtHours" name="txtHours" placeholder="hh" value="" data-ng-pattern="/^\d*\.?\d*$/"
+                                                               data-ng-model="editData.myHour" required />
+                                                        <div data-ng-show="comform.txtHours.$dirty && comform.txtHours.$invalid" class="label label-danger">
+                                                            Invalid: <span data-ng-show="comform.txtHours.$error.required">Tell us your hours.</span>
+                                                            <span data-ng-show="comform.txtHours.$error.pattern">Please enter valid hours.</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <label for="txtMinutes">Minutes<span class="compulsary">*</span></label>
+                                                        <input type="number" min="0" max="60" class="form-control" id="txtMinutes" name="txtMinutes" placeholder="mm" data-ng-pattern="/^\d*\.?\d*$/"
+                                                               data-ng-model="editData.myMinute" required />
+                                                        <div data-ng-show="comform.txtMinutes.$dirty && comform.txtMinutes.$invalid" class="label label-danger">
+                                                            Invalid: <span data-ng-show="comform.txtMinutes.$error.required">Tell us your minutes.</span>
+                                                            <span data-ng-show="comform.txtMinutes.$error.pattern">Please enter valid minutes.</span>
+                                                            <span data-ng-show="comform.txtMinutes.$error.number">Minutes should not be more than 60.</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>Status: </label>
+                                                    <div class="radio-inline" data-ng-repeat="l in todoStatusList" data-ng-if="getUsercanFinish(l.Id)">
+                                                        @*<input type="radio" name="todoStatus" data-ng-value="l.Id" data-ng-show="getUsercanFinish(l.Id)" data-ng-model="editData.saveStatus">{{l.Label}}*@
+                                                        <input type="radio" name="todoStatus" data-ng-value="l.Id" data-ng-model="editData.saveStatus">{{l.Label}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Tab: Add Comment End-->
+                                        <!-- Tab: Upload Files Start-->
+                                        <div data-tab>
+                                            <div data-tab-heading>
+                                                <i class="entypo-vcard"></i>Upload Files
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div upload-multi-file data-filename="editData.multiFileList" data-buttonclass="profile-pic-upload-btn"
+                                                         data-id="comment_files" data-uploadhandler="/TodoComment/UploadDocument"
+                                                         data-ext="*.jpg; *.jpeg;*.png;*.txt;*.csv;*.pdf;*.xls;*.xlsx;*.doc;*.docx;*.mp4" data-filesize="0">
+                                                        <input id="imageOne">
+                                                    </div>
+                                                    <div data-ng-repeat="s in editData.multiFileList" data-ng-form="subform">
+                                                        <div class="row" style="margin-top: 10px;">
+                                                            <div class="col-sm-2" style="line-height: 29px;">
+                                                                @if (hasDeleteRights)
+                                                                {
+                                                                    <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteUploadedFile($index, editData.multiFileList)"><i class="entypo-trash"></i>delete</a>
+                                                                }
+                                                                <a class="btn btn-primary btn-xs"><i class="entypo-attach"></i>{{s.ext | uppercase}}</a>
+                                                            </div>
+                                                            <div class="col-sm-10">
+                                                                <input type="text" style="margin-left: -50px;" class="form-control" data-ng-model="editData.multiFileList[$index].caption" name="txtCaption" placeholder="caption text" value="{{s.caption}}" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Tab: Upload Files End-->
+                                        <!-- Tab: Notify Mail Setting Start-->
+                                        <div data-tab>
+                                            <div data-tab-heading>
+                                                <i class="entypo-vcard"></i>Notify To
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <label class="checkbox" data-ng-repeat="r in AssignedUserList">
+                                                        <input type="checkbox" data-ng-model="r.IsSelected">{{r.Label}}
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <!-- Tab: Notify Mail Setting End-->
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <button data-ng-model="isDisabled" data-ng-disabled="comform.$invalid || !isDisabled || !editData.htmlcontent" style="margin-top: 10px;" type="submit" class="btn btn-sm btn-success btn-icon icon-left"><i class="entypo-check"></i>Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+
+                <div class="ajax-progress-pms" data-ng-show="IsAjaxLoadingPMS">Please wait while loading...</div>
+
+                <!--Comment list-->
+                <div data-ng-if="CommentList.length == 0" style="text-align: center; color: #C00D0D;">
+                    --No Comment Available--
+                </div>
+
+                <div class="media comments-list" data-ng-repeat="c in CommentList">
+                    <a class="pull-left" href="#">
+                        <img data-ng-if="!c.ProfilePix" src="@Url.Content("~/Content/images/thumb_User.png")" alt="" class="media-object img-circle img-circle-style" style="width: 50px; height: 50px;" />
+                        <img data-ng-if="c.ProfilePix" src="/@ViewBag.profilePath/{{c.ProfilePix}}" alt="" class="media-object img-circle img-circle-style" style="width: 50px; height: 50px;" />
+                    </a>
+                    <div class="media-body">
+                        <h3 class="media-heading todo-comment-title-header">{{c.CreByName}}</h3>
+                        <p data-ng-bind-html="c.CommentText"></p>
+                        <p>
+                            <a class="badge badge-comments" title="click to view this file" style="margin-right:5px;" target="_blank" href="/@ViewBag.mainPath/{{projectId}}/{{l.FileName}}"
+                               data-ng-repeat="l in c.FileList"><i class="entypo-attach"></i>{{l.CaptionText}}</a>
+
+                            <a class="badge badge-comments" title="click to view this video" style="margin-right: 5px;"
+                               data-ng-repeat="l in c.VideoList" data-ng-click="VideoShow(l)"><i class="entypo-video"></i>{{l.CaptionText}}</a>
+                            @*<a class="badge badge-hold" title="Added hours during this comment" style="margin-right: 5px;" data-ng-if="c.Hours"><i class="entypo-compass"></i></a>*@
+                            <span class="todo-comment-hours text-danger">{{c.Hours}} hours</span> |
+                            <a href="#" data-ng-show="c.IsDelete" data-drc-confirm-box="" data-callback="DeleteModuleTodoComments(c.CommentId)" data-message="Are you sure want to delete Comment from Todo list?"><i class="entypo-trash"></i></a>
+                        </p>
+                        <p>
+                            <span data-ng-repeat="l in c.ImageList" class="img-thumbnail" style="margin-right: 5px;">
+                                <img src="/@ViewBag.thumbPath/{{projectId}}/{{l.FileName}}" title="{{l.CaptionText}}" data-ng-click="ImageShow(c.ImageList, $index)" />
+                            </span>
+                        </p>
+                        <p data-ng-if="c.ImageList">
+                            <a data-ng-click="ViewAllOriginal(c.ImageList)" href="/Scripts/template/imageList.html" target="_blank">View All Original</a>
+                        </p>
+                        <!-- <p class="text-muted">{{c.CreDate | date:'dd-MMM-yyyy hh:mm a'}}</p> -->
+                        <p class="text-muted text-xs">Posted {{c.CreDate | date:'dd-MMM-yyyy hh:mm a'}} {{c.CreDate | fromNow}}</p>
+
+
+                        @*<div class="comment-actions" >
+
+                            </div>*@
+                    </div>
+                    <hr />
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+</div>
+
+<!-- BEGIN IMAGE SHOW POPUP TEMPLATE  -->
+<script type="text/ng-template" id="Slider.html">
+    <div class="modal-body">
+        <div class="row leave-row">
+            <div class="col-sm-12">
+                <slider data-list="slideImages" data-mainpath="@ViewBag.mainPath" data-id="{{projectId}}" data-index="{{imgCurrentIndex}}" data-callbackevent="callback()"/>
+            </div>
+        </div>
+    </div>
+</script>
+ <!-- / END IMAGE SHOW POPUP TEMPLATE --> 
+
+ <!-- BEGIN VIDEO SHOW POPUP TEMPLATE -->
+<script type="text/ng-template" id="Video.html">
+    <div class="modal-header" style="background-color:#FFF;">
+        <h3 style="color:#222;">{{videos.CaptionText}}
+        <span style="float: right;">
+            <a href="#" data-ng-click="close()" class="btn btn-xs btn-danger" title="Close">
+                <i class="entypo-cancel"></i>
+            </a>
+        </span>
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <video tabindex="0" controls="" autoplay="" width="100%">
+                    <source ng-src="{{videos.FileName}}" type="video/mp4">
+                </video>
+             
+            </div>
+        </div>
+    </div>
+</script>
+<!-- / END VIDEO SHOW POPUP TEMPLATE  -->
+
+@section Scripts{
+    @Scripts.Render("~/Areas/PMS/Scripts/pmsProjectTodoComment")
+}

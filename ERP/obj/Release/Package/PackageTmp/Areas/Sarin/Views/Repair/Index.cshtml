@@ -1,0 +1,248 @@
+﻿@{
+    ViewBag.Title = "Repair Entry";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRRepairCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Repair Entry</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRRepair()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSRRepair(editData)" name="repairform" id="repairform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Repair Entry</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpMachine">Machine<span class="compulsary">*</span></label>
+                                    <select id="drpMachine" name="drpMachine"
+                                        data-ng-model="editData.MachineId"
+                                        class="form-control"
+                                        required
+                                        data-drc-focus="isFirstFocus">
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRMachines" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="repairform.drpMachine.$dirty && validateDropMachine()" class="label label-danger">
+                                        Invalid: Please select machine
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpPart">Part Name<span class="compulsary">*</span></label>
+                                    <select id="drpPart" name="drpPart"
+                                        data-ng-model="editData.PartId"
+                                        class="form-control"
+                                        required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in SRParts" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="repairform.drpPart.$dirty && validateDropPart()" class="label label-danger">
+                                        Invalid: Please select Part.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtProblem">Problem<span class="compulsary">*</span></label>
+                            <textarea class="form-control" id="txtProblem" name="problem" data-ng-model="editData.Problem" placeholder="Enter problem" maxlength="100" required></textarea>
+                            <div data-ng-show="repairform.problem.$dirty && repairform.problem.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="repairform.problem.$error.required">Please enter problem detail.</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtIssueDate">Issue Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtIssueDate" name="txtIssueDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editData.IssueDate" data-ng-change="ValidateIssueDate(editData.IssueDate)" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="calOpenIssueDate"
+                                                data-ng-model="issueDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenIssueDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="repairform.txtIssueDate.$dirty && repairform.txtIssueDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="repairform.txtIssueDate.$error.invalidIssueDate">Please enter valid Issue date</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtReceiveDate">Receive Date</label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtReceiveDate" name="txtReceiveDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editData.ReceiveDate" data-ng-change="ValidateReceiveDate(editData.ReceiveDate)" />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="calOpenReceiveDate"
+                                                data-ng-model="receiveDate"
+                                                data-min="minDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-click="calendarOpenReceiveDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="repairform.txtReceiveDate.$dirty && repairform.txtReceiveDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="repairform.txtReceiveDate.$error.invalidReceiveDate">Please enter valid receive date</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label for="drpRepairBy">Repair By<span class="compulsary">*</span></label>
+                                    <div>
+                                        <div class="btn-group" data-toggle="buttons-radio">
+                                            <input type="radio" data-ng-model="editData.RepairedBy" value="S" name="" />
+                                            Sarin
+                                                <input type="radio" data-ng-model="editData.RepairedBy" value="O" name="" />
+                                            Other
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="txtOthers" data-ng-show="isOther">Other</label>
+                                    <input type="text" data-ng-show="isOther" class="form-control" id="txtOthers" name="other" data-ng-model="editData.Others" placeholder="Enter detail if repair by other" maxlength="50" value="" />
+                                    <div data-ng-show="repairform.other.$dirty && repairform.other.$invalid && isOther" class="label label-danger">
+                                        Invalid: <span data-ng-show="repairform.other.$error.required && isOther">Tell us others detail.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="txtRemarks">Remarks</label>
+                            <textarea class="form-control" id="txtRemarks" name="remarks" data-ng-model="editData.Remarks" placeholder="Enter remark" maxlength="100"></textarea>
+                            <div data-ng-show="repairform.remarks.$dirty && repairform.remarks.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="repairform.remarks.$error.required">Remark can have Maximum 100 character</span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="repairform.$invalid || validateDropMachine() || validateDropPart() || validateDropRepairBy() "><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRRepair()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRRepair()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--SR-Repair list-->
+    <div class="row" data-ng-init="RetrieveSRRepair()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data" ng-class="{'text-danger' : !d.ReceiveDate }">
+
+                            <td data-title="'Machine'" data-filter="{'MachineName': 'text' }" data-sortable="'MachineName'">{{d.MachineName}}</td>
+                            <td data-title="'Serial No'" data-filter="{'SerialNo': 'text' }" data-sortable="'SerialNo'">{{d.SerialNo}}</td>
+                            <td data-title="'Part'" data-filter="{'PartName': 'text'}" data-sortable="'PartName'">{{d.PartName}}</td>
+                            <td data-title="'Repaired By'" data-filter="{'RepairMansName': 'text' }" data-sortable="'RepairMansName'">{{d.RepairMansName}}</td>
+                            <td data-title="'Problem'" data-filter="{'Problem': 'text' }" data-sortable="'Problem'">{{d.Problem}}</td>
+                            <td style="width: 100px;" data-title="'Issue Date'" data-sortable="'IssueDate'">{{d.IssueDate  | date:'dd-MMM-yyyy' }}</td>
+                            <td style="width: 100px;" data-title="'Receive Date'" data-sortable="'ReceiveDate'">{{d.ReceiveDate | date:'dd-MMM-yyyy' }}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRRepair(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRRepair(d.RepairId)" data-message="Are you sure want to delete '{{d.MachineName}}' from Repair Entry?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="7">Your search did not match any Repair Entry.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRRepairCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRRepairService.js")"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+}

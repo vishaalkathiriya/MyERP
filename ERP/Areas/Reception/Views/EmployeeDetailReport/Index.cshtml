@@ -1,0 +1,126 @@
+﻿@{
+    ViewBag.Title = "Employee Detail Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div class="row" data-ng-controller="EmployeeDetailReportCtrl">
+    <div class="col-sm-12 employee-tabs">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2><i class="entypo-doc-text"></i>Employee Detail Report</h2>
+                </div>
+
+            </div>
+        </div>
+
+        <div data-tabset>
+            <div data-tab
+                active="master.isOuterTabActive">
+                <div data-tab-heading>
+                    <i class="entypo-search"></i>Employee Detail
+                </div>
+                <!--form-->
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <form role="form" name="employeedetailreportform" id="employeedetailreportform">
+                            <div class="panel panel-default panel-shadow">
+                                <!--<div class="panel-heading">
+                                    <h3 class="panel-title">Search Employee Detail</h3>
+                                </div>-->
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtFirstName">First Name</label>
+                                                    <input type="text" class="form-control" id="txtFirstName" name="txtFirstName" data-ng-model="editData.FirstName" placeholder="Enter first name" maxlength="50" value="" tabindex="4" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtMiddleName">Middle Name</label>
+                                                    <input type="text" class="form-control" id="txtMiddleName" name="txtMiddleName" data-ng-model="editData.MiddleName" placeholder="Enter middle name" maxlength="50" value="" tabindex="4" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtLastName">Last Name</label>
+                                                    <input type="text" class="form-control" id="txtLastName" name="txtLastName" data-ng-model="editData.LastName" placeholder="Enter last name" maxlength="50" value="" tabindex="4" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label for="drpDept">Department</label>
+                                                <select id="drpDept" name="drpDept" class="form-control" data-ng-model="editData.Department" tabindex="8">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="t in DeptList" value="{{t.department}}">{{t.department}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <b class="pull-right" style="margin-top: -10px;">{{totalRecords}} records found !!</b>
+                <div class="row" data-ng-init="GetEmployeeReportData_Table()">
+                    <div class="col-sm-12">
+                        <div data-loading-container="tableParams.settings().$loading">
+                            <div class="table-responsive">
+                                <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                    <tr data-ng-repeat="d in $data">
+                                        <td data-title="'ECode'" data-filter="{'ECode': 'text' }" data-sortable="'ECode'">{{d.ECode}}</td>
+                                        <td data-title="'FullName'" data-filter="{'FullName': 'text'}" data-sortable="'FullName'">{{d.FullName}}</td>
+                                        <td data-title="'Designation'" data-filter="{'Designation': 'text'}" data-sortable="'Designation'">{{d.Designation}}</td>
+                                        <td data-title="'Department'" data-filter="{'Department': 'text'}" data-sortable="'Department'">{{d.Department}}</td>
+                                        <td data-title="'Manager'" data-filter="{'Manager': 'text'}" data-sortable="'Manager'">{{d.Manager}}</td>
+                                        <td data-title="'ManCode'" data-filter="{'ManCode': 'text'}" data-sortable="'ManCode'">{{d.ManCode}}</td>
+                                        <td data-title="'ICom'" data-filter="{'ICom': 'text'}" data-sortable="'ICom'">{{d.ICom}}</td>
+                                        <td data-title="'Present'" data-filter="{ 'Present': 'select' }" filter-data="PresentTypes($column)" data-sortable="'Present'">{{d.Present}} </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pull-right">
+                <div>
+                    <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-click="GetEmployeeReportData()"><i class="entypo-check"></i>Search</button>
+                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetEmployeeReport()"><i class="entypo-erase"></i>Reset</button>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/Reception/Scripts/controllers/EmployeeDetailReportCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Reception/Scripts/services/EmployeeDetailReportService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+}

@@ -1,0 +1,128 @@
+D:\_Current Projects\ERP\ERP\bin\ERP.dll.config
+D:\_Current Projects\ERP\ERP\bin\ERP.dll
+D:\_Current Projects\ERP\ERP\bin\ERP.pdb
+D:\_Current Projects\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\_Current Projects\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\_Current Projects\ERP\ERP\bin\Microsoft.Owin.dll
+D:\_Current Projects\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\_Current Projects\ERP\ERP\bin\Microsoft.Owin.Security.dll
+D:\_Current Projects\ERP\ERP\bin\Owin.dll
+D:\_Current Projects\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\_Current Projects\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\_Current Projects\ERP\ERP\bin\Microsoft.Owin.xml
+D:\_Current Projects\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\_Current Projects\ERP\ERP\bin\Microsoft.Owin.Security.xml
+D:\_Current Projects\ERP\ERP\obj\Debug\ERP.dll
+D:\_Current Projects\ERP\ERP\obj\Debug\ERP.pdb
+D:\_Current Projects\ERP\ERP\obj\Debug\ERP.csprojResolveAssemblyReference.cache
+E:\ERP\ERP\bin\ERP.dll.config
+E:\ERP\ERP\bin\ERP.dll
+E:\ERP\ERP\bin\ERP.pdb
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+E:\ERP\ERP\bin\Microsoft.Owin.dll
+E:\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+E:\ERP\ERP\bin\Microsoft.Owin.Security.dll
+E:\ERP\ERP\bin\Owin.dll
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+E:\ERP\ERP\bin\Microsoft.Owin.xml
+E:\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+E:\ERP\ERP\bin\Microsoft.Owin.Security.xml
+E:\ERP\ERP\obj\Debug\ERP.csprojResolveAssemblyReference.cache
+E:\ERP\ERP\obj\Debug\ERP.dll
+E:\ERP\ERP\obj\Debug\ERP.pdb
+E:\DRC\ERP\ERP\bin\ERP.dll.config
+E:\DRC\ERP\ERP\bin\ERP.dll
+E:\DRC\ERP\ERP\bin\ERP.pdb
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.dll
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.dll
+E:\DRC\ERP\ERP\bin\Owin.dll
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.xml
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.xml
+E:\DRC\ERP\ERP\obj\Debug\ERP.dll
+E:\DRC\ERP\ERP\obj\Debug\ERP.pdb
+I:\DRC\ERP\ERP\bin\ERP.dll.config
+I:\DRC\ERP\ERP\bin\ERP.dll
+I:\DRC\ERP\ERP\bin\ERP.pdb
+I:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+I:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+I:\DRC\ERP\ERP\bin\Microsoft.Owin.dll
+I:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+I:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.dll
+I:\DRC\ERP\ERP\bin\Owin.dll
+I:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+I:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+I:\DRC\ERP\ERP\bin\Microsoft.Owin.xml
+I:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+I:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.xml
+I:\DRC\ERP\ERP\obj\Debug\ERP.csprojResolveAssemblyReference.cache
+I:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CoreCompileInputs.cache
+I:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CopyComplete
+I:\DRC\ERP\ERP\obj\Debug\ERP.dll
+I:\DRC\ERP\ERP\obj\Debug\ERP.pdb
+F:\DRC\ERP\ERP\bin\ERP.dll.config
+F:\DRC\ERP\ERP\bin\ERP.dll
+F:\DRC\ERP\ERP\bin\ERP.pdb
+F:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+F:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+F:\DRC\ERP\ERP\bin\Microsoft.Owin.dll
+F:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+F:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.dll
+F:\DRC\ERP\ERP\bin\Owin.dll
+F:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+F:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+F:\DRC\ERP\ERP\bin\Microsoft.Owin.xml
+F:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+F:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.xml
+F:\DRC\ERP\ERP\obj\Debug\ERP.csprojAssemblyReference.cache
+F:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CoreCompileInputs.cache
+F:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CopyComplete
+F:\DRC\ERP\ERP\obj\Debug\ERP.dll
+F:\DRC\ERP\ERP\obj\Debug\ERP.pdb
+E:\DRC\ERP\ERP\obj\Debug\ERP.csprojAssemblyReference.cache
+E:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CoreCompileInputs.cache
+E:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CopyComplete
+D:\DRC\ERP\ERP\bin\ERP.dll.config
+D:\DRC\ERP\ERP\bin\ERP.dll
+D:\DRC\ERP\ERP\bin\ERP.pdb
+D:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\DRC\ERP\ERP\bin\Microsoft.Owin.dll
+D:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.dll
+D:\DRC\ERP\ERP\bin\Owin.dll
+D:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\DRC\ERP\ERP\bin\Microsoft.Owin.xml
+D:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.xml
+D:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CoreCompileInputs.cache
+D:\DRC\ERP\ERP\obj\Debug\ERP.csproj.CopyComplete
+D:\DRC\ERP\ERP\obj\Debug\ERP.dll
+D:\DRC\ERP\ERP\obj\Debug\ERP.pdb
+D:\DRC\ERP\ERP\obj\Debug\ERP.csprojAssemblyReference.cache
+D:\DRC\ERP\Source Code\ERP\bin\ERP.dll.config
+D:\DRC\ERP\Source Code\ERP\bin\ERP.dll
+D:\DRC\ERP\Source Code\ERP\bin\ERP.pdb
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Security.dll
+D:\DRC\ERP\Source Code\ERP\bin\Owin.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Security.xml
+D:\DRC\ERP\Source Code\ERP\obj\Debug\ERP.csprojAssemblyReference.cache
+D:\DRC\ERP\Source Code\ERP\obj\Debug\ERP.csproj.CopyComplete
+D:\DRC\ERP\Source Code\ERP\obj\Debug\ERP.dll
+D:\DRC\ERP\Source Code\ERP\obj\Debug\ERP.pdb

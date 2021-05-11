@@ -1,0 +1,190 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab data-ng-controller="EmpRelativeInfoCtrl" data-select="RetrieveRelativeInfo();SetFocus()" data-disabled="!master.Mode == 'Edit' || master.Mode == 'Add'">
+    <div data-tab-heading>
+        <i class="entypo-users"></i>Relatives
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateRelativeInfo(relativeInfo)" name="frmRelativeInfo" id="frmRelativeInfo">
+        <input type="hidden" data-ng-model="relativeInfo.SrNo" />
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Relatives Information</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtRelativeName">Relative Name<span class="compulsary">*</span></label>
+                            <input type="text" name="txtRelativeName" id="txtRelativeName" data-ng-model="relativeInfo.RelativeName" data-drc-focus="isFirstFocus" class="form-control" placeholder="Enter relative name" maxlength="50" value="" required tabindex="1" />
+                            <div data-ng-show="frmRelativeInfo.txtRelativeName.$dirty && frmRelativeInfo.txtRelativeName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmRelativeInfo.txtRelativeName.$error.required">Tell us your relative name.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="cmbRelativeRelation">Relative Relation<span class="compulsary">*</span></label>
+                            <select id="cmbRelativeRelation" name="cmbRelativeRelation" data-ng-model="relativeInfo.RelationId" class="form-control" required tabindex="2">
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="r in Relations" data-ng-selected="relativeInfo.RelationId==r.RelationId" value="{{r.RelationId}}">{{r.RelativeRelationName}}</option>
+                                <option value="-1">Other</option>
+                            </select>
+                            <div data-ng-show="frmRelativeInfo.cmbRelativeRelation.$dirty && ValidateRelativeRelation()" class="label label-danger">
+                                Invalid: Please select relative relation.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-ng-if="relativeInfo.RelationId == -1">
+                        <div class="form-group">
+                            <label for="txtRelativeRelationNameOther">Relation Name<span class="compulsary">*</span></label>
+                            <input type="text" class="form-control" id="txtRelativeRelationNameOther" name="txtRelativeRelationNameOther" data-ng-model="relativeInfo.RelativeRelationNameOther" placeholder="Enter relation name" maxlength="50" value="" required tabindex="3" />
+                            <div data-ng-show="frmRelativeInfo.txtRelativeRelationNameOther.$dirty && frmRelativeInfo.txtRelativeRelationNameOther.$invalid" class="label label-danger">
+                                <span data-ng-show="frmRelativeInfo.txtRelativeRelationNameOther.$error.required">Invalid: Tell us relation name.</span>
+                                <span data-ng-show="frmRelativeInfo.txtRelativeRelationNameOther.$error.errorRelationOther">Invalid: Please enter valid relation name.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="txtBirthDate">Birth Date<span class="compulsary">*</span></label>
+                            <p class="input-group" style="margin-bottom: 0;" id="p9">
+                                <input type="text" data-parentid="p9" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtBirthDate" name="txtBirthDate" tabindex="4" data-ng-model="relativeInfo.BirthDate" data-ng-change="ValidateBirthDate(relativeInfo.BirthDate)" placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default"
+                                            data-datepicker-popup="{{format}}"
+                                            data-is-open="isBirthDateCalendarOpened"
+                                            data-ng-model="relativeInfo.bDate"
+                                            data-max="maxDate"
+                                            data-datepicker-options="dateOptions"
+                                            data-close-text="Close"
+                                            data-ng-click="BirthDateCalendarOpened($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </p>
+
+                            <div data-ng-show="frmRelativeInfo.txtBirthDate.$dirty && frmRelativeInfo.txtBirthDate.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmRelativeInfo.txtBirthDate.$error.required">Tell us your Birth Date.</span>
+                                <span data-ng-show="frmRelativeInfo.txtBirthDate.$error.invalidBirthDateRI">Please enter valid Birth Date.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="cmbAcedamicStatusId">Acedamic<span class="compulsary">*</span></label>
+                    <select id="cmbAcedamicStatusId" name="cmbAcedamicStatusId" data-ng-model="relativeInfo.AcedamicStatusId" class="form-control" required tabindex="5">
+                        <option value="0">--Select--</option>
+                        <option data-ng-repeat="a in Acedamic" data-ng-selected="relativeInfo.AcedamicStatusId==a.Id" value="{{a.Id}}">{{a.Label}}</option>
+                    </select>
+                    <div data-ng-show="frmRelativeInfo.cmbAcedamicStatusId.$dirty && ValidateAcedamic()" class="label label-danger">
+                        Invalid: Please select acedamic qualification.
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="cmbDegree">Degree<span class="compulsary">*</span></label>
+                    <select id="cmbDegree" name="cmbDegree" data-ng-model="relativeInfo.DegreeId" class="form-control" required tabindex="6">
+                        <option value="0">--Select--</option>
+                        <option data-ng-repeat="d in Degree" data-ng-selected="relativeInfo.DegreeId==d.Id" value="{{d.Id}}">{{d.Label}}</option>
+                        <option value="-1">Other</option>
+                    </select>
+                    <div data-ng-show="frmRelativeInfo.cmbDegree.$dirty && ValidateDegree()" class="label label-danger">
+                        Invalid: Please select Degree.
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" data-ng-if="relativeInfo.DegreeId == -1">
+                <div class="form-group">
+                    <label for="_txtDegreeOther">Degree Name<span class="compulsary">*</span></label>
+                    <input type="text" class="form-control" id="_txtDegreeOther" name="_txtDegreeOther" data-ng-model="relativeInfo.DegreeNameOther" placeholder="Enter degree name" maxlength="50" value="" required tabindex="7" />
+                    <div data-ng-show="frmRelativeInfo._txtDegreeOther.$dirty && frmRelativeInfo._txtDegreeOther.$invalid" class="label label-danger">
+                        <span data-ng-show="frmRelativeInfo._txtDegreeOther.$error.required">Invalid: Tell us degree name.</span>
+                        <span data-ng-show="frmRelativeInfo._txtDegreeOther.$error.errorDegreeOther">Invalid: Please enter valid degree name.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="txtTypeOfWork">Type of Work<span class="compulsary">*</span></label>
+                    <input type="text" class="form-control" id="txtTypeOfWork" name="txtTypeOfWork" data-ng-model="relativeInfo.TypeOfWork" placeholder="Enter type of work" maxlength="50" value="" required tabindex="8" />
+                    <div data-ng-show="frmRelativeInfo.txtTypeOfWork.$dirty && frmRelativeInfo.txtTypeOfWork.$invalid" class="label label-danger">
+                        Invalid: <span data-ng-show="frmRelativeInfo.txtTypeOfWork.$error.required">Tell us your type of work.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                @{
+                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                    {
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" tabindex="9" data-ng-disabled="frmRelativeInfo.$invalid || ValidateRelativeRelation() || ValidateAcedamic() || ValidateDegree()"><i class="entypo-check"></i>{{saveText}}</button>
+                    }
+                }
+                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" tabindex="10" data-ng-click="ResetRelativeInfo()"><i class="entypo-erase"></i>Reset</button>
+                <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="ClearRelativeInfo()"><i class="entypo-cancel"></i>Clear</button>
+            </div>
+        </div>
+    </form>
+    <br />
+    <!-- Relative Information List -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="'Name'" data-filter="{ 'RelativeName': 'text' }" data-sortable="'RelativeName'">{{d.RelativeName}}</td>
+                            <td data-title="'Relation'" data-filter="{ 'Relation': 'text' }" data-sortable="'Relation'">{{d.RelativeRelationName}}</td>
+                            <td style="width: 90px;" data-title="'Birth Date'" data-sortable="'BirthDate'">{{d.BirthDate | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Acedamic Status'" data-filter="{ 'AcedamicStatus': 'text' }" data-sortable="'AcedamicStatus'">{{d.AcedamicStatus}}</td>
+                            <td data-title="'Degree Name'" data-filter="{ 'DegreeName': 'text' }" data-sortable="'DegreeName'">{{d.DegreeName}}</td>
+                            <td data-title="'Type Of Work'" data-filter="{ 'TypeOfWork': 'text' }" data-sortable="'TypeOfWork'">{{d.TypeOfWork}}</td>
+                            <td style="width: 130px" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @{
+                                    if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateEmpRelativeInfo(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                        }
+                                        @{
+                                    if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteEmpRelativeInfo(d)" data-message="Are you sure want to delete '{{d.RelativeName}}' from relatives information?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                        }
+                                    </td>
+                                }
+                            }
+
+
+
+
+
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="6">Your search did not match any record.</td>
+                            <td style="width: 130px;"></td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Relative Information List -->
+</div>

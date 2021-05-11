@@ -1,0 +1,168 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab
+    data-ng-controller="DesignationCtrl"
+    data-select="SetFocus('Designation')">
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Designation
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        if (Model.HasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddDesignation()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isDesignationFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateDesignation(editData)" name="desform" id="desform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Designation</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtDesignationName">Designation Name</label>
+                            <input type="text" class="form-control" id="txtDesignationName" name="designationName" data-ng-model="editData.Designation" data-drc-focus="isFirstFocus" placeholder="Enter designation name" maxlength="50" value="" required />
+                            <div data-ng-show="desform.designationName.$dirty && desform.designationName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="desform.designationName.$error.required">Tell us your designation name.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="drpDesignationGroup">Designation Group Name</label>
+                            <select id="drpDesignationGroup" name="drpDesignationGroup"
+                                data-ng-model="editData.DesignationGroupId"
+                                class="form-control"
+                                required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in DesignationGroup" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="desform.drpDesignationGroup.$dirty && validateDropGroup()" class="label label-danger">
+                                Invalid: Please select designation group.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="drpDesignationParent">Designation Parent Name</label>
+                            <select id="drpDesignationParent" name="drpDesignationParent"
+                                data-ng-model="editData.DesignationParentId"
+                                class="form-control"
+                                required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in DesignationParent" value="{{t.Id}}">{{t.Label}}</option>
+                            </select>
+                            <div data-ng-show="desform.drpDesignationParent.$dirty && validateDropParent()" class="label label-danger">
+                                Invalid: Please select designation parent.
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="desform.$invalid || validateDropGroup() || validateDropParent()"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetDesignation()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseDesignation()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING DESIGNATION LIST -->
+    <div class="row" data-ng-init="RetrieveDesignation()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                    <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to InActive '{{d.DesignationName}}' Designation?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                    <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id, d.IsActive)" data-message="Are you sure want to Active '{{d.DesignationName}}' Designation?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                </td>                                               
+                                }
+                            }
+
+                            <td data-title="'Designation'" data-filter="{'DesignationName': 'text'}" data-sortable="'DesignationName'">{{d.DesignationName}}</td>
+                            <td data-title="'Designation Group'" data-filter="{'DesignationGroup': 'text' }" data-sortable="'DesignationGroup'">{{d.DesignationGroup}}</td>
+                            <td data-title="'Designation Parent'" data-filter="{'DesignationParent': 'text'}" data-sortable="'DesignationParent'">{{d.DesignationParent}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateDesignation(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteDesignation(d.Id)" data-message="Are you sure want to delete '{{d.DesignationName}}' from Designation?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="3">Your search did not match any designation.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END DESIGNATION LIST -->
+</div>
+

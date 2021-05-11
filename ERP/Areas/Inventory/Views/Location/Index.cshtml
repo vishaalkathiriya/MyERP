@@ -1,0 +1,158 @@
+﻿@{
+    ViewBag.Title = "Manage Location";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div class="row">
+    <div class="sol-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Manage Location </h2>
+        </div>
+    </div>
+</div>
+
+<div data-ng-controller="LocationCtrl">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="addLocation()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download </button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="SaveLocation(editData)" name="locform" id="locform">
+                <input type="hidden" data-ng-model="editData.LocationId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Location</h3>
+                        <div class="panel-options">
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtLocationName">Location Name</label>
+                            <input type="text" class="form-control" id="txtLocationName" name="locName" data-ng-model="editData.LocationName" placeholder="Enter Location Name"
+                                maxlength="50" value="" data-drc-focus="isFirstFocus" required />
+                            <div data-ng-show="locform.LocationName.$dirty && locform.locName.$invalid" class="lable label-danger">
+                                Invalid:<span data-ng-show="locform.locName.$error.required">Tell us your Location name. </span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">IsActive</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="locform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="reset(editData)"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="cancel()"><i class="entypo-cancel"></i>Close</button>
+
+                        <label id="lblMsgContainer" class="label label-success" style="display: none;"></label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING LOCATION LIST -->
+    <div class="row" data-ng-init="loadAllLocations()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="loc in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission)
+                                {
+                                <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                    <a href="#" class="btn btn-success btn-xs" data-ng-show="{{loc.IsActive}}" data-drc-confirm-box="" data-callback="IsActive(loc)" data-message="Are you sure want to InActive '{{loc.LocationName}}' Location?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                    <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!loc.IsActive}}" data-drc-confirm-box="" data-callback="IsActive(loc)" data-message="Are you sure want to Active '{{loc.LocationName}}' Location?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                </td>                                        
+                                }
+                            }
+                            <td data-title="'Location Name'" data-filter="{ 'LocationName': 'text' }" data-sortable="'LocationName'">{{loc.LocationName}}</td>
+                            <td data-title="'Changed On'" style="width: 125px" data-sortable="'ChgDate'">{{loc.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td data-title="'Actions'" style="width: 80px; text-align: center;">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="EditLocation(loc)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteLocation(loc)" data-message="Are you sure want to delete '{{loc.LocationName}}' from 'Locations' ?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                <td></td>   
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any category.
+                            </td>
+                            <td></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END LOCATION LIST -->
+</div>
+
+@section Scripts{
+
+    @Scripts.Render("~/Area/Inventory/Scripts/location")
+
+}
+

@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Manage Brands";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Manage Brands</h2>
+        </div>
+    </div>
+</div>
+
+<div data-ng-controller="BrandsCtrl">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                          bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                    if (hasInsertRights) { 
+                                <button type="button" class="btn btn-sm btn-info" data-ng-click="AddBrand()">Add New</button>           
+		                    }
+                    }
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Export To Excel</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> 
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateBrand(editData)" name="frmBrand" id="frmBrand">
+                <input type="hidden" data-ng-model="editData.brandId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Brand</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtBrandName">Brand Name</label>
+                            <input type="text" data-drc-focus="isFirstFocus" class="form-control" id="txtBrandName" name="brandName" data-ng-model="editData.brandName" placeholder="Enter brand name" maxlength="50" value="" required />
+                            <div data-ng-show="frmBrand.brandName.$dirty && frmBrand.brandName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmBrand.brandName.$error.required">Tell us your brand name.</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.isActive">Active</label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+		                    if (hasInsertRights) { 
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmBrand.$invalid"><i class="entypo-check"></i>{{SaveText}}</button>            
+		                    }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetBrand()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseBrand()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING BRANDS LIST -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="brand in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td data-title="'Status'" style="width: 50px; text-align: center;">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{brand.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(brand)" data-message="Are you sure want to InActive '{{brand.BrandName}}' Brand?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!brand.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(brand)" data-message="Are you sure want to Active '{{brand.BrandName}}' Brand?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                                
+	                            }
+                            }
+                            
+                            <td data-title="'Brands Name'" data-filter="{ 'BrandName': 'text' }" data-sortable="'BrandName'">{{brand.BrandName}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{brand.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission){
+                                    <td data-title="'Actions'" style="width: 80px; text-align: center;">
+                                        @if (editPermission) {
+                                            <a class="btn btn-primary btn-xs" data-ng-click="UpdateBrand(brand)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                            
+                                        }
+                                        @if (deletePermission) {
+                                            <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteBrand(brand)" data-message="Are you sure want to delete this record?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                                                             
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td>Your search - <b>{{filterText}}</b> - did not match any brand.</td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END BRANDS LIST -->
+
+   
+    @section Scripts{
+        @Scripts.Render("~/Area/Inventory/Scripts/brands")
+    }
+
+</div>
+    

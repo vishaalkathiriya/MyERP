@@ -1,0 +1,131 @@
+﻿@{
+    ViewBag.Title = "Machine Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRMachineReportCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Machine Report</h2>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ">
+            <form role="form" data-ng-submit="CreateUpdateSRMachine(editData)" name="machinereportform" id="machinereportform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Search Machine Report</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Type</label>
+                                    <multiselect class="input-xlarge" multiple="true" data-ng-model="selectedTypeList" options="p.Label for p in SRTypes" change="selected()"></multiselect>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>SubType</label>
+                                    <multiselect class="input-xlarge" multiple="true" data-ng-model="selectedSubTypeList" options="p.Label for p in SRSubTypes" change="selected()"></multiselect>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label>Parameter</label>
+                                        <multiselect class="input-xlarge" multiple="true" data-ng-model="selectedParameterList" options="p.Label for p in SRParameters" change="selected()"></multiselect>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label>Location</label>
+                                    <multiselect class="input-xlarge" multiple="true" data-ng-model="selectedLocationList" options="p.Label for p in SRLocations" change="selected()"></multiselect>
+                                </div>
+                            </div>
+                           <!-- <div class="col-sm-4">
+                                <label>Date</label>
+                                <div class="form-group form-group-with-close">
+                                    <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                                    <a class="close" data-ng-click="clearDateBox($event);">×</a>
+                                </div>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-click="GetMachineReportData()"><i class="entypo-check"></i>Search</button>
+                            <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRMachineReport()"><i class="entypo-erase"></i>Reset</button>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-danger">Download</button>
+                                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                    <i class="entypo-down"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-danger" role="menu">
+                                    <li>
+                                        <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-10">
+        </div>
+        <div class="col-sm-2">
+            <label style="float: right"> <b>{{TotalRecords}}</b> Records found !!!</label>
+        </div>
+    </div>
+    <div class="row" data-ng-init="GetMachineReportData_Table()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="'Machine Name'" data-filter="{'MachineName': 'text' }" data-sortable="'MachineName'">{{d.MachineName}}</td>
+                            <td data-title="'Serial No'" data-filter="{'SerialNo': 'text'}" data-sortable="'SerialNo'">{{d.SerialNo}}</td>
+                            <td data-title="'Type'" data-filter="{'TypeName': 'text'}" data-sortable="'TypeName'">{{d.TypeName}}</td>
+                            <td data-title="'Sub-Type'" data-filter="{'SubTypeName': 'text'}" data-sortable="'SubTypeName'">{{d.SubTypeName}}</td>
+                            <td data-title="'Parameter'" data-filter="{'ParameterName': 'text'}" data-sortable="'ParameterName'">{{d.ParameterName}}</td>
+                            <td data-title="'Location'"
+                                data-filter="{ 'LocationName': 'select' }"
+                                filter-data="LocationTypes($column)"
+                                data-sortable="'LocationName'">{{d.LocationName}} </td>
+                            <td data-title="'Manager'" data-filter="{'ManagerName': 'text'}" data-sortable="'ManagerName'">{{d.ManagerName}}</td>
+
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRMachineReportCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRMachineReportService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+}

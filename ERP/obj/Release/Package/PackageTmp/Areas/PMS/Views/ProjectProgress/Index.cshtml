@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@using ERP.Utilities
+
+<div data-ng-controller="PMSModuleCtrl">
+
+     <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i> Project Progress </h2>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row" data-ng-init="getAllProjectName()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                       <!-- <table class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in data">
+                            <td data-title="'Project Name'">{{d.ProjectName}}</td>
+                            <td data-title="'AssignHoure'">{{d.AssignedHours || "-"}}</td>
+                            <td data-title="'AssignHoure'">{{d.Hours || "-"}}</td>
+                        </tr>
+                    </table> -->
+
+                    <div data-ng-repeat="d in data">
+                        {{d.ProjectName}}
+                        <progressbar max="d.AssignedHours" value="d.Hours"  data-ng-class="{ 'Progresscolours-denger':   d.Hours > d.AssignedHours }" ><span style="color:white;  text-align:center;"  data-ng-show=" d.AssignedHours!= null && d.Hours != null ">{{d.Hours}} / {{d.AssignedHours}}</span></progressbar>
+                        <!--   <progressbar max="d.AssignedHours" value="d.Hours"  data-ng-class="{ 'Progresscolours-denger ':  true }" ><span style="color:black; white-space:nowrap;"  data-ng-show=" d.AssignedHours!= null && d.Hours != null ">{{d.Hours}} / {{d.AssignedHours}}</span></progressbar> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+@section Scripts{
+        @Scripts.Render("~/Areas/PMS/Scripts/pmsProjectProgress")
+    }

@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div class="row print-hide">
+    <div class="col-sm-12 ">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Print Address</h2>
+        </div>
+    </div>
+</div>
+
+
+<div class="row" data-ng-controller="ABPrintAddressCtrl">
+
+    <div class="col-sm-12 print-hide">
+        <div class="well well-sm">
+            <form class="form-inline ">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <select id="drpGroup" name="drpGroup" data-ng-model="editData.Group" class="form-control">
+                            <option value="0">All Groups</option>
+                            <option data-ng-repeat="g in GroupList" value="{{g.GroupId}}" data-ng-selected="g.GroupId==editData.Group">{{g.GroupName}}</option>
+                        </select>
+
+                    </div>
+                    <div class="col-sm-3">
+                        <select id="drpTemplate" name="drpTemplate" data-ng-model="editData.Template" class="form-control">
+                            <option data-ng-repeat="t in TemplateList" value="{{t.TemplateId}}" data-ng-selected="t.TemplateId==editData.Template">{{t.TemplateName}}</option>
+                        </select>
+                    </div>
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        {
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="SetFeature()">Set Feature</button>
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="PrintAddress()">Print</button>
+
+                        }
+                    }
+
+                    <button type="button" class="btn btn-sm btn-info" data-ng-click="Set3by8()">3 X 8 </button>
+                    <button type="button" class="btn btn-sm btn-info" data-ng-click="Set3by6()">3 X 6</button>
+
+                </div>
+            </form>
+        </div>
+    </div> <!-- / END HEADER SECTION -->
+
+
+    <div class="col-sm-12 print-hide " data-ng-show="isFormVisible">
+        <form role="form" name="frmPrintAddress" id="frmPrintAddress" data-ng-submit="StyleForm()">
+            <input type="hidden" data-ng-model="editData.ContactId" />
+            <div class="panel panel-default panel-shadow">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Set Address Feature</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label id="lblHeight" for="txtHeight">
+                                Height
+                                <label class="sublabel">(px)</label>
+                            </label>
+                            <input type="text" id="txtHeight" name="txtHeight" data-ng-model="height" class="form-control" data-ng-pattern="/^[0-9]*$/" required />
+                            <div data-ng-show="frmPrintAddress.txtHeight.$dirty && frmPrintAddress.txtHeight.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmPrintAddress.txtHeight.$error.required">Tell us Height.</span>
+                                <span data-ng-show="frmPrintAddress.txtHeight.$error.pattern">Please enter only digits.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label id="lblPadding" for="txtPadding">
+                                Padding
+                                <label class="sublabel">(px)</label>
+                            </label>
+                            <input type="text" id="txtPadding" name="txtPadding" data-ng-model="padding" class="form-control" data-ng-pattern="/^[0-9]*$/" required />
+                            <div data-ng-show="frmPrintAddress.txtPadding.$dirty && frmPrintAddress.txtPadding.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmPrintAddress.txtPadding.$error.required">Tell us Padding.</span>
+                                <span data-ng-show="frmPrintAddress.txtPadding.$error.pattern">Please enter only digits.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label id="lblFontSize" for="txtFontSize">
+                                Font Size
+                                <label class="sublabel">(px)</label>
+                            </label>
+                            <input type="text" id="txtFontSize" name="txtFontSize" data-ng-model="fontSize" class="form-control" data-ng-pattern="/^[0-9]*$/" required />
+                            <div data-ng-show="frmPrintAddress.txtFontSize.$dirty && frmPrintAddress.txtFontSize.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmPrintAddress.txtFontSize.$error.required">Tell us Font Size.</span>
+                                <span data-ng-show="frmPrintAddress.txtFontSize.$error.pattern">Please enter only digits.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label id="lblWidth" for="txtWidth">
+                                Width
+                                <label class="sublabel">(%)</label>
+                            </label>
+                            <input type="text" id="txtWidth" name="txtWidth" data-ng-model="width" class="form-control" data-ng-pattern="/^[0-9]*$/" required />
+                            <div data-ng-show="frmPrintAddress.txtWidth.$dirty && frmPrintAddress.txtWidth.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmPrintAddress.txtWidth.$error.required">Tell us Width.</span>
+                                <span data-ng-show="frmPrintAddress.txtWidth.$error.pattern">Please enter only digits.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label id="lblmargin" for="txtmargin">
+                                Margin
+                                <label class="sublabel">(px)</label>
+                            </label>
+                            <input type="text" id="txtMargin" name="txtMargin" data-ng-model="margin" class="form-control" data-ng-pattern="/^[0-9]*$/" required />
+                            <div data-ng-show="frmPrintAddress.txtMargin.$dirty && frmPrintAddress.txtMargin.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmPrintAddress.txtMargin.$error.required">Tell us Margin.</span>
+                                <span data-ng-show="frmPrintAddress.txtMargin.$error.pattern">Please enter only digits.</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label id="lblLineHeight" for="txtLineHeight">
+                                Line Height
+                                <label class="sublabel">(px)</label>
+                            </label>
+                            <input type="text" id="txtLineHeight" name="txtLineHeight" data-ng-model="lineHeight" class="form-control" data-ng-pattern="/^[0-9]*$/" required />
+                            <div data-ng-show="frmPrintAddress.txtLineHeight.$dirty && frmPrintAddress.txtLineHeight.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmPrintAddress.txtLineHeight.$error.required">Tell us Line Height.</span>
+                                <span data-ng-show="frmPrintAddress.txtLineHeight.$error.pattern">Please enter only digits.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmPrintAddress.$invalid"><i class="entypo-check"></i>{{SaveText}}</button>
+                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetFeature()"><i class="entypo-erase"></i>Reset</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseFeature()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </form>
+    </div> <!-- / END FORM SECTION -->
+
+    <!-- LIST ADDRESS -->
+    <div class="col-sm-12">
+        <div class="address" data-ng-init="DisplayContact(editData)">
+            <div ab-template-builder="" group="editData.Group" temptype="editData.Template">
+            </div>
+        </div>
+    </div> <!-- / END LIST ADDRESS -->
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Area/AddressBook/Scripts/abprintaddress")
+                <script src="~/Scripts/directives/abTemplateBuilder.js"></script>
+
+}

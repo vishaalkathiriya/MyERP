@@ -1,0 +1,314 @@
+﻿@{
+    ViewBag.Title = "Manage Issued HRD Documents";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="IssuedDocumentCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Issued HRD Documents</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline" data-ng-submit="FilterByIssueDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Documents:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="cmbDocumentsFilter" data-ng-model="filterDate.DocumentTypeId" class="form-control" style="width: 150px;" required>
+                            <option value="0" data-ng-selected="true">ALL</option>
+                            <option data-ng-repeat="t in DocumentList" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddDocument()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateDocument(editData)" name="docform" id="docform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Issued Document</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="txtECode">ECode<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="1" class="form-control" id="txtECode" name="txtECode" placeholder="ECode" maxlength="50" value=""
+                                        data-drc-focus="isFirstFocus" data-ng-model="editData.ECode" required />
+                                    <div data-ng-show="docform.txtECode.$dirty && docform.txtECode.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.txtECode.$error.required">Tell us your employee code.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="txtFullName">FullName<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="2" class="form-control" id="txtFullName" name="txtFullName" placeholder="FullName" maxlength="150" value=""
+                                        data-ng-model="editData.FullName" required />
+                                    <div data-ng-show="docform.txtFullName.$dirty && docform.txtFullName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.txtFullName.$error.required">Tell us your full name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="txtDocType">Document Type<span class="compulsary">*</span></label>
+                                    <select id="drpDocType" tabindex="3" name="drpDocType" data-ng-model="editData.DocumentTypeId" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in DocumentList" data-ng-selected="t.Id == editData.DocumentTypeId" value="{{t.Id}}">{{t.Label}}</option>
+                                    </select>
+                                    <div data-ng-show="docform.drpDocType.$dirty && validateDropDocument()" class="label label-danger">
+                                        Invalid: Please select document type.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtFromDate">From Date</label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="4" class="form-control" id="txtFromDate" name="txtFromDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editData.FromDate" data-ng-change="ValidateFromDate(editData.FromDate)" />
+
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="calOpenFromDate"
+                                                data-ng-model="fromDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-click="calendarOpenFromDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="docform.txtFromDate.$dirty && docform.txtFromDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.txtFromDate.$error.invalidFromDate">Please enter valid from date.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtToDate">To Date</label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p2">
+                                        <input type="text" data-parentid="p2" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="5" class="form-control" id="txtToDate" name="txtToDate" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                            data-ng-model="editData.ToDate" data-ng-change="ValidateToDate(editData.ToDate)" />
+
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="calOpenToDate"
+                                                data-ng-model="toDate"
+                                                data-min="minDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-click="calendarOpenToDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="docform.txtToDate.$dirty && docform.txtToDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.txtToDate.$error.invalidToDate">Please enter valid to date.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtDepartmentName">Department Name<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="6" class="form-control" id="txtDepartmentName" name="txtDepartmentName" placeholder="Department Name" maxlength="50" value=""
+                                        data-ng-model="editData.DepartmentName" required />
+                                    <div data-ng-show="docform.txtDepartmentName.$dirty && docform.txtDepartmentName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.txtDepartmentName.$error.required">Tell us your department name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtInterComNo">Intercom No</label>
+                                    <input type="text" tabindex="7" class="form-control" id="txtInterComNo" name="txtInterComNo" placeholder="Intercom Number" maxlength="5" value=""
+                                        data-ng-model="editData.IntercomNo" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtIssuedBy">Issued By<span class="compulsary">*</span></label>
+                                    <input type="text" tabindex="8" class="form-control" id="txtIssuedBy" name="txtIssuedBy" placeholder="Issued By" maxlength="50" value=""
+                                        data-ng-model="editData.IssuedBy" required />
+                                    <div data-ng-show="docform.txtIssuedBy.$dirty && docform.txtIssuedBy.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="docform.txtIssuedBy.$error.required">Tell us your issued by name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row">
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
+                                            <label for="txtIssuedOn">Issued On<span class="compulsary">*</span></label>
+                                            <p class="input-group" style="margin-bottom: 0;" id="p3">
+                                                <input type="text" data-parentid="p3" data-drc-input-mask='{ "mask": "d-m-y"}' tabindex="9" class="form-control" id="txtIssuedOn" name="txtIssuedOn" placeholder="DD-MM-YYYY" maxlength="10" value=""
+                                                    required data-ng-model="editData.IssuedOn" data-ng-change="ValidateIssuedDate(editData.IssuedOn)" />
+
+                                                <span class="input-group-btn" style="position: initial;">
+                                                    <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                        data-is-open="calOpenIssueDate"
+                                                        data-ng-model="issuedOn"
+                                                        data-min="minDateForIssuedOn"
+                                                        data-datepicker-options="dateOptions"
+                                                        data-close-text="Close"
+                                                        data-ng-click="calendarOpenIssueDate($event)">
+                                                        <i class="glyphicon glyphicon-calendar"></i>
+                                                    </button>
+                                                </span>
+                                            </p>
+                                            <div data-ng-show="docform.txtIssuedOn.$dirty && docform.txtIssuedOn.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="docform.txtIssuedOn.$error.required">Tell us your issued date.</span>
+                                                <span data-ng-show="docform.txtIssuedOn.$error.invalidIssuedDate">Please enter valid issued date.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5" style="margin-top: -12px;">
+                                        <div data-ng-model="mytime" data-ng-change="changed()">
+                                            <timepicker hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></timepicker>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div style="margin-top: 20px;" upload-file data-filename="fileName" data-ext="*.pdf" data-filesize="1000KB" data-buttonclass="profile-pic-upload-btn" data-uploadhandler="/IssuedDocument/UploadIssuedDoc">
+                                    <input id="imageOne">
+                                </div>
+                            </div>
+                            <div class="col-sm-10">
+                                <div class="form-group">
+                                    <label for="txtRemarks">Remarks</label>
+                                    <input type="text" tabindex="10" class="form-control" id="txtRemarks" name="txtRemarks" placeholder="Remarks" maxlength="255" value=""
+                                        data-ng-model="editData.Remarks" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" tabindex="11" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="docform.$invalid || !fileName || validateDropDocument()"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" tabindex="12" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetDocument()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" tabindex="13" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseDocument()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING ISSUED DOCUMENTS LIST -->
+    <div class="row" data-ng-init="RetrieveDocument()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="" style="width: 50px;"><a href="@ViewBag.ImagePath/{{d.AttachmentName}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+                            <td data-title="'ECode'" data-filter="{ 'ECode': 'text' }" data-sortable="'ECode'">{{d.ECode}}</td>
+                            <td data-title="'FullName'" data-filter="{ 'FullName': 'text' }" data-sortable="'FullName'">{{d.FullName}}</td>
+                            <td data-title="'Department'" data-filter="{ 'DepartmentName': 'text' }" data-sortable="'DepartmentName'">{{d.DepartmentName}}</td>
+                            <!--   <td data-title="'Document'">{{d.tblDocument.Documents}}</td> -->
+                            <td data-title="'Document'"
+                                data-filter="{ 'DocumentTypeId': 'select' }"
+                                filter-data="DocumentsLst($column)">{{d.tblDocument.Documents}} </td>
+                            <td data-title="'Extension'">{{d.IntercomNo}}</td>
+                            <td data-title="'IssuedOn'" data-sortable="'IssuedOn'">{{d.IssuedOn | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateDocument(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                                
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteDocument(d.HRDIssuedDocId)" data-message="Are you sure want to delete '{{d.ECode}}' from issued documents?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                              
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td style="width: 50px;"></td>
+                            <td colspan="6">Your search did not match any documents.</td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END ISSUED DOCUMENTS LIST -->
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Scripts/issuedHRDDocuments")
+}

@@ -1,0 +1,108 @@
+﻿@model ERP.Models.HasAccessViewModel
+<div data-tab data-ng-controller="EmpDocumentCtrl" disabled="!master.Mode == 'Edit' || master.Mode == 'Add'" data-select="setThumbPath('@ViewBag.thumbDocPath');RetrieveEmpDocuments();SetFocus()">
+    <div data-tab-heading>
+        <i class="entypo-docs"></i>Document
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateEmpDocument(documents)" name="empDform" id="empDform">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Document Information</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="drpDocumentLabel">Document</label>
+                            <select id="drpDocument" name="drpDocument" data-ng-model="documents.DocumentId" data-drc-focus="isFirstFocus" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="t in DDocument" value="{{t.Id}}">{{t.Documents}}</option>
+                            </select>
+                            <div data-ng-show="empDform.drpDocument.$dirty && validateDropDDocument()" class="label label-danger">
+                                Invalid: Please select your Document.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-md-2">
+                        <img data-ng-if="!DocFileName" src="~/Content/images/thumb_Document.png" class="img-responsive" width="100%" title="Please select a Document picture" />
+                        <div data-ng-if="uploadFileType == 'pdf'">
+                            <img data-ng-if="DocFileName" data-ng-model="DocFileName" src="~/Content/images/pdf_file.jpg" title="{{DocFileName}}" class="img-responsive" width="100%" />
+                        </div>
+                        <div data-ng-if="uploadFileType != 'pdf'">
+                            <img data-ng-if="DocFileName" data-ng-model="DocFileName" src="~/{{ImagePath}}/{{DocFileName}}" title="{{DocFileName}}" class="img-responsive" width="100%" />
+                        </div>
+                        <div upload-file data-filename="DocFileName" data-buttonclass="document-pic-upload-btn" data-id="document_pic" data-uploadhandler="/HR/Employee/UploadDocument" data-ischanged="isChanged" data-ext="*.jpg; *.jpeg; *.pdf; " data-filesize="6000KB">
+                            <input id="imageOne">
+                        </div>
+                        <input type="text" style="display: none" data-ng-model="DocFileName" required />
+                        <div data-ng-show="empDform.DocFileName.$dirty && validateImage()" class="label label-danger">
+                            Invalid: Please select Document Image.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                @{
+                    if (Model.HasInsertRights || Model.HasUpdateRights)
+                    {
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="empDform.$invalid || validateDropDDocument() "><i class="entypo-check"></i>{{saveText}}</button>
+                    }
+                }
+
+                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetEmpDocument()"><i class="entypo-erase"></i>Reset</button>
+                <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="clearControl()"><i class="entypo-cancel"></i>Clear</button>
+            </div>
+        </div>
+
+        <br />
+        <!-- BEGIN  DOCUMENTS LIST -->
+        <div class="gallery-env">
+            <div class="row" data-ng-init="RetrieveEmpDocuments()">
+                <div class="col-sm-3" data-ng-repeat="d in docList">
+                    <article class="album">
+                        <header>
+                            <a href="#" data-ng-if="d.FileType != 'pdf'">
+                                <img src="/@ViewBag.thumbDocPath/{{d.FileName}}" title="{{FileName}}">
+                            </a>
+                            <a data-ng-if="d.FileType != 'pdf'" href="#" class="album-options" data-ng-click="ImageShow(imageList, $index)">
+                                <i class="entypo-picture"></i>
+                                View Gallery
+                            </a>
+                            <a href="#" data-ng-if="d.FileType == 'pdf'">
+                                <img src="~/Content/images/pdf_file.jpg" title="{{FileName}}" style="height: 158px;">
+                            </a>
+                            <a data-ng-if="d.FileType == 'pdf'" href="/@ViewBag.empPDFDoc/{{d.FileName}}" target="_blank" class="album-options">
+                                <i class="entypo-picture"></i>
+                                open document
+                            </a>
+                        </header>
+                        <section class="album-info">
+                            <p>{{d.tblDocument.Documents}}</p>
+                        </section>
+                        <footer>
+                            <div class="album-options">
+                                @{
+                                    if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d)" data-message="Are you sure want to InActive this Document?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d)" data-message="Are you sure want to Active this Document?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                        <a href="#" data-drc-tooltip="Edit" data-ng-click="UpdateEmpDocument(d)"><i class="entypo-pencil"></i></a>
+                                    }
+                                }
+                                @{
+                                    if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" data-drc-confirm-box="" data-callback="DeleteEmpDoc(d.SrNo)" data-message="Are you sure want to delete this record from Document?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                }
+                            </div>
+                        </footer>
+                    </article>
+                </div>
+            </div>
+        </div>
+        <!-- / END DOCUMENTS LIST -->
+    </form>
+</div>

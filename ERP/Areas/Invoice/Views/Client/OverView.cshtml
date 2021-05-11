@@ -1,0 +1,357 @@
+﻿@{
+    ViewBag.Title = "OverView Client";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="ClientOverViewCtrl" class="kyc-overview">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row" data-ng-init="LoadOverViewData('@ViewBag.ClientId')">
+        <div class="col-sm-12">
+           <div class="page-header main-page-header">
+               <h2><i class="entypo-doc-text"></i>OverView Client</h2>
+           </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+    @*@{
+            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+            if (hasInsertRights) {
+                <a href="/Invoice/Client/Create" class="btn btn-sm btn-info">Add New</a>
+            }
+        }*@
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="kyc-section">
+        @*<div class="row">
+            <div class="col-sm-12 employee-tabs">
+                <div data-tabset>
+                    <div data-tab data-ng-controller="EmpPayRollCtrl" disabled="false" data-select="FetchPersonalInfo()">
+                        <div data-tab-heading>
+                            <i class="entypo-cc-nc"></i>Personl Information
+                        </div>
+                        
+                        row for content
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+        <div class="row">
+            <div class="col-sm-12 kyc-header">
+                <h3>Information about the company</h3>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Company Name : </label>
+                            <span>{{editDataF.CompanyName}}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Client Code : </label>
+                            <span>{{editDataF.ClientCode}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Contact Person : </label>
+                    <span>{{editDataF.CPrefix}} {{editDataF.ContactPerson}}</span>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Mobile Number : </label>
+                    <span>{{editDataF.MobileNo}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label>Company Address : </label>
+                    <span>{{editDataF.CompanyAddress}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Country From : </label>
+                    <span>{{editDataF.CountryName}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>States : </label>
+                    <span>{{editDataF.StateName}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>City : </label>
+                    <span>{{editDataF.City}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Postal Code : </label>
+                    <span>{{editDataF.PostalCode}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Telephone number : </label>
+                    <span>{{editDataF.TelephoneNo}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Fax number : </label>
+                    <span>{{editDataF.FaxNo}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Email : </label>
+                    <span>{{editDataF.Email}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Website : </label>
+                    <span><a href="{{editDataF.Website}}" target="_blank">{{editDataF.Website}}</a></span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Nature Of Business : </label>
+                    <span>{{editDataF.BusinessType}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Business Established Date : </label>
+                    <span>{{editDataF.BusinessStartDate | date:'dd-MM-yyyy'}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Client Source : </label>
+                    <span>{{editDataF.SourceName}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>Tax Number : </label>
+                    <span>{{editDataF.IncomeTaxNo}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>VAT Number : </label>
+                    <span>{{editDataF.VATNo}}</span>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label>License Number : </label>
+                    <span>{{editDataF.LicenseNo}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Bank details-->
+    <div class="kyc-section">
+        <div class="row">
+            <div class="col-sm-12 kyc-header">
+                <h3>Bank Information</h3>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Bank Name : </label>
+                            <span>{{editDataF.BankName}}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Bank Type : </label>
+                            <span>{{editDataF.BankType}}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label>Account Number : </label>
+                            <span>{{editDataF.AccountNo}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label>Branch Address : </label>
+                    <span>{{editDataF.BranchAddress}}</span>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label>IBAN Number : </label>
+                    <span>{{editDataF.IBANNumber}}</span>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label>Swift Code : </label>
+                    <span>{{editDataF.SwiftCode}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Director list-->
+    <div class="kyc-section">
+        <div class="row">
+            <div class="col-sm-12 kyc-header">
+                <h3>Contact Person List</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>FullName</th>
+                                <th>Designation</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Identity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="d in editDataF.ClientPersonList">
+                                <td>{{d.Prefix}} {{d.FullName}}</td>
+                                <td>{{d.Designation}}</td>
+                                <td>{{d.Email}}</td>
+                                <td>{{d.MobileNo}}</td>
+                                <td>{{d.Identity}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Document list-->
+    <div class="kyc-section" data-ng-show="editDataF.ClientDocumentList.length > 0">
+        <div class="row">
+            <div class="col-sm-12 kyc-header">
+                <h3>Document List</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr class="client-overview-item" data-ng-repeat="d in editDataF.ClientDocumentList">
+                                <td>
+                                    {{d.DocTypeName}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Conversation list-->
+    <div class="kyc-section" data-ng-show="editDataF.ClientConversationList.length > 0">
+        <div class="row">
+            <div class="col-sm-12 kyc-header">
+                <h3>
+                    Open Conversation List
+                    <span class="pull-right">
+                        <span>
+                            <a class="badge" href="/Invoice/Conversation" target="_blank">
+                                <i class="fa fa-external-link"></i> View All
+                            </a>
+                        </span>
+                        @*<span>
+                            <a class="badge" href="/Invoice/Conversation/Index/{{editDataF.PKClientId}}?action=add" target="_blank">
+                                <i class="fa fa-plus"></i> Add New
+                            </a>
+                        </span>*@
+                    </span>
+                </h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <tbody>
+                            <tr class="client-overview-item" data-ng-repeat="c in editDataF.ClientConversationList">
+                                <td>
+                                    {{c.ConversationTitle}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inquiry list-->
+    <div class="kyc-section" data-ng-show="editDataF.ClientInquiryList.length > 0">
+        <div class="row">
+            <div class="col-sm-12 kyc-header">
+                <h3>
+                    Inquiry List
+                    <span class="pull-right">
+                        <span>
+                            <a class="badge badge-danger" href="/Invoice/Conversation" target="_blank">
+                                <i class="fa fa-external-link"></i> View All
+                            </a>
+                        </span>
+                        @*<span>
+                            <a class="badge badge-success" href="/Invoice/Inquiry/Index/{{editDataF.PKClientId}}?action=add" target="_blank">
+                                <i class="fa fa-plus"></i> Add New
+                            </a>
+                        </span>*@
+                    </span>
+                </h3>
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                        <tr class="client-overview-item" ng-repeat="c in editDataF.ClientInquiryList">
+                            <td>
+                                {{c.InquiryTitle}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- / END FORM SECTION -->
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Area/Invoice/Scripts/invoiceClientOverview")
+}

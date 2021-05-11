@@ -1,0 +1,206 @@
+﻿@{
+    ViewBag.Title = "Manage Currency";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+
+<div data-ng-controller="CurrencyCtrl">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Currency</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        {
+                    <button type="button" class="btn btn-sm btn-info" data-ng-click="AddCurrency()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- /END  BEGIN HEADER SECTION -->
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateCurrency(editData)" name="currencyForm" id="currencyForm">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}}  Currency</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtCurrencyName">Currency Name</label>
+                                    <input type="text" class="form-control" id="txtCurrencyName" name="currencyName" data-ng-model="editData.CurrencyName" data-drc-focus="isFirstFocus" placeholder="Enter Currency name" maxlength="90" value="" required />
+                                    <div data-ng-show="currencyForm.currencyName.$dirty && currencyForm.currencyName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="currencyForm.currencyName.$error.required">Tell us your currency name.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label for="txtCurrencyCode">Currency Code</label>
+                                        <input type="text" class="form-control" id="txtCurrencyCode" name="currencyCode"
+                                                data-ng-model="editData.CurrencyCode" data-ng-minlength="3"
+                                                data-ng-change="IsCurrencyCodeExists(editData.CurrencyCode, currencyForm)"
+                                                placeholder="Enter Currency Code" maxlength="19" value="" required />
+                                        <div data-ng-show="currencyForm.currencyCode.$dirty && currencyForm.currencyCode.$invalid" class="label label-danger">
+                                            Invalid: <span data-ng-show="currencyForm.currencyCode.$error.required">Tell us your currency code.</span>
+                                                     <span data-ng-show="currencyForm.currencyCode.$error.invalidCode">Currency code already exists</span>
+                                                     <span data-ng-show="currencyForm.currencyCode.$error.minlength">Please enter minimum 3 alphbet characters.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="drpCountryId">Country<span class="compulsary">*</span></label>
+                                    <select id="drpCountryId" name="CountryId" data-ng-model="editData.CountryId" class="form-control" required>
+                                        <option value="0">--Select--</option>
+                                        <option data-ng-repeat="t in countryList" data-ng-selected="t.Id == editData.CountryId" value="{{t.Id}}">{{t.CountryName}}</option>
+                                    </select>
+                                    <div data-ng-show="currencyForm.CountryId.$dirty && validateDropCountry()" class="label label-danger">
+                                        Invalid: Please select Country.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label for="txtRemark">Remark</label>
+                                        <input type="text" class="form-control" id="txtCurrencyRemark" name="currencyRemark" data-ng-model="editData.Remark" placeholder="Remark" maxlength="100" value="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group" style="display: none;">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active
+                            </label>
+                        </div>*@
+                </div>
+                <div class="panel-footer">
+                    @{
+                        if (hasInsertRights)
+                        {
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="currencyForm.$invalid || validateDropCountryId()"><i class="entypo-check"></i>{{saveText}}</button>
+                        }
+                    }
+
+                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetCurrency()"><i class="entypo-erase"></i>Reset</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseCurrency()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+    <!-- BEGING CURRENCY LIST -->
+    <div class="row" data-ng-init="CurrencyList()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id)" data-message="Are you sure want to InActive '{{d.Documents}}' Currency?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.Id)" data-message="Are you sure want to Active '{{d.Documents}}' Currency?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>
+                                }
+                            }
+                            <td data-title="'CurrencyName'" data-filter="{ 'CurrencyName': 'text' }" data-sortable="'CurrencyName'">{{d.CurrencyName}}</td>
+                            <td data-title="'CurrencyCode'" data-filter="{ 'CurrencyCode': 'text' }" data-sortable="'CurrencyCode'">{{d.CurrencyCode}}</td>
+                            <td data-title="'CountryName'" data-filter="{ 'CountryName': 'text' }" data-sortable="'CountryName'">{{d.CountryName}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @if (editPermission)
+                                        {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateCurrency(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                        }
+                                        @if (deletePermission)
+                                        {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteCurrency(d.Id)" data-message="Are you sure want to delete '{{d.Documents}}' from Currency?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>
+                                @*Your search - <b>{{filterText}}</b> - did not match any currency.*@
+                                Your search did not match any currency.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END CURRENCY LIST -->
+</div>
+@section Scripts{
+    @Scripts.Render("~/Scripts/Currency")
+}

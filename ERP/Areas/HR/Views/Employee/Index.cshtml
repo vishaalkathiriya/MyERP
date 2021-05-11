@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "Manage Employee";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="EmployeeListCtrl">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Employee</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                          bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                    if (hasInsertRights) { 
+                                <a href="/HR/Employee/Create" class="btn btn-sm btn-info">Add New</a>
+		                    }
+                    }
+                  <a class="btn btn-sm btn-info" href="/HR/OrgChart">Employee Organizational Chart</a>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+     <!-- / END HEADER SECTION -->
+
+
+    <!-- BEGING EMPLOYEE LIST -->
+    <div class="row" data-ng-init="RetrieveEmployee()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.EmployeeId, d.IsActive)" data-message="Are you sure want to InActive '{{d.EmployeeRegisterCode}}' Employee?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.EmployeeId, d.IsActive)" data-message="Are you sure want to Active '{{d.EmployeeRegisterCode}}' Employee?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                   
+	                            }
+                            }
+                            <td data-title="'E Code'" data-filter="{ 'EmployeeRegisterCode': 'text' }" data-sortable="'EmployeeRegisterCode'">{{d.EmployeeRegisterCode}}</td>
+                            <td data-title="'Employee Name'" data-filter="{ 'EmployeeName': 'text' }" data-sortable="'EmployeeName'">{{d.EmployeeName}}</td>
+                            <td data-title="'Designation'" data-filter="{ 'Designation': 'text' }" data-sortable="'Designation'">{{d.Designation}}</td>
+                            <td data-title="'Exp In Company'">{{d.ExpInCompany}}</td>
+                            <td data-title="'Total Exp'">{{d.ExpTotal}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                        @if (editPermission) {
+                                            <a href="/HR/Employee/Create/{{d.EmployeeId}}" class="btn btn-primary btn-xs" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                            
+                                        }
+                                        @if (deletePermission) {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteEmployee(d.EmployeeId)" data-message="Are you sure want to delete '{{d.EmployeeRegisterCode}}' from Employee?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="5">Your search did not match any documents.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+     <!-- / END EMPLOYEE LIST -->
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Area/HR/Scripts/employeeList")
+}

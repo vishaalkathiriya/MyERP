@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div ng-view></div>
+
+@section Scripts{
+    <script src="~/Areas/EMS/Scripts/ems.module.js"></script>
+    <script src="~/Areas/EMS/Scripts/controllers/NewsletterOverviewController.js"></script>
+    <script src="~/Areas/EMS/Scripts/controllers/NewsletterDetailController.js"></script>
+    <script src="~/Areas/EMS/Scripts/services/emsservice.js"></script>
+    <script src="~/Areas/EMS/Scripts/directives/emsEmailPreview.js"></script>
+}

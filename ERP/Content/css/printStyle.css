@@ -1,0 +1,183 @@
+﻿body
+{
+    font-family:Verdana;
+    color:#473530;
+    font-size:11px;
+    background-color:#EBEBEB;
+    bottom:0px;
+}
+.main
+{
+    width:800px;
+    margin:auto;
+    background-color:White;  
+}
+.content
+{
+    margin:30px;
+    height:947px;     
+}
+.row{clear:both;width:100%;}
+#header
+{
+    border-bottom: 2px solid #473530;
+    height: 90px;
+}
+#header .logo{text-align:right;padding-top:20px;}
+#header .logo img{height:60px;width:120px;}
+#header .invoiceCode{font-family:Sylfaen;color:#E37000;margin-top: 50px;font-size: 27px;position: absolute;}
+#header .invoiceCode span:first-child{color:black;}
+
+#subheader{text-align:right;height: 70px;border-bottom: 1px solid #473530;}
+#subheader .date{position:absolute;margin-top:10px;border-bottom:1px solid #DED0AF;height:22px;width: 350px;text-align: left;}
+#subheader .totalH{font-size:27px;color:#E37000;padding-top:20px;}
+
+#contact{line-height:20px;height:160px;border-bottom:2px solid #473530;margin-top:2px;}
+#contact .client{position:absolute;}
+#contact .company{text-align:right;}
+        
+table{border-collapse: collapse;margin-top:10px;font-size: 11px;}
+
+tr{
+    border-top: 1px solid #F3E9D0;
+}
+tr:first-child
+{
+    border:0;
+}
+tr.lastRow td
+{
+    border-bottom:1px solid #F3E9D0;
+}
+td{
+    border-right:1px solid #F3E9D0;
+    border-left:1px solid #F3E9D0;
+    padding-left:10px;
+    padding-right:10px;
+    height:25px;
+    background-color:#F9F5EE;
+    -webkit-print-color-adjust: exact;
+}
+td.floatCol
+{
+    text-align:right;
+}
+th{
+    text-align:center;
+    _border-color: white;
+    _border-bottom-color:#F3E9D0;
+    font-weight:normal;
+    font-size:13px;
+    line-height:20px;
+}
+
+.noBack
+{
+    border:0;
+}
+.noBack td
+{
+    background-color:white;
+    border:0;
+    text-align:right;
+}
+.line td
+{
+    _border-top:1px solid #473530;
+    padding-top:10px;
+    padding-bottom:15px;
+    font-size: 15px;
+    color: #E37000;
+}
+.trMain td
+{
+    padding-top:5px !important;
+}
+
+.payment{border-bottom: 2px solid #473530;}
+#terms{margin-top:10px;line-height:20px;}
+#terms div{font-size:15px;font-family:Sylfaen;color:#AA5500;}
+
+#payDetails{margin-top:10px;line-height:20px;}
+#payDetails div:first-child{font-size:15px;font-family:Sylfaen;color:#AA5500;}
+
+.footerPage
+{
+    height: 30px;
+    text-align: center;
+    margin-left: 30px;
+    margin-right: 30px;
+    bottom:0;
+}
+.divFooterContent
+{
+    border-top:1px solid #713800;
+    text-align:center;
+    color: #AA5500;
+    font-size:10px;
+    padding-top: 5px;
+} 
+
+#spnPrint
+{
+    position:fixed;
+    right: 217px;
+    padding:10px 20px;
+    font-size:17px;
+}
+
+/* BUTTON STYLE */      
+.btn-red {
+text-decoration: none;
+color: white;
+cursor:pointer;
+text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2);
+background: #C00;
+background-image: -webkit-gradient(linear, left top, left bottom, from(#EA0035), to(#C00));
+background-image: -webkit-linear-gradient(top, #EA0035, #C00);
+background-image: -moz-linear-gradient(top, #EA0035, #C00);
+background-image: -ms-linear-gradient(top, #EA0035,#C00);
+background-image: -o-linear-gradient(top, #EA0035, #C00);
+background-image: linear-gradient(top, #EA0035,#C00);
+-moz-box-shadow: inset 0px 1px 0px 0px #ff9b9b;
+-webkit-box-shadow: inset 0px 1px 0px 0px #FF9B9B;
+box-shadow: inset 0px 1px 0px 0px #FF9B9B;
+border: 1px solid #900;
+font-weight: bold;
+border-radius:3px;
+}
+
+.btn-red:hover {
+text-decoration: none;
+background: #B30000;
+background-image: -webkit-gradient(linear, left top, left bottom, from(#C00), to(#B30000));
+background-image: -webkit-linear-gradient(top, #C00, #B30000);
+background-image: -moz-linear-gradient(top, #C00, #B30000);
+background-image: -ms-linear-gradient(top, #C00, #B30000);
+background-image: -o-linear-gradient(top, #C00, #B30000);
+background-image: linear-gradient(top, #C00, #B30000);
+}
+
+.message
+{
+    background-color: #5F9961;
+    font-size: 20px;
+    color: #F5F5F5;
+    text-align: center;
+    padding: 5px 0;
+    margin: 0px;
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+}
+
+.lnkHome
+{
+    position: absolute;
+    margin-left: 276px;
+    top: 8px;
+    color: #A40000;
+    text-decoration: none;
+}

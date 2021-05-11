@@ -1,0 +1,187 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab
+    data-ng-controller="FestivalTypeCtrl"
+    data-select="SetFocus('FestivalType')">
+    <div data-tab-heading>
+        <i class="entypo-vcard"></i>Festival Type
+    </div>
+
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        if (Model.HasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddFestivalType()">Add New</button>
+                        }
+                    }
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFestivalTypeFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateFestivalType(editData)" name="fesform" id="fesform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Festival Type</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="txtFTypeName">Festival Type</label>
+                                    <input type="text" class="form-control" id="txtFTypeName" name="festivalName" data-ng-model="editData.FestivalType" data-drc-focus="isFirstFocus" placeholder="Enter festival type" maxlength="50" value="" required />
+                                    <div data-ng-show="fesform.festivalName.$dirty && fesform.festivalName.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="fesform.festivalName.$error.required">Tell us your festival type.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="drpPartFullTime">Part/Full Time</label>
+                                    <select id="drpPartFullTime" name="drpPartFullTime" data-ng-model="editData.PartFullTime" class="form-control" required>
+                                        <option value="F">Full Time</option>
+                                        <option value="P">Part Time</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="txtFTypeName">Color Code</label>
+                                    <input type="text" class="form-control" id="txtFTypeCC" name="festivalCC" placeholder="Enter display color code"
+                                        data-ng-style="{'background-color': editData.DisplayColorCode, 'border-color':editData.DisplayColorCode}"
+                                        maxlength="7" value=""
+                                        data-ng-model="editData.DisplayColorCode"
+                                        data-colorpicker=""
+                                        data-colorpicker-fixed-position="true"
+                                        data-colorpicker-position="bottom"
+                                        required />
+                                    <div data-ng-show="fesform.festivalCC.$dirty && fesform.festivalCC.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="fesform.festivalCC.$error.required">Tell us your display color code.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="chkIsWorkingDay" name="chkIsWorkingDay" data-ng-model="editData.IsWorkingDay">IsWorkingDay</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group" style="display: none;">
+                                    <label class="checkbox">
+                                        <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-3"></div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (Model.HasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="fesform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetFestivalType()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseFestivalType()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING FESTIVAL TYPE LIST -->
+    <div class="row" data-ng-init="RetrieveFestivalType()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                    <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.FestivalTypeId, d.IsActive)" data-message="Are you sure want to InActive '{{d.FestivalType}}' Festival Type?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                    <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.FestivalTypeId, d.IsActive)" data-message="Are you sure want to Active '{{d.FestivalType}}' Festival Type?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                </td>                                         
+                                }
+                            }
+                            <td data-title="'Festival Type'" data-filter="{ 'FestivalType': 'text' }" data-sortable="'FestivalType'">{{d.FestivalType}}</td>
+                            <td data-title="'Part/Full Time'"
+                                data-filter="{ 'PartFullTime': 'select' }"
+                                filter-data="FestivalTimeType($column)"
+                                data-sortable="'PartFullTime'">{{d.PartFullTime == 'P' ? "Part Time" : "Full Time"}} </td>
+                            <td data-title="'Color Code'">
+                                <span class="badge" data-ng-style="{'background-color':'{{d.DisplayColorCode}}'}" style="padding: 5px;">{{d.DisplayColorCode}}</span>
+                            </td>
+                            <td data-title="'Working Day'" data-sortable="'IsWorkingDay'">{{d.IsWorkingDay ? "Yes" : "No" }}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (Model.HasUpdateRights)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateFestivalType(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                            
+                                    }
+                                    @if (Model.HasDeleteRights)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteFestivalType(d.FestivalTypeId)" data-message="Are you sure want to delete '{{d.FestivalType}}' from Festival Type?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (Model.HasUpdateRights)
+                                {
+                                <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="4">Your search did not match any festival type.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (Model.HasUpdateRights || Model.HasDeleteRights)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END FESTIVAL TYPE LIST -->
+</div>

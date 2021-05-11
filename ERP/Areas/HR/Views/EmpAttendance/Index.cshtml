@@ -1,0 +1,450 @@
+﻿@{
+    ViewBag.Title = "Employee Attendance Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<style>
+    /* Year-Format Report CSS */
+    #tblReportHeader th, td {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #tblReportDetail th, td {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #divDetails {
+        width: 100%;
+        overflow-x: scroll;
+        overflow-y: visible;
+    }
+
+    .nopadding {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .modal-dialog {
+        width: 50%;
+    }
+
+    @@media (min-width: 1024px) {
+        .modal-dialog {
+            width: 40%;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .modal-dialog {
+            width: 100%;
+        }
+    }
+
+    .tooltip {
+        z-index: 999999;
+    }
+
+    .notjoin {
+        background-color: #EBEBEB;
+        color: #EBEBEB;
+    }
+    /*End Year-Formar Report CSS*/
+
+    /*Begin Month Format Report */
+    #divDetailsMonth {
+        width: 100%;
+        overflow-x: scroll;
+        overflow-y: visible;
+    }
+
+    #tblReportHeaderMonth th, td {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    #tblReportDetailMonth th, td {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .tblBody tr:last-child td {
+        border-bottom: 2px solid lightgray;
+        border-collapse: separate;
+        border-spacing: 5px 5px;
+    }
+
+    .tblBody tr:first-child td {
+        border-top: 2px solid lightgray;
+        border-collapse: separate;
+        border-spacing: 5px 5px;
+    }
+
+    /* End Month Format Report*/
+</style>
+<div data-ng-controller="EmpAttendanceCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Employee Attendance Report</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 10px; margin-top: 4px; color: #212121;">Select Year:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpfilterYear" id="drpfilterYear" data-ng-model="selectedYear" ng-options="item.Id as item.Label for item in filterYears" class="form-control">
+                            <option value="0">Select Year </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="drpGroupName" name="drpGroupName" data-ng-model="GroupName" class="form-control">
+                            <option value="">--Select--</option>
+                            <option value="DD">DD</option>
+                            <option value="DRC">DRC</option>
+                            <option value="KREELI">KREELI</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="drpMonth" name="drpMonth" data-ng-model="selectedMonth" class="form-control">
+                            <option value="">--Select--</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-sm btn-primary" data-ng-click="GetEmpAttendanceReport(GroupName,selectedMonth)">Filter</button>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel(GroupName,selectedMonth)">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN ATTENDANCE REPORT DATA -->
+    <div class="ajax-progress-pms" data-ng-show="IsAjaxLoadingPMS">Please wait while loading...</div>
+    <div style="margin-left: 15px; margin-right: 15px" ng-show="ShowYearly">
+        <div class="row" data-ng-show="!IsAjaxLoadingPMS" style="overflow: hidden">
+            <div class="col-xs-6 col-lg-4 nopadding">
+                <table class="table table-hover table-bordered table-striped" id="tblReportHeader">
+                    <tr>
+                        <th colspan="5">Total</th>
+                        <th>PL</th>
+                        <th>User</th>
+                    </tr>
+                    <tr>
+                        <td>P</td>
+                        <td>A</td>
+                        <td>L</td>
+                        <td>O</td>
+                        <td>H</td>
+                        <td>&nbsp;</td>
+                        <td></td>
+                    </tr>
+                    <tr data-ng-repeat="d in GetEmpAttendanceReportList">
+                        <td>{{d.Total_P}}</td>
+                        <td>{{d.Total_A}}</td>
+                        <td>{{d.Total_L}} </td>
+                        <td>{{d.Total_O}} </td>
+                        <td>{{d.Total_H}}</td>
+                        <td>{{d.PendingLeave}}</td>
+                        <td><strong>{{d.EmpName}}</strong></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-xs-6 col-lg-8 nopadding">
+                <div id="divDetails">
+                    <table class="table table-bordered table-att-repo" id="tblReportDetail">
+                        <tr>
+                            <th colspan="5" class="att-jan-title">Jan</th>
+                            <th colspan="5" class="att-feb-title">Feb</th>
+                            <th colspan="5" class="att-mar-title">Mar</th>
+                            <th colspan="5" class="att-apr-title">Apr</th>
+                            <th colspan="5" class="att-may-title">May</th>
+                            <th colspan="5" class="att-jun-title">Jun</th>
+                            <th colspan="5" class="att-jul-title">Jul</th>
+                            <th colspan="5" class="att-aug-title">Aug</th>
+                            <th colspan="5" class="att-sep-title">Sep</th>
+                            <th colspan="5" class="att-oct-title">Oct</th>
+                            <th colspan="5" class="att-nov-title">Nov</th>
+                            <th colspan="5" class="att-dec-title">Dec</th>
+                        </tr>
+                        <tr>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-jan-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-feb-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-mar-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-apr-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-may-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-jun-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-jul-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-aug-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-sep-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-oct-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-nov-sep"><span class="att">H</span></td>
+                            <td><span class="att">P</span></td>
+                            <td><span class="att">A</span></td>
+                            <td><span class="att">L</span></td>
+                            <td><span class="att">O</span></td>
+                            <td class="att-dec-sep"><span class="att">H</span></td>
+                        </tr>
+                        <tr data-ng-repeat="d in GetEmpAttendanceReportList">
+                            <td ng-class="getTdClass(d,'1')"><span ng-class="getSpanClass(d,'1','p')">{{d.JAN_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'1')"><span ng-class="getSpanClass(d,'1','a')">{{d.JAN_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'1')"><span ng-class="getSpanClass(d,'1','l')">{{d.JAN_L || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'1')"><span ng-class="getSpanClass(d,'1','o')">{{d.JAN_O || 0}}</span></td>
+                            <td ng-class="getLastTdClass(d,'1','jan')">
+                                <span ng-class="getSpanClass(d,'1','h')">{{d.JAN_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'1')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'2')"><span ng-class="getSpanClass(d,'2','p')">{{d.FEB_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'2')"><span ng-class="getSpanClass(d,'2','a')">{{d.FEB_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'2')"><span ng-class="getSpanClass(d,'2','l')">{{d.FEB_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'2')"><span ng-class="getSpanClass(d,'2','o')">{{d.FEB_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'2','feb')">
+                                <span ng-class="getSpanClass(d,'2','h')">{{d.FEB_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'2')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'3')"><span ng-class="getSpanClass(d,'3','p')">{{d.MAR_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'3')"><span ng-class="getSpanClass(d,'3','a')">{{d.MAR_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'3')"><span ng-class="getSpanClass(d,'3','l')">{{d.MAR_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'3')"><span ng-class="getSpanClass(d,'3','o')">{{d.MAR_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'3','mar')">
+                                <span ng-class="getSpanClass(d,'3','h')">{{d.MAR_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'3')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'4')"><span ng-class="getSpanClass(d,'4','p')">{{d.APR_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'4')"><span ng-class="getSpanClass(d,'4','a')">{{d.APR_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'4')"><span ng-class="getSpanClass(d,'4','l')">{{d.APR_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'4')"><span ng-class="getSpanClass(d,'4','o')">{{d.APR_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'4','apr')">
+                                <span ng-class="getSpanClass(d,'4','h')">{{d.APR_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'4')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'5')"><span ng-class="getSpanClass(d,'5','p')">{{d.MAY_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'5')"><span ng-class="getSpanClass(d,'5','a')">{{d.MAY_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'5')"><span ng-class="getSpanClass(d,'5','l')">{{d.MAY_L || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'5')"><span ng-class="getSpanClass(d,'5','o')">{{d.MAY_O || 0}}</span></td>
+                            <td ng-class="getLastTdClass(d,'5','may')">
+                                <span ng-class="getSpanClass(d,'5','h')">{{d.MAY_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'5')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'6')"><span ng-class="getSpanClass(d,'6','p')">{{d.JUN_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'6')"><span ng-class="getSpanClass(d,'6','a')">{{d.JUN_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'6')"><span ng-class="getSpanClass(d,'6','l')">{{d.JUN_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'6')"><span ng-class="getSpanClass(d,'6','o')">{{d.JUN_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'6','jun')">
+                                <span ng-class="getSpanClass(d,'6','h')">{{d.JUN_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'6')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'7')"><span ng-class="getSpanClass(d,'7','p')">{{d.JUL_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'7')"><span ng-class="getSpanClass(d,'7','a')">{{d.JUL_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'7')"><span ng-class="getSpanClass(d,'7','l')">{{d.JUL_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'7')"><span ng-class="getSpanClass(d,'7','o')">{{d.JUL_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'7','jul')">
+                                <span ng-class="getSpanClass(d,'7','h')">{{d.JUL_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'7')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'8')"><span ng-class="getSpanClass(d,'8','p')">{{d.AUG_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'8')"><span ng-class="getSpanClass(d,'8','a')">{{d.AUG_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'8')"><span ng-class="getSpanClass(d,'8','l')">{{d.AUG_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'8')"><span ng-class="getSpanClass(d,'8','o')">{{d.AUG_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'8','aug')">
+                                <span ng-class="getSpanClass(d,'8','h')">{{d.AUG_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'8')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'9')"><span ng-class="getSpanClass(d,'9','p')">{{d.SEP_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'9')"><span ng-class="getSpanClass(d,'9','a')">{{d.SEP_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'9')"><span ng-class="getSpanClass(d,'9','l')">{{d.SEP_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'9')"><span ng-class="getSpanClass(d,'9','o')">{{d.SEP_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'9','sep')">
+                                <span ng-class="getSpanClass(d,'9','h')">{{d.SEP_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'9')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'10')"><span ng-class="getSpanClass(d,'10','p')">{{d.OCT_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'10')"><span ng-class="getSpanClass(d,'10','a')">{{d.OCT_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'10')"><span ng-class="getSpanClass(d,'10','l')">{{d.OCT_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'10')"><span ng-class="getSpanClass(d,'10','o')">{{d.OCT_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'10','oct')">
+                                <span ng-class="getSpanClass(d,'10','h')">{{d.OCT_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'10')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'11')"><span ng-class="getSpanClass(d,'11','p')">{{d.NOV_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'11')"><span ng-class="getSpanClass(d,'11','a')">{{d.NOV_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'11')"><span ng-class="getSpanClass(d,'11','l')">{{d.NOV_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'11')"><span ng-class="getSpanClass(d,'11','o')">{{d.NOV_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'11','nov')">
+                                <span ng-class="getSpanClass(d,'11','h')">{{d.NOV_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'11')"></a>
+                            </td>
+                            <td ng-class="getTdClass(d,'12')"><span ng-class="getSpanClass(d,'12','p')">{{d.DEC_P || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'12')"><span ng-class="getSpanClass(d,'12','a')">{{d.DEC_A || 0}}</span></td>
+                            <td ng-class="getTdClass(d,'12')"><span ng-class="getSpanClass(d,'12','l')">{{d.DEC_L || 0}}</span> </td>
+                            <td ng-class="getTdClass(d,'12')"><span ng-class="getSpanClass(d,'12','o')">{{d.DEC_O || 0}}</span> </td>
+                            <td ng-class="getLastTdClass(d,'12','dec')">
+                                <span ng-class="getSpanClass(d,'12','h')">{{d.DEC_H || 0}}</span>
+                                <a href="#" tooltip="Click to see details" tooltip-placement="top" data-ng-click="ShowDetails(d,'12')"></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END ATTENDANCE REPORT DATA -->
+
+    <!--BEGIN MONTH-FORMAT-REPORT VIEW-->
+    <div style="margin-left: 15px; margin-right: 15px" ng-show="ShowMonthly">
+        <div class="row" data-ng-show="!IsAjaxLoadingPMS" style="overflow: hidden">
+            <div class="col-xs-6 col-lg-4 nopadding">
+                <table class="table table-bordered table-striped" id="tblReportHeaderMonth">
+                    <thead>
+                        <tr>
+                            <th colspan="6">Total</th>
+                            <th>Employee</th>
+                        </tr>
+                        <tr>
+                            <td>P</td>
+                            <td>A</td>
+                            <td>L</td>
+                            <td>O</td>
+                            <td>H</td>
+                            <td>S</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="d in GetEmpAttendanceReportListMonthFormat" class="tblBody">
+                        <tr>
+                            <td>{{d.Total_P}}</td>
+                            <td>{{d.Total_A}}</td>
+                            <td>{{d.Total_L}}</td>
+                            <td>{{d.Total_O}}</td>
+                            <td>{{d.Total_H}}</td>
+                            <td>{{d.Total_S}}</td>
+                            <td><strong>{{d.EmpName}}</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6"></td>
+                            <td><strong>Leave</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6"></td>
+                            <td><strong>Absense</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6"></td>
+                            <td><strong>OT</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-xs-6 col-lg-8 nopadding">
+                <div id="divDetailsMonth">
+                    <table class="table table-bordered table-att-repo" id="tblReportDetailMonth">
+                        <thead>
+                            <tr>
+                                <th colspan="{{GetEmpAttendanceReportListMonthFormat[0].objDetail.length}}">Month : {{GetEmpAttendanceReportListMonthFormat[0].objDetail[0].Edate | date:'MMMM-yyyy'}}
+                                </th>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="days in GetEmpAttendanceReportListMonthFormat[0].objDetail"><span class="att">{{days.Edate | date:'dd'}}</span> </td>
+                            </tr>
+                        </thead>
+                        <tbody ng-repeat="d in GetEmpAttendanceReportListMonthFormat" class="tblBody">
+                            <tr>
+                                <td ng-repeat="day in d.objDetail" ng-class="getTdClassPRow(day)"><span data-tooltip-html-unsafe="{{d.EmpName}}<br>Day : {{day.Edate | date:'dd'}}<br> {{day.Remark}}" data-tooltip-placement="bottom" class="att">{{day.P || 0 }}</span></td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="day in d.objDetail" ng-class="getTdClassLARow(day,'L')"><span data-tooltip-html-unsafe="{{d.EmpName}}<br>Day : {{day.Edate | date:'dd'}}<br>{{day.Remark}}" data-tooltip-placement="bottom" class="att">{{day.L || 0 }}</span></td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="day in d.objDetail" ng-class="getTdClassLARow(day,'A')"><span data-tooltip-html-unsafe="{{d.EmpName}}<br>Day : {{day.Edate | date:'dd'}}<br>{{day.Remark}}" data-tooltip-placement="bottom" class="att">{{day.A || 0 }}</span></td>
+                            </tr>
+                            <tr>
+                                <td ng-repeat="day in d.objDetail" ng-class="getTdClassORow(day)"><span data-tooltip-html-unsafe="{{d.EmpName}}<br>Day : {{day.Edate | date:'dd'}}<br>{{day.Remark}}" data-tooltip-placement="bottom" class="att">{{day.O || 0 }}</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- END MONTH-FORMAT-REPORT VIEW-->
+</div>
+
+
+@section Scripts{
+    <script src="@Url.Content("~/Areas/HR/Scripts/controllers/EmpAttendanceCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/HR/Scripts/services/EmpAttendanceService.js")"></script>
+}

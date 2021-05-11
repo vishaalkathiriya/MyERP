@@ -1,0 +1,387 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    
+}
+@using ERP.Utilities
+
+<style>
+    .guj-scope {
+        font-family: HARIKRISHNA,HARI;
+        font-size: 1.3em;
+    }
+    .contactName {
+        border: none;
+        background-color: initial;
+        margin: 0;
+        padding: 0;
+        color: #222222;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Manage Contact</h2>
+        </div>
+    </div>
+</div>
+
+@* BEGIN CONTACT CONTROLLER *@
+<div class="row" data-ng-controller="ABContactCtrl">
+    @* BEGIN HEADER SECTION *@
+    <div class="col-sm-12">
+        <div class="well well-sm">
+            <form class="form-inline">
+                @{
+                    var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                    bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                    if (hasInsertRights)
+                    {
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddContact()" id="testIdidid">Add New</button>
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="ApplyGroup()">Apply Group </button>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Export To Excel</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-info">Upload</button>
+                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-up"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="UploadExcel()">Import Excel</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-info" data-ng-click="LanguageSelect(2)">Guj</button>
+                            <button type="button" class="btn btn-info" data-ng-click="LanguageSelect(1)">Eng</button>
+                            <button type="button" class="btn btn-info" data-ng-click="LanguageSelect(0)">All</button>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-info" data-ng-click="SetFontSize('minus')">A-</button>
+                            <button type="button" class="btn btn-info" data-ng-click="SetFontSize('plus')">A+</button>
+                        </div>
+                        <div class="form-group">
+                            <multiselect class="input-xlarge" multiple="true" data-ng-model="selectedList" options="p.Label for p in group" change="selected()"></multiselect>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-sm btn-primary" data-ng-click="FilterGroup()">Filter</button>
+                        </div>
+                    }
+
+                }
+            </form>
+        </div>
+    </div>
+    @* END HEADER SECTION *@
+
+    @* BEGIN CONTACT FORM *@
+    <div class="col-sm-12" data-ng-show="isFormVisible">
+        <form role="form" name="frmContact" id="frmContact" data-ng-submit="CreateUpdateContact(editData)">
+            <input type="hidden" data-ng-model="editData.ContactId" />
+            <div class="panel panel-default panel-shadow">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{mode}} Contact</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label for="drpLanguage">Select Language <span class="compulsary">*</span></label>
+
+                            <select id="drpLanguage" name="drpLanguage" data-ng-model="editData.Language" class="form-control" required>
+                                <option value="0">---select--- </option>
+                                <option data-ng-repeat="d in languageList" value="{{d.LangId}}">{{d.Language}}</option>
+                            </select>
+
+                            <div data-ng-show="frmContact.drpLanguage.$dirty && validateDropLanguage()" class="label label-danger">
+                                Invalid: Please select Language.
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtContactName">Full Name <span class="compulsary">*</span></label>
+                                            <input type="text" data-drc-focus="isFirstFocus" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtFullName" name="fullName" data-ng-model="editData.fullName" maxlength="50" value="" required />
+                                            <div data-ng-show="frmContact.fullName.$dirty && frmContact.fullName.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmContact.fullName.$error.required">Tell us your full name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtPhoneNo">Phone No.<span class="compulsary">*</span></label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtPhoneNo" name="phoneNo" data-ng-model="editData.phoneNo" maxlength="50" value="" required />
+
+                                            <div data-ng-show="frmContact.phoneNo.$dirty && frmContact.phoneNo.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmContact.phoneNo.$error.required">Tell us your phone no.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtCompanyName">Company Name</label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtCompanyName" name="companyName" data-ng-model="editData.companyName" maxlength="50" value="" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtLandlineNo">Landline No</label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtLandlineNo" name="landlineNo" data-ng-model="editData.landlineNo" maxlength="50" value="" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtAddress1">Address Line1</label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtAddress1" name="address1" data-ng-model="editData.address1" maxlength="50" value="" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtAddress1">Address Line2</label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtAddress2" name="address2" data-ng-model="editData.address2" maxlength="50" value="" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <div class="form-contact">
+                                            <label for="txtArea">Area<span class="compulsary">*</span></label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtArea" name="area" data-ng-model="editData.area" maxlength="50" value="" required />
+                                            <div data-ng-show="frmContact.area.$dirty && frmContact.area.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmContact.area.$error.required">Tell us your area name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-contact">
+                                            <label for="txtCity">City<span class="compulsary">*</span></label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtCity" name="city" data-ng-model="editData.city" maxlength="50" value="" required />
+                                            <div data-ng-show="frmContact.city.$dirty && frmContact.city.$invalid" class="label label-danger">
+                                                Invalid: <span data-ng-show="frmContact.city.$error.required">Tell us your city name.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-contact">
+                                            <label for="txtPincode">Pincode</label>
+                                            <input type="text" data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtPincode" name="pincode" data-ng-model="editData.pincode" maxlength="50" value="" />
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-contact">
+                                    <label style="float: left"><b>Groups</b></label>
+                                    <span style="margin: 5px; vertical-align: text-top">
+                                        <label data-ng-repeat="group in GroupList" class="checkbox" style="display: block">
+                                            <input type="checkbox" id="chkGroupName" name="chkGroupName" value="{{group.GroupId}}" data-ng-checked="selection.indexOf(group.GroupId) > -1" data-ng-click="selectGroup(group.GroupId)">{{group.GroupName}}
+                                        </label>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="form-contact">
+                                <div class="col-sm-12">
+                                    <label for="txtNote">Note</label>
+                                    <textarea data-ng-class="{'guj-scope form-control ' : editData.Language == 2,'form-control ' : editData.Language < 2}" id="txtNote" name="contactNote" data-ng-model="editData.contactNote"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-contact" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.isActive">Active
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    @{
+                        if (hasInsertRights)
+                        {
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmContact.$invalid || validateDropLanguage()"><i class="entypo-check"></i>{{SaveText}}</button>
+                        }
+                    }
+                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetContact()"><i class="entypo-erase"></i>Reset</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseContact()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    @*END FORM*@
+
+    @*BEGIN APPLY GROUP FORM*@
+    <div class="col-sm-12" data-ng-show="isGroupFormVisible">
+        <form role="form" name="frmGroup" id="frmGroup" data-ng-submit="ApplyGroupContact()">
+            <div class="panel panel-default panel-shadow">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add Groups to <b>{{contactSelection.length}} Selected </b>Contacts  </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="form-contact">
+                            <div class="col-sm-12">
+                                <span style="float: left; margin: 5px">
+                                    <label data-ng-repeat="group in GroupList" class="checkbox" style="display: block">
+                                        <input type="checkbox" id="chkcontactGroupName" name="chkGroupName" value="{{group.GroupId}}" data-ng-checked="selection.indexOf(group.GroupId) > -1" data-ng-click="selectGroup(group.GroupId)">{{group.GroupName}}
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    @{
+                        if (hasInsertRights)
+                        {
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left"><i class="entypo-check"></i>{{SaveText}}</button>
+                        }
+                    }
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseGroup()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    @*END APPLY GROUP FORM*@
+
+    @*BEGIN EXCEL CONTACT FORM*@
+    <div class="col-sm-12" data-ng-show="isContactUploadFormVisible">
+        <form role="form" name="frmUploadContact" id="frmUploadContact" data-ng-submit="ImportExcel()">
+            <div class="panel panel-default panel-shadow">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Upload contacts from excel file </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="form-contact">
+                            <div class="col-sm-12">
+                                <div upload-file data-filename="fileName" data-buttonclass="profile-pic-upload-btn" data-id="profile_pic" data-uploadhandler="../AB/Contact/UploadExcel" data-ischanged="isChanged" data-ext="*.xlsx;*.xls" data-filesize="50MB" class="col-sm-4">
+                                    <input id="imageOne2">
+                                </div>
+                                <label ng-show="fileName != null && fileName !='' " data-ng-if="tempmode == 'Save'">File Ready To Upload<i class="entypo-attach"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    @{
+                        if (hasInsertRights)
+                        {
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left"><i class="entypo-check"></i>Upload</button>
+                        }
+                    }
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseUploadExcel()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    @*END EXCEL CONTACT FORM*@
+
+    @* BEGIN LIST CONTACT*@
+    <div class="col-sm-12 fontsize">
+        <div data-loading-container="tableParams.settings().$loading">
+            <div class="table-responsive">
+                <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped" id="tblContactList">
+                    <tr data-ng-repeat="contact in $data">
+
+                        @{
+                            var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                            if (editPermission)
+                            {
+                                <td data-title="" header="'ng-table/headers/checkbox.html'">
+                                    <input type="checkbox" id="chkIsSelect" class="chkSize" name="chkIsSelect" data-ng-model="checkboxes.items[contact.ContactId]" data-ng-click="selectContact(contact.ContactId)" />
+                                </td>
+                            }
+                        }
+                        <td data-title="'Full Name'" data-filter="{ 'Name': 'text' }" data-sortable="'Name'" ><pre data-ng-class="contact.LangId == 2?'guj-scope contactName':'contactName'" >{{contact.Name}}</pre></td>
+                        <td data-title="'Address'" data-filter="{ 'AreaCity': 'text' }" data-sortable="'AreaCity'" data-ng-class="{'guj-scope' : contact.LangId == 2}">{{contact.AreaCity}}</td>
+                        <td data-title="'Phone No.'" data-filter="{ 'PhoneNo': 'text' }" data-sortable="'PhoneNo'" data-ng-class="{'guj-scope ' : contact.LangId == 2}">{{contact.PhoneNo}}</td>
+                        @*  <td data-title="'Group Name'" data-filter="{ 'ddlGroupName': 'select' }" filter-data="FilterGroupName($column)" >{{contact.GroupName.split(',').join(', ')}}</td>*@
+                        <td data-title="'Group Name'" filter-data="FilterGroupName($column)">{{contact.GroupName.split(',').join(', ')}}</td>
+                        <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{contact.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                        @{
+                            var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                            if (editPermission || deletePermission)
+                            {
+                                <td data-title="'Actions'" style="width: 80px; text-align: center;">
+                                    @if (editPermission)
+                                    {
+                                        <a class="btn btn-primary btn-xs fontsize" data-ng-click="UpdateContact(contact)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a class="btn btn-danger btn-xs fontsize" data-drc-confirm-box="" data-callback="DeleteContact(contact.ContactId)" data-message="Are you sure want to delete this record?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                    }
+                                </td>
+                            }
+                        }
+                    </tr>
+                    <tr data-ng-show="noRecord" style="text-align: center;">
+                        @{
+                            if (editPermission)
+                            {
+                                <td style="width: 50px;"></td>
+                            }
+                        }
+                        <td>Your search - <b>{{filterText}}</b> - did not match any contact.</td>
+                        <td style="width: 125px;"></td>
+                        @{
+                            if (editPermission || deletePermission)
+                            {
+                                <td style="width: 80px;"></td>
+                            }
+                        }
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @*END LIST CONTACT*@
+    <script type="text/javascript">
+        window.Origin = "@System.Configuration.ConfigurationManager.AppSettings["UploadContactPath"].ToString()";
+        window.temp = "@ViewBag.TempImageThumbPath";
+    </script>
+    <script type="text/ng-template" id="ng-table/headers/checkbox.html">
+        <input type="checkbox" data-ng-click="selectAll()" ng-model="checkboxes.checked" id="select_all" name="filter-checkbox" value="" />
+    </script>
+
+
+    <!-- PAGE SCRIPTS -->
+    @section Scripts{
+        @Scripts.Render("~/Area/AddressBook/Scripts/abcontact")
+    }
+
+
+</div>
+@*END FORM*@

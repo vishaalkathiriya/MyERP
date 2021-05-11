@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Alphabats>
+  <char number="1">A</char>
+  <char number="2">B</char>
+  <char number="3">C</char>
+  <char number="4">D</char>
+  <char number="5">E</char>
+  <char number="6">F</char>
+  <char number="7">G</char>
+  <char number="8">H</char>
+  <char number="9">I</char>
+  <char number="10">J</char>
+  <char number="11">K</char>
+  <char number="12">L</char>
+  <char number="13">M</char>
+  <char number="14">N</char>
+  <char number="15">O</char>
+  <char number="16">P</char>
+  <char number="17">Q</char>
+  <char number="18">R</char>
+  <char number="19">S</char>
+  <char number="20">T</char>
+  <char number="21">U</char>
+  <char number="22">V</char>
+  <char number="23">W</char>
+  <char number="24">X</char>
+  <char number="25">Y</char>
+  <char number="26">Z</char>
+</Alphabats>

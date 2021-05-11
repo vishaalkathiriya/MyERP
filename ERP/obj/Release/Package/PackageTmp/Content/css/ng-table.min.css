@@ -1,0 +1,202 @@
+/*! ngTable v0.3.2 by Vitalii Savchuk(esvit666@gmail.com) - https://github.com/esvit/ng-table - New BSD License */
+
+.ng-table{
+    margin-bottom:0px !important;
+}
+
+.table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th{
+    background-color:rgba(249, 249, 249,0.5) !important;
+}
+
+.ng-table th {
+    text-align: left;
+    font-weight:400;
+    font-size:13px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    background-color:#f5f5f6 !important;
+}
+
+    .ng-table th.sortable {
+        cursor: pointer;
+    }
+
+        .ng-table th.sortable div {
+            padding-right: 18px;
+            position: relative;
+        }
+
+            .ng-table th.sortable div:after, .ng-table th.sortable div:before {
+                content: "";
+                border-width: 0 4px 4px;
+                border-style: solid;
+                border-color: #000 transparent;
+                visibility: visible;
+                right: 8px;
+                top: 50%;
+                position: absolute;
+                opacity: .3;
+                margin-top: -4px;
+            }
+
+            .ng-table th.sortable div:before {
+                margin-top: 2px;
+                border-bottom: 0;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 4px solid #000;
+            }
+
+            .ng-table th.sortable div:hover:after, .ng-table th.sortable div:hover:before {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
+            /*background-color: gray;
+            text-shadow: 0 1px 1px rgba(255,255,255,.75);*/
+
+            color:#000000;
+        }
+
+            .ng-table th.sortable.sort-desc div:after, .ng-table th.sortable.sort-asc div:after {
+                margin-top: -2px;
+            }
+
+            .ng-table th.sortable.sort-desc div:before, .ng-table th.sortable.sort-asc div:before {
+                visibility: hidden;
+            }
+
+            .ng-table th.sortable.sort-asc div:after, .ng-table th.sortable.sort-asc div:hover:after {
+                visibility: visible;
+                filter: alpha(opacity=60);
+                -khtml-opacity: .6;
+                -moz-opacity: .6;
+                opacity: .6;
+            }
+
+            .ng-table th.sortable.sort-desc div:after {
+                border-bottom: 0;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 4px solid #000;
+                visibility: visible;
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+                filter: alpha(opacity=60);
+                -khtml-opacity: .6;
+                -moz-opacity: .6;
+                opacity: .6;
+            }
+
+    .ng-table th.filter .input-filter {
+        margin: 0;
+        display: block;
+        width: 100%;
+        min-height: 30px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+.ng-table + .pagination {
+    margin-top: 0;
+}
+
+.ng-table-pager {
+    background: #f5f5f6;
+    border:1px solid #F0F0F0;
+    border-top:none;
+    padding: 10px 10px 6px 10px;
+    line-height: 1.428571429;
+}
+
+.ng-table-pager:before,
+.ng-table-pager:after {
+  display: table;
+  content: " ";
+}
+
+.ng-table-pager:after {
+  clear: both;
+}
+
+.ng-table-pager .ng-table-pagination{
+    padding:0;
+    margin:0;
+}
+
+.ng-table-pager .ng-table-counts .btn{
+    background:#fff;
+    font-size:11px;
+    /*margin-left:4px !important;*/
+    display:inline-block;
+    /*border-radius:500px !important;*/
+    padding: 5px 9px;
+}
+
+.ng-table-pager .ng-table-counts .btn.active{
+    background-color:#000;
+    border-color:#000;
+    color:#fff;
+}
+
+
+
+@media only screen and (max-width:800px) {
+    .ng-table-responsive {
+        border-bottom: 1px solid #999;
+    }
+
+        .ng-table-responsive tr {
+            border-top: 1px solid #999;
+            border-left: 1px solid #999;
+            border-right: 1px solid #999;
+        }
+
+        .ng-table-responsive td:before {
+            position: absolute;
+            padding: 8px;
+            left: 0;
+            top: 0;
+            width: 50%;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .ng-table-responsive thead tr th {
+            text-align: left;
+        }
+
+        .ng-table-responsive thead tr.ng-table-filters th {
+            padding: 0;
+        }
+
+            .ng-table-responsive thead tr.ng-table-filters th form > div {
+                padding: 8px;
+            }
+
+        .ng-table-responsive td {
+            border: 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+            .ng-table-responsive td:before {
+                content: attr(data-title-text);
+            }
+
+        .ng-table-responsive, .ng-table-responsive thead, .ng-table-responsive tbody, .ng-table-responsive th, .ng-table-responsive td, .ng-table-responsive tr {
+            display: block;
+        }
+}

@@ -1,0 +1,234 @@
+﻿@{
+    ViewBag.Title = "Quarterly Management Meeting";
+     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@using ERP.Utilities
+
+<style>
+    .ta-editor {
+        min-height: 300px;
+        height: auto;
+        overflow: auto;
+        font-family: inherit;
+        font-size: 100%;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Quarterly Management Meeting</h2>
+        </div>
+    </div>
+</div>
+
+<div data-ng-controller="QuarterlyManagementMeetingCtrl">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form role="form" class="form-inline" data-ng-submit="FilterByMeetingDate()" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Date From:</label>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                            if (hasInsertRights)
+                            { 
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddMeeting()">Add New</button>
+                            }
+                        }
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateMeeting(editData)" name="Meetingform" id="Meetingform">
+                <!--<input type="hidden" data-ng-model="data.SrNo" />-->
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Quarterly Meeting Management</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="txtTitle">Title<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtTitle" name="Title" data-ng-model="editData.Title" placeholder="Enter title of meeting" tabindex="1" maxlength="250" value="" required />
+                                    <div data-ng-show="Meetingform.Title.$dirty && Meetingform.Title.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="Meetingform.Title.$error.required">Tell us your title of meeting.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="txtDateOfMeeting">Date of Meeting<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtDateOfMeeting" tabindex="2" name="txtDateOfMeeting" tabindex="4"
+                                            data-ng-model="editData.DateOfMeeting"
+                                            data-ng-change="ValidateDateOfMeeting(editData.DateOfMeeting,Meetingform)"
+                                            placeholder="DD-MM-YYYY" maxlength="10" value="" required />
+
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default"
+                                                data-datepicker-popup="{{format}}"
+                                                data-is-open="editData.calOpenDateOfMeeting"
+                                                data-ng-model="dateOfMeeting"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenDateOfMeeting($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="Meetingform.txtDateOfMeeting.$dirty && Meetingform.txtDateOfMeeting.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="Meetingform.txtDateOfMeeting.$error.required">Tell us your date of meeting.</span>
+                                        <span data-ng-show="Meetingform.txtDateOfMeeting.$error.invalidDate">Please enter valid date of meeting.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="txtParticipants">List of Participants<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtParticipants" name="ListOfParticipants" data-ng-model="editData.ListOfParticipants" tabindex="3" placeholder="Enter list of participants" maxlength="150" value="" required />
+                                    <div data-ng-show="Meetingform.ListOfParticipants.$dirty && Meetingform.ListOfParticipants.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="Meetingform.ListOfParticipants.$error.required">Tell us your list of participants.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="document_pic">Attachment</label>
+                                        <div upload-file data-filename="editData.Attachment" data-buttonclass="document-pic-upload-btn" data-id="document_pic" data-uploadhandler="/QuarterlyManagementMeeting/UploadMeetingDoc" data-ischanged="ischanged" data-ext="*.pdf" tabindex="4" style="display: inline-block; width: 90%;">
+                                            <input id="imageOne">
+                                        </div>
+                                        <input type="text" style="display: none" data-ng-model="editData.Attachment" />
+
+                                        <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Add'"   href="/@ViewBag.tempDocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                        <a ng-show="editData.Attachment != null  && editData.Attachment !='' " data-ng-if="mode == 'Edit'"   href="/@ViewBag.DocPdf/{{editData.Attachment}}" target="_blank"><i class="entypo-attach"></i></a>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="txtAgendaOfTraining">Agenda of Training</label>
+                                    <div text-angular="text-angular" name="txtAgendaOfTraining" data-ng-model="editData.AgendaOfTraining" ta-disabled='disabled' tabindex="5"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="txtDecisionTakenDuringMeeting">Decision Taken During Meeting</label>
+                                <div text-angular="text-angular" name="txtDecisionTakenDuringMeeting" data-ng-model="editData.DecisionTakenDuringMeeting" ta-disabled='disabled' tabindex="6"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="Meetingform.$invalid" tabindex="7"><i class="entypo-check"></i>{{saveText}}</button>            
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetMeeting()" tabindex="8"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseMeeting()" tabindex="9"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+     <!-- BEGING HRD QUARTERLY MEETING MANAGEMENT LIST -->
+    <div class="row" data-ng-init="RetrieveMeetings()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            <td data-title="" style="width: 50px;"><a ng-if="d.Attachment != NULL && d.Attachment != '' "      href="@ViewBag.DocPdf/{{d.Attachment}}" target="_blank" title="click to download"><i class="entypo-attach"></i></a></td>
+                            <td data-title="'Date'" data-sortable="'DateOfMeeting'">{{d.DateOfMeeting | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            <td data-title="'Title'" data-filter="{ 'Title': 'text' }" data-sortable="'Title'">{{d.Title}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            <td data-title="'Actions'" style="width: 100px">
+                                <a href="#" data-ng-click="ShowMeetingInfo(d.SrNo)" class="btn btn-info btn-xs" data-drc-tooltip="View Detail"><i class="entypo-eye"></i></a>
+                                @if (ERPUtilities.HasAccessPermission(2, ctrl))
+                                {
+                                    <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateMeeting(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                                
+                                }
+                                @if (ERPUtilities.HasAccessPermission(3, ctrl))
+                                {
+                                    <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteMeeting(d.SrNo)" data-message="Are you sure want to delete '{{d.AgendaOfTraining}}' from meetings?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                              
+                                }
+                            </td>
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (ERPUtilities.HasAccessPermission(2, ctrl))
+                                {
+                                <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td colspan="2">Your search did not match any record.</td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (ERPUtilities.HasAccessPermission(2, ctrl) || ERPUtilities.HasAccessPermission(3, ctrl))
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END HRD QUARTERLY MEETING MANAGEMENT LIST -->
+
+
+    @section Scripts{
+
+        <script src="~/Scripts/date/date.js"></script>
+        <script src="@Url.Content("~/Areas/HRD/Scripts/controllers/HRDQuarterlyManagementMeetingCtrl.js")"></script>
+        <script src="@Url.Content("~/Areas/HRD/Scripts/services/HRDQuarterlyManagementMeetingService.js")"></script>
+        <script src="~/Scripts/directives/checkbox.js"></script>
+        <script src="~/Scripts/directives/confirmbox.js"></script>
+        <script src="~/Scripts/directives/focus.js"></script>
+        <script src="~/Content/js/jquery.uploadify.js"></script>
+        <script src="~/Scripts/directives/uploadFile.js"></script>
+        <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+        <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+        <script src="~/Scripts/directives/drcInputMask.js"></script>
+    }
+</div>

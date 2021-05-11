@@ -1,0 +1,46 @@
+﻿<div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2 ng-bind="vm.title"></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <a class="btn btn-sm btn-info" ng-href="#/detail/new">Add Newsletter</a>
+            </div>
+
+
+            <table class="table table-hover table-bordered table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 70%;">Subject</th>
+                        <th style="width: 20%;">Nr. Opened</th>
+                        <th style="width: 10%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody ng-if="vm.newsletters.length">
+                    <tr ng-repeat="newsletter in vm.newsletters | orderBy:'NewsletterID':true">
+                        <td><a ng-href="#/detail/{{newsletter.NewsletterID}}">{{ newsletter.Subject }}</a></td>
+                        <td>{{ newsletter.NrOpened }}</td>
+                        <td>
+                            <button class="btn btn-xs btn-danger" ng-click="vm.deleteNewsletter(newsletter)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody ng-if="vm.newsletters.length === 0">
+                    <tr>
+                        <td colspan="3" class="text-center text-info">
+                            No newsletters found!
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>

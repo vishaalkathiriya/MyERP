@@ -1,0 +1,256 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="DashboardCtrl">
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Dashboard</h2>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+    <!-- BEGIN FORM SECTION -->
+    <div class="row" data-ng-init="isTeamLeader('@ViewBag.isTl')">
+        <div class="col-sm-12">
+            <div class="row">
+                @{
+                    var ctrl = ViewBag.ctrlName;
+                    if (ERPUtilities.HasAccessPermission(1, ctrl))
+                    {
+                        <div class="col-md-8">
+                            @{
+                                if (ERPUtilities.HasAccessPermission(2, ctrl))
+                                {
+                                    // Userwise  divided remainder
+                                    <div class="panel panel-primary panel-shadow">
+                                        <div class="panel-heading">
+                                            <div class="panel-title">
+                                                <h4>Reminders</h4>
+                                            </div>
+                                            <div class="panel-options">
+                                                <a href="#" title="collapse" data-rel="collapse"><i class="entypo-down-open"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="dash-reminders">
+                                                <!-- used for approved leave -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.approveLeaves.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-approved-leave-title">
+                                                        <h4>{{reminders.approveLeaves[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item" data-ng-repeat="event in reminders.approveLeaves">
+                                                        <img data-ng-if="event.EmployeeId != 0" data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+                                                        <strong>{{event.EmployeeName}}</strong>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}}) <span data-ng-show="event.OnDate != event.EndDate &&  event.Type == 'Approved Leave' && event.LeaveTime == 0 ">to {{ event.EndDate | date:'dd-MMM'}} ({{event.EndDateWeekName}}) </span><span data-ng-show="event.LeaveTime != 0">({{event.LeaveTime}})</span></span>
+                                                    </div>
+                                                </div>
+                                                <!-- / end dash-reminders-section -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.DisApproved.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-disapprived-leave-title">
+                                                        <h4>{{reminders.DisApproved[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item" data-ng-repeat="event in reminders.DisApproved">
+                                                        <img data-ng-if="event.EmployeeId != 0" data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+                                                        <strong>{{event.EmployeeName}}</strong>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}}) <span data-ng-show="event.OnDate != event.EndDate &&  event.Type == 'Approved Leave' && event.LeaveTime == 0 ">to {{ event.EndDate | date:'dd-MMM'}} ({{event.EndDateWeekName}}) </span><span data-ng-show="event.LeaveTime != 0">({{event.LeaveTime}})</span></span>
+                                                    </div>
+                                                </div>
+                                                <!-- used for pendding leave -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.pendingLeaves.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-pending-leave-title">
+                                                        <h4>{{reminders.pendingLeaves[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item" data-ng-repeat="event in reminders.pendingLeaves">
+                                                        <img data-ng-if="event.EmployeeId != 0 " data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+
+                                                        <a data-ng-show="isTl" target="_blank" href="/HR/ApplyLeave?Id='{{event.EmployeeId}}'&Date='{{ event.OnDate | date:'MM-yyyy'}}'"><strong>{{event.EmployeeName}}</strong></a>
+                                                        <strong data-ng-hide="isTl">{{event.EmployeeName}}</strong>
+
+                                                        <span class="triangle" data-ng-style="{'background-color': event.ColorCode}"></span>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}}) <span data-ng-show="event.OnDate != event.EndDate &&  event.Type == 'Pending Leave' && event.LeaveTime == 0 ">to {{ event.EndDate | date:'dd-MMM'}} ({{event.EndDateWeekName}}) </span><span data-ng-show="event.LeaveTime != 0">({{event.LeaveTime}})</span></span>
+                                                    </div>
+                                                </div>
+                                                <!-- / end dash-reminders-section -->
+                                                <!-- used for Ekadashi leave set as static image -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.ekadashies.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-ekadashi-title">
+                                                        <h4>{{reminders.ekadashies[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item dash-reminder-item-ekadashi" data-ng-repeat="event in reminders.ekadashies">
+                                                        <img data-ng-if="event.EmployeeId != 0" data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+                                                        <strong>{{event.EmployeeName}}</strong>
+                                                        <span class="triangle" data-ng-style="{'background-color': event.ColorCode}"></span>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}})</span>
+                                                    </div>
+                                                </div>
+                                                <!-- / end dash-reminders-section -->
+                                                <!-- used for holiday leave set as static image -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.holidays.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-holiday-title">
+                                                        <h4>{{reminders.holidays[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item dash-reminder-item-holiday" data-ng-repeat="event in reminders.holidays">
+                                                        <img data-ng-if="event.EmployeeId != 0" data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+                                                        <strong>{{event.EmployeeName}}</strong>
+                                                        <span class="triangle" data-ng-style="{'background-color': event.ColorCode}"></span>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}})</span>
+                                                        <span data-ng-show="event.lastDateWeekName.length > 0">  to </span>
+                                                        <span class="badge" data-ng-show="event.lastDateWeekName.length > 0">{{ event.lastDate | date:'dd-MMM'}} ({{event.lastDateWeekName}})</span>
+                                                    </div>
+                                                </div>
+                                                <!-- / end dash-reminders-section -->
+                                                <!-- used for birthDate -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.birthDates.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-birthday-title">
+                                                        <h4>{{reminders.birthDates[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item" data-ng-repeat="event in reminders.birthDates">
+                                                        <img data-ng-if="event.EmployeeId != 0" data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+                                                        <strong>{{event.EmployeeName}}</strong>
+                                                        <span class="triangle" data-ng-style="{'background-color': event.ColorCode}"></span>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}})</span>
+                                                    </div>
+                                                </div>
+                                                <!-- / end dash-reminders-section -->
+                                                <!-- used for anniversary -->
+                                                <div class="dash-reminders-section" data-ng-if="reminders.anniversaries.length > 0">
+                                                    <div class="dash-reminder-title dash-reminder-anniversary-title">
+                                                        <h4>{{reminders.anniversaries[0].Type}}</h4>
+                                                    </div>
+                                                    <div class="dash-reminder-item" data-ng-repeat="event in reminders.anniversaries">
+                                                        <img data-ng-if="event.EmployeeId != 0" data-ng-src="/@System.Configuration.ConfigurationManager.AppSettings["Thumbnails"].ToString()/{{ event.ProfilePhoto}}" alt="" class="img-circle" width="40" height="40" />
+                                                        <strong>{{event.EmployeeName}}</strong>
+                                                        <span class="triangle" data-ng-style="{'background-color': event.ColorCode}"></span>
+                                                        <span class="badge">{{ event.OnDate | date:'dd-MMM'}} ({{event.OnDateWeekName}})</span>
+                                                    </div>
+                                                </div>
+                                                <!-- / end dash-reminders-section -->
+                                            </div>
+                                            <!-- / end dash-reminders -->
+                                        </div>
+                                        <!-- / end panel body -->
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                }
+
+                <div class="col-md-4" ng-show="@ViewBag.isAdmin != 1">
+                    @{
+                        if (ERPUtilities.HasAccessPermission(3, ctrl))
+                        {
+                            <div class="panel panel-primary panel-shadow" data-ng-controller="EmpDailyInOutCtrl">
+                                <div class="panel-heading">
+                                    <div class="panel-title">
+                                        <h4>In Out</h4>
+                                    </div>
+                                    <div class="panel-options">
+                                        <a href="#" title="collapse" data-rel="collapse"><i class="entypo-down-open"></i></a>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="panel-loading-div" data-ng-show="checkLoginStatusLogin">
+                                        <span>Loading..</span>
+                                    </div>
+                                    <form name="formInOut" role="form" action="" novalidate>
+                                        <div data-ng-if="savedInDateTime">
+                                            <h3 class="text-center" data-ng-if="inOutCurrentStatusTitle">{{inOutCurrentStatusTitle}}</h3>
+                                            <div class="text-center" data-timer="" data-start-time="savedInDateTime" data-interval="1000">
+                                                <div data-ng-class="timerCountDownClass">
+                                                    <span data-change-anim="'hours'">{{hhours}}</span>
+                                                    <span data-change-anim="'minutes'">{{mminutes}}</span>
+                                                    <span data-change-anim="'seconds'">{{sseconds}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <select class="form-control" name="dropInOutType" data-ng-model="inOutType" required>
+                                                <option value="0">--Select Type--</option>
+                                                <option data-ng-repeat="item in visibleInOutItems" value="{{item.value}}"
+                                                        data-ng-selected="inOutType == item.value">
+                                                    {{item.key}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea class="form-control" data-ng-model="inOutComment" rows="3" placeholder="Your comments place here (optional)"></textarea>
+                                        </div>
+                                        <button type="button" data-ng-click="SaveInOut()" class="btn btn-block btn-success" data-ng-disabled="formInOut.$inValid || validateInOutDrop()">Punch Me</button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    @{
+                        if (ERPUtilities.HasAccessPermission(14, ctrl))
+                        {
+                            <div class="panel panel-primary panel-shadow">
+                                <div class="panel-heading" style="position: relative;">
+                                    <div class="panel-title">
+                                        <h4 style="display: inline-block;" data-ng-show="GetEmpAttendanceReportList.length > 0">
+                                            Pending Leaves {{DisplayPandingLeave[0].pendingLeave}}
+                                        </h4>
+                                        <h4 style="display: inline-block;" data-ng-show="GetEmpAttendanceReportList == null">
+                                            Pending Leaves 0
+                                        </h4>
+                                        <select name="drpFilterYear" id="drpFilterYear" data-ng-model="filterYear" class="form-control input-sm" style="width: 100px;display: inline-block;margin-left: 9px;" required>
+                                            <option value="2012">2012</option>
+                                            <option value="2013">2013</option>
+                                            <option value="2014">2014</option>
+                                            <option value="2015">2015</option>
+                                            <option value="2016">2016</option>
+                                            <option value="2017">2017</option>
+                                        </select>
+                                    </div>
+                                    <div class="panel-options" style="position: absolute;top: 5px;right: 2px;">
+                                        <a href="#" title="collapse" data-rel="collapse"><i class="entypo-down-open"></i></a>
+                                    </div>
+                                </div>
+                                <table class="table table-hover table-bordered table-condensed table-striped table-dash-att" data-ng-if="GetEmpAttendanceReportList.length > 0 && @ViewBag.isAdmin != 1">
+                                    <thead>
+                                        <tr>
+                                            <th>Month</th>
+                                            <th>P</th>
+                                            <th>A</th>
+                                            <th>L</th>
+                                            <th>O</th>
+                                            <th>H</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="list in GetEmpAttendanceReportList">
+                                            <td class="att-dash">
+                                                <span class="att">{{list.mth || 0}}</span>
+                                                <a href="#" tooltip="Click to see details" tooltip-placement="top" tooltip-append-to-body="true" data-ng-click="ShowDetails('@ViewBag.isAdmin',list.monthNumber,filterYear)"></a>
+                                            </td>
+                                            <td><span class="att att-p">{{list.presence || 0}}</span></td>
+                                            <td><span class="att att-a">{{list.absence || 0}}</span> </td>
+                                            <td><span class="att att-l">{{list.leave || 0}}</span> </td>
+                                            <td><span class="att att-o">{{list.overTime || 0}}</span></td>
+                                            <td>
+                                                <span class="att att-h">{{list.holiday || 0}}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+                <!-- / end col-md-4 -->
+            </div>
+        </div>
+    </div>
+    <!-- / End FORM SECTION -->
+</div>
+
+@section Scripts{
+    <script src="@Url.Content("~/Scripts/controllers/DashboardCtrl.js")"></script>
+    @Scripts.Render("~/Scripts/deshboard")
+}

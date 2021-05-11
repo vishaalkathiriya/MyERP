@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Manage Technology";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="TechnologyMasterCtrl">
+    <div>
+        <!-- BEGIN HEADER SECTION -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2 style="text-transform: capitalize">
+                        <i class="entypo-doc-text"></i>
+                        Technology Masters
+                        <span style="float: right;">
+                            @{
+                                var ctrl = ViewBag.ctrlName;
+                                bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                                bool hasUpdateRights = ERPUtilities.HasAccessPermission(2, ctrl);
+                                bool hasDeleteRights = ERPUtilities.HasAccessPermission(3, ctrl);
+                                var hasAccessViewModel = new ERP.Models.HasAccessViewModel()
+                                {
+                                    HasInsertRights = hasInsertRights,
+                                    HasUpdateRights = hasUpdateRights,
+                                    HasDeleteRights = hasDeleteRights
+                                };
+                            }
+                        </span>
+                    </h2>
+
+                </div>
+            </div>
+        </div>
+        <!-- / END HEADER SECTION -->
+        <!-- BEGIN FORM SECTION -->
+        <div class="row">
+            <div class="col-sm-12 employee-tabs">
+                <div data-tabset>
+
+                    @*@if (ERPUtilities.HasAccessPermission(4, ctrl))*@
+                    @if (hasInsertRights || hasUpdateRights || hasDeleteRights)
+                    {
+                        <!-- BEGIN TECHNOLOGY-GROUP INFORMATION -->
+                        @Html.Partial("_TechnologyGroup", hasAccessViewModel)
+                        <!-- / END TECHNOLOGY-GROUP INFORMATION -->
+                    }
+
+                    @*@if (ERPUtilities.HasAccessPermission(5, ctrl))*@
+                    @if (hasInsertRights || hasUpdateRights || hasDeleteRights)
+                    {
+                        <!-- BEGIN TECHNOLOGY INFORMATION -->
+                        @Html.Partial("_Technology", hasAccessViewModel)
+                        <!-- / END TECHNOLOGY INFORMATION -->
+                    }
+
+                </div>
+            </div>
+        </div>
+        <!-- / END FORM SECTION -->
+
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Scripts/technologyMaster")
+}
+

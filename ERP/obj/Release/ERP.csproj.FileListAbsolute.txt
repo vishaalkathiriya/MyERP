@@ -1,0 +1,52 @@
+E:\ERP\ERP\bin\ERP.dll.config
+E:\ERP\ERP\bin\ERP.dll
+E:\ERP\ERP\bin\ERP.pdb
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+E:\ERP\ERP\bin\Microsoft.Owin.dll
+E:\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+E:\ERP\ERP\bin\Microsoft.Owin.Security.dll
+E:\ERP\ERP\bin\Owin.dll
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+E:\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+E:\ERP\ERP\bin\Microsoft.Owin.xml
+E:\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+E:\ERP\ERP\bin\Microsoft.Owin.Security.xml
+E:\ERP\ERP\obj\Release\ERP.dll
+E:\ERP\ERP\obj\Release\ERP.pdb
+E:\DRC\ERP\ERP\bin\ERP.dll.config
+E:\DRC\ERP\ERP\bin\ERP.dll
+E:\DRC\ERP\ERP\bin\ERP.pdb
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.dll
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.dll
+E:\DRC\ERP\ERP\bin\Owin.dll
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+E:\DRC\ERP\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.xml
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+E:\DRC\ERP\ERP\bin\Microsoft.Owin.Security.xml
+E:\DRC\ERP\ERP\obj\Release\ERP.dll
+E:\DRC\ERP\ERP\obj\Release\ERP.pdb
+E:\DRC\ERP\ERP\obj\Release\ERP.csproj.CoreCompileInputs.cache
+E:\DRC\ERP\ERP\obj\Release\ERP.csproj.CopyComplete
+D:\DRC\ERP\Source Code\ERP\bin\ERP.dll.config
+D:\DRC\ERP\Source Code\ERP\bin\ERP.dll
+D:\DRC\ERP\Source Code\ERP\bin\ERP.pdb
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.Core.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Security.dll
+D:\DRC\ERP\Source Code\ERP\bin\Owin.dll
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.Core.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\DRC\ERP\Source Code\ERP\bin\Microsoft.Owin.Security.xml
+D:\DRC\ERP\Source Code\ERP\obj\Release\ERP.csproj.CoreCompileInputs.cache
+D:\DRC\ERP\Source Code\ERP\obj\Release\ERP.csproj.CopyComplete
+D:\DRC\ERP\Source Code\ERP\obj\Release\ERP.dll
+D:\DRC\ERP\Source Code\ERP\obj\Release\ERP.pdb

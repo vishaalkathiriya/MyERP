@@ -1,0 +1,131 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="page-header main-page-header">
+            <h2><i class="entypo-doc-text"></i>Manage Group</h2>
+        </div>
+    </div>
+</div>
+@* BEGIN GROUP CONTROLLER *@
+<div class="row" data-ng-controller="GroupCtrl">
+    @* BEGIN HEADER SECTION *@
+    <div class="col-sm-12">
+        <div class="well well-sm">
+            <form class="form-inline">
+                @{
+                    var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                    bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                    if (hasInsertRights)
+                    { 
+                    <button type="button" class="btn btn-sm btn-info" data-ng-click="AddGroup()">Add New</button>           
+                    }
+                }
+            </form>
+        </div>
+    </div>
+    @* END HEADER SECTION *@
+
+    @* BEGIN FORM *@
+    <div class="col-sm-12" data-ng-show="isFormVisible">
+        <form role="form" name="frmGroup" id="frmGroup" data-ng-submit="CreateUpdateGroup(editData)">
+            <input type="hidden" data-ng-model="editData.groupId" />
+            <div class="panel panel-default panel-shadow">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{mode}} Group</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="txtGroupName">Group Name</label>
+                        <input type="text" data-drc-focus="isFirstFocus" class="form-control" id="txtGroupName" name="groupName" data-ng-model="editData.groupName" placeholder="Enter group name" maxlength="50" value="" required />
+                         <div data-ng-show="frmGroup.groupName.$dirty && frmGroup.groupName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmGroup.groupName.$error.required">Tell us your Group name.</span>
+                            </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="txtNote">Note</label>
+                        <textarea class="form-control" id="txtNote" name="groupNote" data-ng-model="editData.groupNote" placeholder="Enter group note"></textarea>
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label class="checkbox">
+                            <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.isActive">Active</label>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    @{
+                        if (hasInsertRights)
+                        { 
+                        <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmGroup.$invalid"><i class="entypo-check"></i>{{SaveText}}</button>            
+                        }
+                    }
+                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetGroup()"><i class="entypo-erase"></i>Reset</button>
+                    <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseGroup()"><i class="entypo-cancel"></i>Close</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @* BEGING GROUP LIST *@
+    <div class="col-sm-12">
+        <div data-loading-container="tableParams.settings().$loading">
+            <div class="table-responsive">
+                <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                    <tr data-ng-repeat="group in $data">
+
+                        <td data-title="'Groups Name'" data-filter="{ 'GroupName': 'text' }" data-sortable="'GroupName'">{{group.GroupName}}</td>
+                        <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{group.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                        @{
+                            var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                            var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                            if (editPermission || deletePermission)
+                            {
+                            <td data-title="'Actions'" style="width: 80px; text-align: center;">
+                                @if (editPermission)
+                                {
+                                    <a class="btn btn-primary btn-xs" data-ng-click="UpdateGroup(group)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                            
+                                }
+                                @if (deletePermission)
+                                {
+                                    <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteGroup(group.GroupId)" data-message="Are you sure want to delete this record?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                                                             
+                                }
+                            </td>
+                            }
+                        }
+                    </tr>
+                    <tr data-ng-show="noRecord" style="text-align: center;">
+                        @{
+                            if (editPermission)
+                            {
+                            <td style="width: 50px;"></td>   
+                            }
+                        }
+                        <td>Your search - <b>{{filterText}}</b> - did not match any group.</td>
+                        <td style="width: 125px;"></td>
+                        @{
+                            if (editPermission || deletePermission)
+                            {
+                            <td style="width: 80px;"></td>
+                            }
+                        }
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    @* END GROUP LIST *@
+
+
+    <!-- PAGE SCRIPTS -->
+    @section Scripts{
+        @Scripts.Render("~/Area/AddressBook/Scripts/abgroup")
+    }
+
+</div>
+@*END FORM*@

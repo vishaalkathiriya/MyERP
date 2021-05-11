@@ -1,0 +1,226 @@
+﻿@{
+    ViewBag.Title = "Telephone Report";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div class="row" data-ng-controller="TelephoneReportCtrl">
+    <div class="col-sm-12 employee-tabs">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="page-header main-page-header">
+                    <h2><i class="entypo-doc-text"></i>Telephone Report</h2>
+                </div>
+            </div>
+        </div>
+
+        <div data-tabset>
+            <div data-tab
+                active="master.isOuterTabActive">
+                <div data-tab-heading>
+                    <i class="entypo-search"></i>Outside Log
+                </div>
+                <!--form-->
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <form role="form">
+                            <div class="panel panel-default panel-shadow">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label for="drpType">Extention Type</label>
+                                                <select id="drpType" name="drpType" data-drc-focus="isFirstFocus" class="form-control" data-ng-model="editData.ExtType" tabindex="1">
+                                                    <option value="0">--Select--</option>
+                                                    <option data-ng-repeat="t in ExtTypes" value="{{t.type}}">{{t.type}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtExtNo">Ext No</label>
+                                                    <input type="text" class="form-control" id="txtExtNo" name="txtextno" data-ng-model="editData.ExtNo" placeholder="Enter ext no" maxlength="50" value="" tabindex="2" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtOutNo">OutGoing No</label>
+                                                    <input type="text" class="form-control" id="txtOutNo" name="txtOutNo" data-ng-model="editData.OutNo" placeholder="Enter out no" maxlength="50" value="" tabindex="3" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label for="txtdate">Date</label>
+                                                <div class="input-group">
+                                                    <input class="form-control" id="txtdate" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" data-ng-model="defaultDate" tabindex="4" />
+                                                    <a class="input-group-addon dateRangeClear" data-ng-click="clearDateBox($event);">×</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <b class="pull-right" style="margin-top: -10px;">{{totalOutRecords}} records found !!</b>
+                <div class="row" data-ng-init="GetTelephoneReportData_Out()">
+                    <div class="col-sm-12">
+                        <div data-loading-container="tableParamsOut.settings().$loading">
+                            <div class="table-responsive">
+                                <table data-ng-table="tableParamsOut" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                    <tr data-ng-repeat="d in $data">
+                                        <td data-title="'Type'" data-sortable="'Type'">{{d.Type}}</td>
+                                        <td data-title="'Date'" data-sortable="'pdate'">{{d.pdate | date:'dd-MMM-yyyy'}}</td>
+                                        <td data-title="'Time'" data-sortable="'pdate'">{{d.pdate | date:'HH:mm:ss'}}</td>
+                                        <td data-title="'Outline'" data-sortable="'Outline'">{{d.Outline}}</td>
+                                        <td data-title="'Duration'" style="text-align: right;" data-sortable="'Duration'">{{d.Duration |number:2}}</td>
+                                        <td data-title="'ExtNo'" data-sortable="'ExtNo'">{{d.ExtNo}}</td>
+                                        <td data-title="'OutNo'" data-sortable="'OutNo'">{{d.OutNo}}</td>
+                                    </tr>
+                                    <tr data-ng-show="noRecord" style="text-align: center;">
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pull-right">
+                <div>
+                    <button type="button" class="btn btn-sm btn-info btn-icon icon-left" tabindex="5" data-ng-click="GetTelephoneReportData()"><i class="entypo-check"></i>Search</button>
+                    <button type="button" class="btn btn-sm btn-success btn-icon icon-left" tabindex="6" data-ng-click="ResetTelephoneReport()"><i class="entypo-erase"></i>Reset</button>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div data-tab
+                active="master.isInterTabActive">
+                <div data-tab-heading>
+                    <i class="entypo-search"></i>Intercom Log
+                </div>
+                <!--form-->
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <form role="form">
+                            <div class="panel panel-default panel-shadow">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtFromExt">From Ext</label>
+                                                    <input type="text" class="form-control" data-drc-focus="isFirstFocus" id="txtFromExt" name="txtfromext" data-ng-model="interData.FromExt" placeholder="Enter From-Ext" maxlength="50" value="" tabindex="1" capital-input />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="txtToExt">To Ext</label>
+                                                    <input type="text" class="form-control" id="txtToExt" name="txttoext" data-ng-model="interData.ToExt" placeholder="Enter To-Ext" maxlength="50" value="" tabindex="2" capital-input />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label for="txtDateI">Date</label>
+                                                <div class="input-group">
+                                                    <input class="form-control" id="txtDateI" tabindex="3" type="text" data-drc-filter-date-picker="" data-daterange="filterDateInter.dateRange" data-ng-model="defaultDate" />
+                                                    <a class="input-group-addon dateRangeClear" data-ng-click="clearDateBoxInter($event);">×</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <b class="pull-right" style="margin-top: -10px;">{{totalInterRecords}} records found !!</b>
+                <div class="row" data-ng-init="GetTelephoneReportData_Inter()">
+                    <div class="col-sm-12">
+                        <div data-loading-container="tableParamsInter.settings().$loading">
+                            <div class="table-responsive">
+                                <table data-ng-table="tableParamsInter" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                                    <tr data-ng-repeat="d in $data">
+                                        <td data-title="'Date'" data-sortable="'pdate'">{{d.pdate | date:'dd-MMM-yyyy'}}</td>
+                                        <td data-title="'Time'" data-sortable="'pdate'">{{d.pdate | date:'HH:mm:ss'}}</td>
+                                        <td data-title="'Line'" data-sortable="'Line'">{{d.Line}}</td>
+                                        <td data-title="'FromExt'" data-sortable="'FromExt'">{{d.FromExt}}</td>
+                                        <td data-title="'ToExt'" data-sortable="'ToExt'">{{d.ToExt}}</td>
+                                        <td style="text-align: right;" data-title="'Duration'" data-sortable="'Duration'">{{d.Duration |number:2}}</td>
+                                    </tr>
+                                    <tr data-ng-show="noRecord" style="text-align: center;">
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/Reception/Scripts/controllers/TelephoneReportCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Reception/Scripts/services/TelephoneReportService.js")"></script>
+    <script src="~/Scripts/directives/drcMultiSelect.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    @*<script src="~/Scripts/directives/drcEnterAsTab.js"></script>*@
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("input").not($(":button")).keypress(function (evt) {
+                if (evt.keyCode == 13) {
+                    iname = $(this).val();
+                    if (iname !== 'Submit') {
+                        var fields = $(this).parents('form:eq(0),body').find('button, input, textarea, select');
+                        var index = fields.index(this);
+                        if (index > -1 && (index + 1) < fields.length) {
+                            fields.eq(index + 1).focus();
+                        }
+                        return false;
+                    }
+                }
+            });
+
+            $("select").not($(":button")).keypress(function (evt) {
+                if (evt.keyCode == 13) {
+                    iname = $(this).val();
+                    if (iname !== 'Submit') {
+                        var fields = $(this).parents('form:eq(0),body').find('button, input, textarea, select');
+                        var index = fields.index(this);
+                        if (index > -1 && (index + 1) < fields.length) {
+                            fields.eq(index + 1).focus();
+                        }
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+}

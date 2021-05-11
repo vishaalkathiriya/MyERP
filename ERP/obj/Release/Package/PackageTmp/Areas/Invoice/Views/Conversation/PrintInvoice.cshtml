@@ -1,0 +1,227 @@
+﻿@{
+    //ViewBag.Title = "Print Invoice";
+    Layout = "~/Views/Shared/_StaticLayout.cshtml";
+}
+
+@Styles.Render("~/Content/PrintInvoice")
+
+<div ng-controller="PrintInvoiceCtrl">
+    <div class="row" data-ng-init="LoadInvoiceData('@ViewBag.InvoiceId')">
+        <div class="col-sm-12">
+            <form id="form1" runat="server">
+                <div class="main">
+                    <div class="message"></div>
+                    <a id="spnPrint" href="#" class="btn btn-danger">
+                        P<br />
+                        R<br />
+                        I<br />
+                        N<br />
+                        T<br />
+                    </a>
+                    <div class="content">
+                        <!--header-->
+                        <div class="row" id="header">
+                            <div class="invoiceCode">
+                                <span>INVOICE</span>
+                                <span>{{invoiceData.invoice.InvoiceCode}}</span>
+                            </div>
+                            <div class="logo">
+                                <img src="~/Content/images/DRCTECHNO.png" />
+                            </div>
+                        </div>
+
+                        <!--sub header-->
+                        <div class="row" id="subheader">
+                            <div class="date">
+                                {{invoiceData.invoice.InvoiceDate | date: 'dd MMM yyyy'}}
+                            </div>
+                            <div class="totalH">
+                                <span>{{invoiceData.invoice.TotalAmount | number: 2}}</span>
+                                <span>{{invoiceData.invoice.Currency}}</span>
+                            </div>
+                        </div>
+
+                        <!--company address-->
+                        <div class="row" id="contact">
+                            <div class="client">
+                                <b>To,</b> <br/>
+                                <b>{{invoiceData.invoice.tblINVClient.CompanyName}}</b> <br />
+                                {{invoiceData.invoice.tblINVClient.CPrefix}} {{invoiceData.invoice.tblINVClient.ContactPerson}}<br/>
+                                {{invoiceData.invoice.tblINVClient.CompanyAddress}}<br/>
+                                {{invoiceData.invoice.tblINVClient.City}} - {{invoiceData.invoice.tblINVClient.PostalCode}}<br/>
+                                {{invoiceData.invoice.StateName}} - {{invoiceData.invoice.CountryName}}<br/>
+                                <span>Email : {{invoiceData.invoice.tblINVClient.Email}}</span><br/>
+                                <span data-ng-if="invoiceData.invoice.tblINVClient.VATNo">VAT No. : {{invoiceData.invoice.tblINVClient.VATNo}}</span><br />
+                            </div>
+                            <div class="company">
+                                <b>From,</b> <br/>
+                                <b>DRC Techno</b><br/>
+                                Plot No. 294-Ground Floor<br/>
+                                Beside Dharmanandan Diamond<br/>
+                                Behind PatelFaliya, Gotalawadi<br/>
+                                Surat-395004<br/>
+                                Gujarat - India
+                            </div>
+                        </div>
+
+                        <!--payment description-->
+                        <div class="row">
+                            <div class="payment">
+                                <table width="100%">
+                                    <tr>
+                                        <th width="10%">HOURS</th>
+                                        <th width="55%" colspan="2">DETAILS</th>
+                                        <th width="15%">PRICE</th>
+                                        <th width="20%">LINE TOTAL (<span>{{invoiceData.invoice.Currency}}</span>)</th>
+                                    </tr>
+
+                                    <tr data-ng-repeat="m in invoiceData.milestone" style="height: 40px; border-bottom: 1px solid #F3E9D0;" class="trMain">
+                                        <td><span>{{m.TotalHours}}</span></td>
+                                        @*<td colspan="2"><span>{{m.MilestoneName}}</span></td>*@
+                                        <td colspan="2">
+                                            <span><b>{{m.tblINVProject.ProjectTitle}} :</b> {{m.MilestoneName}}</span><br />
+                                            <i>{{m.MilestoneDesc}}</i>
+                                        </td>
+                                        <td class="floatCol"><span>{{m.Price | number: 2}}</span></td>
+                                        <td class="floatCol"><span>{{m.Price | number: 2}}</span></td>
+                                    </tr>
+
+                                    <tr class="noBack">
+                                        <td>&nbsp;</td>
+                                        <td colspan="2">&nbsp;</td>
+                                        <td>Net Total</td>
+                                        <td><span>{{invoiceData.milestonePrice | number: 2}}</span></td>
+                                    </tr>
+
+                                    <!--Tax Details-->
+                                    <tr class='noBack' data-ng-if="invoiceData.invoice.tblINVInvoiceTaxes.length > 0" data-ng-repeat="i in invoiceData.invoice.tblINVInvoiceTaxes">
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>{{i.tblINVTaxMaster.TaxTypeName}}</td>
+                                        <td>{{i.TaxPercentage}}%</td>
+                                        <td>{{i.tblINVTaxMaster.Mode == 'P' ? "+" : "-"}} {{i.Amount}}</td>
+                                    </tr>
+
+                                    <tr class='noBack' data-ng-if="invoiceData.invoice.RoundOff != 0">
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>&nbsp;</td>
+                                        <td>Round Off</td>
+                                        <td>{{invoiceData.invoice.RoundOff}}</td>
+                                    </tr>
+
+                                    <tr class="noBack line">
+                                        <td>&nbsp;</td>
+                                        <td width="35%">&nbsp;</td>
+                                        <td width="20%" style="border-top: 1px solid #473530;">&nbsp;</td>
+                                        <td style="border-top: 1px solid #473530;"><span>{{invoiceData.invoice.Currency}}</span> TOTAL</td>
+                                        <td style="border-top: 1px solid #473530;"><span>{{invoiceData.invoice.TotalAmount | number: 2}}</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!--terms-->
+                        <div class="row" id="terms">
+                            <div>INSTRUCTIONS</div>
+                            1. Please note that any type of processing fees enforced by PayPal or Client's bank, shall be borne by the client.<br />
+                            2. We accept payment through Cheque (only for INDIAN Customers), PayPal or Bank Wired.<br />
+                        </div>
+
+                        <!--payment details-->
+                        <div class="row" id="payDetails">
+                            <div>ACCOUNT DETAILS & PROCESSING FEES SCHEDULE</div>
+                            <div style="width: 350px; float: left;">
+                                <b>1) Bank Wired* :</b><br />
+                                <table width="100%" style="margin-top: 0;">
+                                    <tr style="border-top: 1px solid #F3E9D0;">
+                                        <td>Name of Beneficiary: DRC TECHNO</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Name of Bank: HDFC Bank</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Account Number: 5332020008089</td>
+                                    </tr>
+                                    <tr>
+                                        <td>RTGS/NEFT IFSC: HDFC0000533</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Routing Number (SWIFT Code): HDFCINBB</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Service Tax No: AAIFD6146JSD001</td>
+                                    </tr>
+                                    <tr class="lastRow">
+                                        <td>TAN No: SRTD03600C</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background: none;border-right: none;border-left: none;">
+                                            *Please consult with your bank about their processing fee schedule before executing the payment.
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div style="width: 385px; padding-left: 5px; float: right;">
+                                <b>2) PayPal : </b>paypal@DRCTechno.com<br />
+                                <table width="100%" style="margin-top: 0;">
+                                    <tr style="border-top: 1px solid #F3E9D0;">
+                                        <td>If Payment Amount is in range</td>
+                                        <td>Processing fees*</td>
+                                    </tr>
+                                    <tr>
+                                        <td>$0.00 USD - $3,000.00 USD</td>
+                                        <td>3.9% + $0.30 USD</td>
+                                    </tr>
+                                    <tr>
+                                        <td>$3,000.01 USD - $10,000.00 USD</td>
+                                        <td>3.4% + $0.30 USD</td>
+                                    </tr>
+                                    <tr>
+                                        <td>$10,000.01 USD - $100,000.00 USD</td>
+                                        <td>3.2% + $0.30 USD</td>
+                                    </tr>
+                                    <tr class="lastRow">
+                                        <td>> $100,000.00 USD</td>
+                                        <td>2.9% + $0.30 USD</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="background: none;border-right: none;border-left: none;">
+                                            *Processing fees to be paid by the client per transaction.
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="footerPage">
+                        <div style="text-align: center; font-style: italic; font-size: 11px;">This is a computer generated Invoice and requires no signature.</div>
+                        <div class="divFooterContent">Phone No: +91 0261 2530457 | Mobile: +91 99099 90897 | Email: info@drcinfotech.com | www.drcinfotech.com</div>
+                    </div>
+                </div>
+            </form>
+            <iframe id="iframePrintContent" name="print_iframe" frameborder="0" scrolling="no" style="display: none;" src="about:blank"></iframe>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/Area/Invoice/Scripts/PrintInvoice");
+}
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#spnPrint').click(function () {
+            printDivCSS = new String('<link href="/Content/css/printStyle.css" rel="stylesheet" type="text/css" />')
+
+            var htmlContent = printDivCSS + '<div class="main"><div class="content">' + $('.content').html() + '</div>' + '<div class="footerPage">' + $('.footerPage').html() + '</div></div>'
+            window.frames["print_iframe"].document.body.innerHTML = htmlContent
+            window.frames["print_iframe"].window.focus()
+            window.frames["print_iframe"].window.print()
+        });
+    });
+</script>
+

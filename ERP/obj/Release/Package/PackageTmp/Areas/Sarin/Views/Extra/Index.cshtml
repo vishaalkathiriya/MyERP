@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "Extra";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+<div data-ng-controller="SRExtraCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Extra</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <select id="drpFilterType" name="drpFilterType" data-ng-model="FilterType" class="form-control">
+                            <option value="">--Select--</option>
+                            <option value="S">Scrap</option>
+                            <option value="O">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-with-close">
+                        <input class="form-control input-sm" type="text" data-drc-filter-date-picker="" data-daterange="filterDate.dateRange" value="" />
+                        <a class="close" data-ng-click="clearDateBox($event);">×</a>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-sm btn-primary" data-ng-click="FilterData()">Filter</button>
+                    </div>
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSRExtra()">Add New</button>
+                        }
+                    }
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--form-->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSRExtra(editData)" name="extraform" id="extraform" novalidate>
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Extra</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="drpType">Type<span class="compulsary">*</span></label>
+                                    <div>
+                                        <!-- <div class="btn-group" data-toggle="buttons-radio"> -->
+                                            <input type="radio" data-ng-model="editData.Type" value="S" name="" />
+                                            Scrap
+                                                <input type="radio" data-ng-model="editData.Type" value="O" name="" />
+                                            Other
+                                        <!-- </div> -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtMachineNo">Machine No.<span class="compulsary">*</span></label>
+                                    <input type="text" class="form-control" id="txtMachineNo" name="machineNo" data-ng-model="editData.MachineNo" placeholder="Enter machine no" maxlength="50" value="" tabindex="2" required />
+                                    <div data-ng-show="extraform.machineNo.$dirty && extraform.machineNo.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="extraform.machineNo.$error.required">Tell us machine no.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="txtIssueDate">Issue Date<span class="compulsary">*</span></label>
+                                    <p class="input-group" style="margin-bottom: 0;" id="p1">
+                                        <input type="text" data-parentid="p1" data-drc-input-mask='{ "mask": "d-m-y"}' class="form-control" id="txtIssueDate" name="txtIssueDate" placeholder="DD-MM-YYYY" maxlength="10" tabindex="3" value="" required data-ng-model="editData.ExtraDate" data-ng-change="ValidateIssuedDate(editData.ExtraDate)" />
+                                        <span class="input-group-btn" style="position: initial;">
+                                            <button class="btn btn-default" data-datepicker-popup="{{format}}"
+                                                data-is-open="editData.calOpenIssueDate"
+                                                data-ng-model="issueDate"
+                                                data-datepicker-options="dateOptions"
+                                                data-close-text="Close"
+                                                data-ng-required="true"
+                                                data-ng-click="calendarOpenIssueDate($event)">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </button>
+                                        </span>
+                                    </p>
+                                    <div data-ng-show="extraform.txtIssueDate.$dirty && extraform.txtIssueDate.$invalid" class="label label-danger">
+                                        Invalid: <span data-ng-show="extraform.txtIssueDate.$error.required">Please select Date.</span>
+                                        <span data-ng-show="extraform.txtIssueDate.$error.invalidIssueDate">Please enter valid Date.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="txtRemark">Remarks</label>
+                            <textarea class="form-control" id="txtRemark" name="remark" data-ng-model="editData.Remark" placeholder="Enter remark" maxlength="100"></textarea>
+                            <div data-ng-show="extraform.remark.$dirty && extraform.remark.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="extraform.remark.$error.required">Remark can have Maximum 100 character</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            { 
+                            <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="extraform.$invalid || validateDropType() "><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSRExtra()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSRExtra()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--Sub-Type list-->
+    <div class="row" data-ng-init="RetrieveSRExtra()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+
+                            <td data-title="'Type'" data-filter="{'TypeName': 'text' }" data-sortable="'TypeName'">{{d.TypeName}}</td>
+                            <td data-title="'Machine No'" data-filter="{'MachineNo': 'text'}" data-sortable="'MachineNo'">{{d.MachineNo}}</td>
+                            <td data-title="'Issue Date'" data-sortable="'ExtraDate'">{{d.ExtraDate | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Remarks'" data-sortable="'Remark'">{{d.Remark}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px; text-align: center;" data-title="'Actions'">
+                                    @if (editPermission)
+                                    {
+                                        <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateSRExtra(d)"><i class="entypo-pencil" data-drc-tooltip="Edit"></i></a>                                        
+                                    }
+                                    @if (deletePermission)
+                                    {
+                                        <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSRExtra(d.ExtraId)" data-message="Are you sure want to delete '{{d.MachineNo}}' from Extra Entry?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                    }
+                                </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="4">Your search did not match any Extra Entry.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission)
+                                {
+                                <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/date/date.js"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/controllers/SRExtraCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Sarin/Scripts/services/SRExtraService.js")"></script>
+    <script src="~/Scripts/directives/drcInputMask.js"></script>
+    <script src="~/Content/js/daterangepicker/daterangepicker.jQuery.js"></script>
+    <script src="~/Scripts/directives/drcFilterDatePicker.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+}

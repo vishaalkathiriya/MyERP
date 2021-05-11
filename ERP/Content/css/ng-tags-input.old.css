@@ -1,0 +1,149 @@
+tags-input *, *:before, *:after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+tags-input .host {
+    display: block;
+    position: relative;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+tags-input .host:active {
+    outline: none;
+}
+
+tags-input .tags {
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+    padding: 1px;
+    overflow: hidden;
+    word-wrap: break-word;
+    cursor: text;
+    background-color: white;
+    border: 1px solid #bbbbbb;
+    border-radius: 3px;
+}
+
+    tags-input .tags.focused {
+        outline: none;
+        border: 1px solid #005993;
+    }
+
+    tags-input .tags .tag-list {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    tags-input .tags .tag-item {
+        margin: 2px;
+        padding: 0 5px;
+        display: inline-block;
+        float: left;
+        font-size: 10px;
+        height: 24px;
+        line-height: 22px;
+        border: 1px solid #21a9e1;
+        border-radius: 3px;
+        background: #21a9e1;
+        color: #fff;
+    }
+
+tags-input.sm .tags .tag-item {
+    height: 20px;
+    line-height: 19px;
+}
+
+tags-input .tags .tag-item.selected {
+    background: #ff5c5c;
+    color: #fff;
+    border-color: #ff5c5c;
+}
+
+tags-input .tags .tag-item .remove-button {
+    margin: 0 0 0 5px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    vertical-align: middle;
+    font: bold 16px Arial, sans-serif;
+    color: #FFFFFF;
+}
+
+    tags-input .tags .tag-item .remove-button:active {
+        color: red;
+    }
+
+tags-input .tags .input {
+    border: 0;
+    outline: none;
+    margin: 2px;
+    padding: 0;
+    padding-left: 5px;
+    float: left;
+    height: 24px;
+}
+
+tags-input.sm .tags .input {
+    height: 20px;
+}
+
+tags-input .tags .input.invalid-tag {
+    color: red;
+}
+
+tags-input .tags .input::-ms-clear {
+    display: none;
+}
+
+tags-input.ng-invalid .tags {
+    background: #ff5c5c;
+    color: #fff;
+}
+
+tags-input .autocomplete {
+    margin-top: 5px;
+    position: absolute;
+    padding: 5px 0;
+    z-index: 999;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #bbbbbb;
+    border-radius: 3px;
+}
+
+    tags-input .autocomplete .suggestion-list {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    tags-input .autocomplete .suggestion-item {
+        padding: 5px 10px;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: black;
+        background-color: white;
+    }
+
+        tags-input .autocomplete .suggestion-item.selected {
+            color: white;
+            background-color: #21a9e1;
+        }
+
+            tags-input .autocomplete .suggestion-item.selected em {
+                color: white;
+                background-color: #21a9e1;
+            }
+
+        tags-input .autocomplete .suggestion-item em {
+            font: normal bold 12px 'Open Sans', 'Noto Sans', sans-serif, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #21a9e1;
+            background-color: white;
+        }

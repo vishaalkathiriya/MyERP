@@ -1,0 +1,285 @@
+﻿@{
+    ViewBag.Title = "List of Inventories";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+
+<div data-ng-controller="InventoriesListCtrl">
+
+    <!-- BEGIN PAGE TITLE  -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>List of Inventories</h2>
+            </div>
+        </div>
+    </div>
+    <!-- / END PAGE TITLE -->
+
+    <!--  BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline" data-ng-submit="FilterData(filters)" name="filterform">
+                    <div class="form-group">
+                        <select name="cmbVendor" data-ng-model="filters.VendorId" class="form-control col-md-2" data-ng-required="true" style="width: 126px">
+                            <option value="0" data-ng-selected="true">Select Vendor</option>
+                            <option data-ng-repeat="v in vendors" value="{{v.VendorId}}">{{v.VendorName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="cmbLocation" data-ng-model="filters.LocationId" class="form-control col-md-2" data-ng-required="true" style="width: 133px">
+                            <option value="0" data-ng-selected="true">Select Location</option>
+                            <option data-ng-repeat="l in locations" value="{{l.LocationId}}">{{l.LocationName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="cmbBrand" data-ng-model="filters.BrandId" class="form-control col-md-2" data-ng-required="true" style="width: 120px">
+                            <option value="0" data-ng-selected="true">Select Brand</option>
+                            <option data-ng-repeat="b in brands" value="{{b.BrandId}}">{{b.BrandName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="cmbCategory" data-ng-model="filters.CategoryId" class="form-control col-md-2" data-ng-required="true" data-ng-change="RetrieveSubCategories(filters.CategoryId)" style="width: 140px">
+                            <option value="0">Select Category</option>
+                            <option data-ng-repeat="c in categories" data-ng-selected="filters.CategoryId == c.CategoryId" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="cmbSubCategory" data-ng-model="filters.SubCategoryId" class="form-control col-md-2" data-ng-required="true" style="width: 158px">
+                            <option value="0">Select SubCategory</option>
+                            <option data-ng-repeat="sc in subCategories" data-ng-selected="filters.SubCategoryId == sc.SubCategoryId || 0" value="{{sc.SubCategoryId}}">{{sc.SubCategoryName}}</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    @{
+                        var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        { 
+                        <button type="button" class="btn btn-sm btn-info" data-ng-click="AddInventory()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Upload/Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            @{
+                                if (hasInsertRights)
+                                { 
+                                <li>
+                                    <a href="#" data-ng-click="UploadFromExcel()">Import From Excel</a>
+                                </li>
+                                }
+                            }
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Export To Excel</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+     <!-- BEGIN INVENTORY LIST -->
+    <div class="row" data-ng-init="RetrieveInventories()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-striped table-condensed">
+                        <tr data-ng-repeat="inv in $data">
+                            <td data-title="'Inventory Name'" data-filter="{'InventoryName':'text'}" data-sortable="'InventoryName'">{{inv.InventoryName}}</td>
+                            <td data-title="'Issue To'" data-filter="{'IssueTo':'text'}" data-sortable="'IssueTo'">{{inv.IssueTo}}</td>
+                            <td data-title="'Purchase Date'" data-sortable="'PurchaseDate'">{{inv.PurchaseDate | date:'dd-MMM-yyyy'}}</td>
+                            <td data-title="'Amount'" data-sortable="'Amount'">{{inv.Amount}}</td>
+                            <td data-title="'Serial No'" data-sortable="'SerialNo'">{{inv.SerialNumber}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{inv.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            <td data-title="'Actions'" style="width: 100px">
+                                <a class="btn btn-info btn-xs" data-ng-click="ShowInventory(inv)" data-drc-tooltip="View Detail"><i class="entypo-eye"></i></a>
+                                @{
+                                    if (ERPUtilities.HasAccessPermission(2, ctrl))
+                                    {
+                                    <a class="btn btn-primary btn-xs" data-ng-click="UpdateInventory(inv)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                        
+                                    }
+                                    if (ERPUtilities.HasAccessPermission(3, ctrl))
+                                    {
+                                    <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteInventory(inv)" data-drc-tooltip="Delete" data-message="Are you sure want to delete '{{inv.InventoryName}}' from inventories? <br/> <b>NOTE:</b> It will also delete all the inventory detail if any related to this inventory."><i class="entypo-trash"></i></a>                                          
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            <td colspan="2">Your search did not match any record.</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END SUBCATEGORIES LIST -->
+
+     <!-- BEGIN INVENTORY & INVENTORY DETAIL POPUP TEMPLATE -->
+    <script type="text/ng-template" id="InventoryDetailsPopup.html">
+        <div class="modal-header">
+            <h3>{{items.mainDetail.DataList.InventoryName}}</h3>
+        </div>
+        <div class="modal-body">
+            <table class="table table-striped table-condensed">
+	            <tr>
+		            <td><b>Category:</b></td>
+		            <td>{{items.mainDetail.DataList.tblCategory.CategoryName}}</td>
+                    <td><b>Vendor:</b></td>
+		            <td>{{items.mainDetail.DataList.tblVendor.VendorName}}</td>
+	            </tr>
+	            <tr>
+		            <td><b>Brand:</b></td>
+		            <td>{{items.mainDetail.DataList.tblBrand.BrandName}}</td>
+                    <td><b>Purchase Date:</b></td>
+		            <td>{{items.mainDetail.DataList.PurchaseDate | date:'dd-MMM-yyyy'}}</td>
+	            </tr>
+	            <tr>
+		            <td><b>Amount:</b></td>
+		            <td>{{items.mainDetail.DataList.Amount}}</td>
+                    <td><b>Serial Number:</b></td>
+		            <td>{{items.mainDetail.DataList.SerialNumber}}</td>
+	            </tr>
+	            <tr>
+                    <td><b>Available:</b></td>
+		            <td>{{items.mainDetail.DataList.IsAvailable}}</td>
+                    <td><b>Scarp:</b></td>
+		            <td>{{items.mainDetail.DataList.IsScrap}}</td>
+	            </tr>
+	            <tr>
+                    <td><b>Issue:</b></td>
+		            <td>{{items.mainDetail.DataList.IsScrap}}</td>
+                    <td><b>Remarks:</b></td>
+		            <td colspan="3">{{items.mainDetail.DataList.Remarks}}</td>
+	            </tr>
+            </table>
+            <div data-ng-show="isDetailGridVisibleForPopup">
+                <h4>Issue</h4>
+                <table class="table table-bordered table-condensed">
+                     <thead>
+                        <tr>
+                            <th><b>Category</b></th>
+                            <th><b>SubCategory</b></th>
+                            <th><b>Brand</b></th>
+                            <th><b>Serial Number</b></th>
+                            <th><b>Changed On</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+	                    <tr data-ng-repeat="d in items.childDetails | filter: {Status: 'I'}">
+                            <td>{{d.tblCategory.CategoryName}}</td>
+                            <td>{{d.tblSubCategory.SubCategoryName}}</td>
+                            <td>{{d.tblBrand.BrandName}}</td>
+                            <td>{{d.SerialNumber}}</td>
+                            <td>{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                        </tr> 
+                    </tbody>
+                </table>
+                <h4>Receive</h4>
+                <table class="table table-bordered table-condensed">
+                     <thead>
+                        <tr>
+                            <th><b>Category</b></th>
+                            <th><b>SubCategory</b></th>
+                            <th><b>Brand</b></th>
+                            <th><b>Serial Number</b></th>
+                            <th><b>Changed On</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+	                    <tr data-ng-repeat="d in items.childDetails | filter: {Status: 'R'}">
+                            <td>{{d.tblCategory.CategoryName}}</td>
+                            <td>{{d.tblSubCategory.SubCategoryName}}</td>
+                            <td>{{d.tblBrand.BrandName}}</td>
+                            <td>{{d.SerialNumber}}</td>
+                            <td>{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                        </tr> 
+                    </tbody>
+                </table>
+                <h4>Scrap</h4>
+                <table class="table table-bordered table-condensed">
+                     <thead>
+                        <tr>
+                            <th><b>Category</b></th>
+                            <th><b>SubCategory</b></th>
+                            <th><b>Brand</b></th>
+                            <th><b>Serial Number</b></th>
+                            <th><b>Changed On</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+	                    <tr data-ng-repeat="d in items.childDetails | filter: {IsScrap: true}">
+                            <td>{{d.tblCategory.CategoryName}}</td>
+                            <td>{{d.tblSubCategory.SubCategoryName}}</td>
+                            <td>{{d.tblBrand.BrandName}}</td>
+                            <td>{{d.SerialNumber}}</td>
+                            <td>{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                        </tr> 
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm btn-primary" ng-click="Close()">Close</button>
+        </div>
+    </script>
+    <!-- / END INVENTORY & INVENTORY DETAIL POPUP TEMPLATE -->
+
+    <!-- BEGIN UPLOAD EXCEL TEMPLATE -->
+    <script id="UploadExcel.html" type="text/ng-template">
+        <div class="modal-header">
+            <h3>Upload Excel</h3>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div upload-file data-filename="fileName" data-buttonclass="profile-pic-upload-btn" data-id="profile_pic" data-uploadhandler="/Inventories/UploadExcel" data-ischanged="isChanged" data-ext="*.xls; *.xlsx" data-filesize="1024KB">
+                        <input id="imageOne">
+                    </div>    
+                </div>
+                <div class="col-md-8">
+                    <i class="glyphicon glyphicon-file" style=font-size:36px;></i>
+                </div>
+            </div>
+        </div>
+         <div class="modal-footer">
+            <button class="btn btn-sm btn-primary" ng-click="Close()">Close</button>
+        </div>
+    </script>
+    <!-- END UPLOAD EXCEL TEMPLATE -->
+
+@*    @section Scripts{
+        @Scripts.Render("~/Area/Inventory/Scripts/inventoryList")
+    }*@
+
+
+    
+@section Scripts{
+
+    <script src="@Url.Content("~/Areas/Inventory/Scripts/controllers/InventoriesListCtrl.js")"></script>
+    <script src="@Url.Content("~/Areas/Inventory/Scripts/services/InventoriesService.js")"></script>
+    <script src="~/Scripts/directives/checkbox.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+    <script src="~/Content/js/jquery.uploadify.js"></script>
+    <script src="~/Scripts/directives/uploadFile.js"></script>    
+}
+
+</div>
+
+

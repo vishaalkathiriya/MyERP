@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "Manage Invoice Client";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<div data-ng-controller="ClientListCtrl">
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Invoice Client</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline" data-ng-submit="FilterClient(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">KYC Status:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpKYCApproved" data-ng-model="filterData.KYCApproved" class="form-control" style="width: 150px;" required>
+                            <option value="0">ALL</option>
+                            <option value="A">Approved</option>
+                            <option value="D">DisApproved</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpCountry" data-ng-model="filterData.CountryId" class="form-control" style="width: 150px;" required>
+                            <option value="0">--Select--</option>
+                            <option data-ng-repeat="t in Country" value="{{t.CountryId}}">{{t.CountryName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                            bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                    if (hasInsertRights) { 
+                                <a href="/Invoice/Client/Create" class="btn btn-sm btn-info">Add New</a>
+		                    }
+                        }
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+     <!-- / END HEADER SECTION -->
+
+
+    <!-- BEGING INVOICE CLIENT LIST -->
+    <div class="row" data-ng-init="RetrieveClient()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.PKClientId, d.IsActive)" data-message="Are you sure want to InActive '{{d.ClientCode}}' Client?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.PKClientId, d.IsActive)" data-message="Are you sure want to Active '{{d.ClientCode}}' Client?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                   
+	                            }
+                            }
+                            <td data-title="'Client Code'" data-filter="{ 'ClientCode': 'text' }" data-sortable="'ClientCode'">
+                                <a href="@ViewBag.lnkKYC{{d.URLKey}}" target="_blank">{{d.ClientCode}}</a>
+                            </td>
+                            <td data-title="'Company Name'" data-filter="{ 'CompanyName': 'text' }" data-sortable="'CompanyName'">{{d.CompanyName}}</td>
+                            <td data-title="'Contact Person'" data-sortable="'ContactPerson'">{{d.ContactPerson}}</td>
+                            <td data-title="'Mobile No'">{{d.MobileNo}}</td>
+                            <td data-title="'Email'">{{d.Email}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                //if (editPermission || deletePermission){
+                                    <td style="width: 165px; text-align: center;" data-title="'Actions'">
+                                        @if (editPermission) {
+                                            <a href="/Invoice/Client/OverView/{{d.PKClientId}}" target="_blank" class="btn btn-orange btn-xs" data-drc-tooltip="Overview"><i class="entypo-newspaper"></i></a> 
+                                            <a href="/Invoice/Client/Create/{{d.PKClientId}}" class="btn btn-primary btn-xs" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a> 
+                                            <a class="btn btn-blue btn-xs" data-drc-tooltip="Download PDF" data-ng-click="ExportToPDF(d.PKClientId)"><i class="entypo-attach"></i></a> 
+                                            <a class="btn btn-default btn-xs" data-ng-if="!d.URLKey" data-drc-tooltip="Create Link" data-ng-click="ShowModel(d.PKClientId)"><i class="entypo-link"></i></a>
+                                            <a class="btn btn-success btn-xs" data-ng-if="d.URLKey" data-drc-confirm-box="" data-callback="DeleteLink(d.PKClientId)" data-message="Are you sure want to remove client link?" data-drc-tooltip="Remove Link"><i class="entypo-link"></i></a>                                          
+                                        }
+                                        @if (deletePermission) {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteClient(d.PKClientId)" data-message="Are you sure want to delete '{{d.ClientCode}}' from Client?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                           
+                                        }
+                                    </td>
+                                //}
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="6">Your search did not match any client.
+                            </td>
+                            @*<td style="width: 125px;"></td>*@
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 165px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+     <!-- / END EMPLOYEE LIST -->
+</div>
+
+<script type="text/ng-template" id="GeneratedLink.html">
+    <div class="modal-header">
+        <h3>Generated KYC Link</h3>
+    </div>
+    <div class="modal-body">
+        <div ng-if="kycLink != ''">
+           <a href="{{kycLink}}">{{kycLink}}</a>
+        </div>
+        <div class="alert alert-info" ng-if="kycLink == ''">
+            Please generate URL Key first.
+        </div>
+    </div>
+    <div class="modal-footer" style="margin-top:0;">
+        <button class="btn btn-sm btn-default" data-ng-click="ClosePopup()">Close</button>
+    </div>
+</script>
+
+@section Scripts{
+    <script src="~/Areas/Invoice/Scripts/controllers/ClientListCtrl.js"></script>
+    <script src="~/Areas/Invoice/Scripts/services/ClientCreateService.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+}

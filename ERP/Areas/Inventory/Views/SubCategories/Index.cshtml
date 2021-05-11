@@ -1,0 +1,170 @@
+﻿@{
+    ViewBag.Title = "Manage SubCategories";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@using ERP.Utilities
+
+<!-- BEGIN SUBCATEGORY CONTROLLER -->
+<div data-ng-controller="SubCategoriesCtrl">
+    
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage SubCategories</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm well-filter">
+                <form class="form-inline" data-ng-submit="FilterByCategory(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Category:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="cmbCategoryFilter" data-ng-model="filterData.CategoryId" class="form-control" style="width: 150px;" required>
+                            <option value="0" data-ng-selected="true">ALL</option>
+                            <option data-ng-repeat="c in Categories" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                        @{
+                            var ctrl = ViewContext.RouteData.DataTokens["area"].ToString() + ViewBag.ctrlName;
+                              bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+		                        if (hasInsertRights) { 
+                                    <button type="button" class="btn btn-sm btn-info" data-ng-click="AddSubCategory()">Add New</button>
+		                        }
+                        }
+                        
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-danger">Download</button>
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                <i class="entypo-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-danger" role="menu">
+                                <li>
+                                    <a href="#" data-ng-click="ExportToExcel()">Export To Excel</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+     <!-- BEGIN FORM  SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateSubCategory(editData)" name="frmSubCategory" id="frmSubCategory">
+                <input type="hidden" data-ng-model="editData.SubCategoryId" />
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} SubCategory</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="cmbCategories">Category Name</label>
+                            <select id="cmbCategories" data-drc-focus="isFirstFocus" data-ng-model="editData.CategoryId" class="form-control" data-ng-required="true">
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="c in Categories" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+                            </select>
+                            <div data-ng-show="frmSubCategory.cmbCategories.$dirty && frmSubCategory.cmbCategories.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmSubCategory.cmbCategories.$error.required">Please select Category.</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="txtSubCategoryName">SubCategory Name</label>
+                            <input type="text" class="form-control" id="txtSubCategoryName" name="txtSubCategoryName" data-ng-model="editData.SubCategoryName" placeholder="Enter SubCategory Name" maxlength="50" value="" required />
+                            <div data-ng-show="frmSubCategory.SubCategoryName.$dirty && frmSubCategory.SubCategoryName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="frmSubCategory.SubCategoryName.$error.required">Tell us your SubCategory Name.</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active</label>
+
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+		                    if (hasInsertRights) { 
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmSubCategory.$invalid"><i class="entypo-check"></i>{{SaveText}}</button>
+		                    }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetSubCategory()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseSubCategory()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM  SECTION -->
+
+   <!--  BEGIN SUBCATEGORIES LIST -->
+    <div class="row" data-ng-init="RetrieveSubCategories()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="subCategory in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission) {
+                                    <td data-title="'Status'" style="width: 50px; text-align: center;">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{subCategory.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(subCategory)" data-message="Are you sure want to InActive '{{subCategory.SubCategoryName}}' SubCategory?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!subCategory.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(subCategory)" data-message="Are you sure want to Active '{{subCategory.SubCategoryName}}' SubCategory?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>                                               
+	                            }
+                            }
+                            <td data-title="'Category Name'" data-filter="{ 'CategoryName': 'text' }" data-sortable="'CategoryName'">{{subCategory.tblCategory.CategoryName}}</td>
+                            <td data-title="'SubCategory Name'" data-filter="{ 'SubCategoryName': 'text' }" data-sortable="'SubCategoryName'">{{subCategory.SubCategoryName}}</td>
+                            <td data-title="'Changed On'" data-sortable="'ChgDate'" style="width: 125px">{{subCategory.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (editPermission || deletePermission){
+                                    <td data-title="'Actions'" style="width: 80px; text-align: center;">
+                                        @if (editPermission) {
+                                            <a class="btn btn-primary btn-xs" data-ng-click="UpdateSubCategory(subCategory)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>                                         
+                                        }
+                                        @if (deletePermission) {
+                                            <a class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteSubCategory(subCategory)" data-message="Are you sure want to delete this record?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>                                          
+                                        }
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission){
+                                    <td style="width: 50px;"></td>   
+                                }
+                            }
+                            <td colspan="2">Your search did not match any record.</td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (editPermission || deletePermission){
+                                    <td style="width: 80px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- / END SUBCATEGORIES LIST  -->
+
+  
+    @section Scripts{
+       @Scripts.Render("~/Area/Inventory/Scripts/subCategories")
+    }
+  
+
+</div>
+<!--  END SUBCATEGORY CONTROLLER  -->

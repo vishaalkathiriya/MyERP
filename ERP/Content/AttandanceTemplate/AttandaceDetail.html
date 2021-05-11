@@ -1,0 +1,98 @@
+﻿<div class="modal-header">
+    <h3>Attendance Detail of {{EmpName}} for {{MonthYear}}</span></h3>
+</div>
+<div class="modal-body att-det-panel-wide">
+    <div class="well well-att clearfix">
+        <div class="pull-left att-det-footer">
+            <span class="att-det att-det-leaveabsence"></span> = On leave &nbsp;&nbsp;
+            <span class="att-det att-det-holiday"></span> = Holiday &nbsp;&nbsp;
+            <span class="att-det att-det-ot"></span> = Overtime &nbsp;&nbsp;
+            <i class="fa fa-star"></i> = Full &nbsp;&nbsp;
+            <i class="fa fa-star-half-empty"></i> = Half &nbsp;&nbsp;
+        </div>
+    </div>
+    <table class="table table-striped table-bordered table-left table-att-det">
+        <tr>
+            <td style="width: 10%;">Date</td>
+            <td style="width: 10%;">Day</td>
+            <td style="width: 10%;">P</td>
+            <td style="width: 10%;">A</td>
+            <td style="width: 10%;">L</td>
+            <td style="width: 10%;">O</td>
+            <td style="width: 15%;">H</td>
+            <td style="width: 15%;">Work</td>
+            <td style="width: 15%;">IN</td>
+            <td style="width: 15%;">OUT</td>
+        </tr>
+        <tbody>
+            <tr data-ng-repeat="d in detailEmp" tooltip="{{d.Remark}}"
+                data-tooltip-placement="right"
+                data-tooltip-append-to-body="true"
+                data-ng-class="{'att-det-row-sunday': isSunday(d.Edate) }">
+                <td>
+                    <span class="att-det" ng-class="{'att-det-leaveabsence' : (d.A && d.A != 0) || (d.L && d.L != 0) ,'att-det-holiday' : d.H==1, 'att-det-ot': (d.O && d.O != 0) }"></span>
+                    {{d.Edate | date:'dd'}}
+                </td>
+                <td>{{d.Edate | date:'EEE' | uppercase}}</td>
+                <td>
+                    <i data-ng-show="d.P && d.P != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.P) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.P) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.A && d.A != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.A) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.A) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.L && d.L != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.L) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.L) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.O && d.O != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.O) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.O) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.H && d.H != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.H) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.H) == 0.5 }"></i>
+                </td>
+                <td>
+                    <!--<i data-ng-show="d.WORKHR && d.WORKHR != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.WORKHR) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.WORKHR) == 0.5 }"></i>-->
+                    <!--<span data-ng-show="!isSunday(d.Edate)"> {{d.WORKHR }} </span>-->
+                    {{d.WORKHR }}
+                </td>
+                <td>{{d.INTime | date: 'hh:mm a'}}</td>
+                <td>{{d.OUTTime | date: 'hh:mm a'}}</td>
+            </tr>
+            <tr data-ng-repeat="d in detailEmpHalf" tooltip="{{d.Remark}}"
+                data-tooltip-placement="left"
+                data-tooltip-append-to-body="true"
+                data-ng-class="{'att-det-row-sunday': isSunday(d.Edate) }">
+                <td>
+                    <span class="att-det" ng-class="{'att-det-leaveabsence' : (d.A && d.A != 0) || (d.L && d.L != 0) ,'att-det-holiday' : d.H==1, 'att-det-ot': (d.O && d.O != 0) }"></span>
+                    {{d.Edate | date:'dd'}}
+                </td>
+                <td>{{d.Edate | date:'EEE' | uppercase}}</td>
+                <td>
+                    <i data-ng-show="d.P && d.P != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.P) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.P) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.A && d.A != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.A) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.A) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.L && d.L != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.L) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.L) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.O && d.O != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.O) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.O) == 0.5 }"></i>
+                </td>
+                <td>
+                    <i data-ng-show="d.H && d.H != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.H) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.H) == 0.5 }"></i>
+                </td>
+                <td>
+                    <!--<i data-ng-show="d.WORKHR && d.WORKHR != 0" class="fa" data-ng-class="{ 'fa-star': replaceZerotoEmpty(d.WORKHR) == 1, 'fa-star-half-empty': replaceZerotoEmpty(d.WORKHR) == 0.5 }"></i>-->
+                    <!--<span data-ng-show="!isSunday(d.Edate)"> {{d.WORKHR }} </span>-->
+                    {{d.WORKHR }}
+                </td>
+                <td>{{d.INTime | date: 'hh:mm a'}}</td>
+                <td>{{d.OUTTime | date: 'hh:mm a'}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+<div class="modal-footer" style="margin-top:0;">
+    <button class="btn btn-sm btn-default" data-ng-click="CloseUserPopup()">Close</button>
+</div>

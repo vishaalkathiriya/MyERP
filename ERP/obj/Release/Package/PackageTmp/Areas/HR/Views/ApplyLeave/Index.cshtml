@@ -1,0 +1,317 @@
+﻿@{
+    ViewBag.Title = "Apply Leave";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .modal.in .modal-dialog {
+        width: 80%;
+    }
+
+    .bootbox {
+        z-index: 1070;
+    }
+
+        .bootbox .modal-dialog {
+            width: 50% !important;
+        }
+
+        .bootbox + div {
+            z-index: 1060;
+        }
+
+    .fc-event {
+        cursor: pointer;
+    }
+
+    .text-caption {
+        color: white;
+        margin-right: 3px;
+    }
+
+    .popover {
+        min-width: 240px;
+         border-radius: 3px;
+        border: none;
+        padding: 0;
+        box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16),
+            0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    }
+
+        .popover.bottom .arrow {
+            border-bottom-color: #37BD9C;
+        }
+
+            .popover.bottom .arrow:after {
+                border-bottom-color: #37BD9C;
+            }
+
+    .popover-title {
+        background-color: #37BD9C;
+        font-size: 14px;
+        text-transform:uppercase;
+        border-radius: 2px;
+        color: #FFF;
+        margin-top: 0 !important;
+    }
+
+    .popover-content {
+        padding: 0px;
+    }
+
+    .popover-inner {
+        padding-top: 10px;
+    }
+
+        .popover-inner hr {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .popover-inner .comment-box {
+            color: #222;
+            
+        }
+
+            .popover-inner .comment-box strong {
+                font-weight: bold;
+                display: block;
+            }
+
+        .popover-inner .reason {
+            background-color: #FFFFFF;
+            padding: 0 10px 0px 10px;
+            margin-bottom: 5px;
+        }
+
+        .popover-inner .reason-date,
+        .popover-inner .comment-date {
+            font-size: 10px;
+            border-radius: 2px;
+            margin-top: 3px;
+            font-style: normal;
+            display: block;
+            text-align: right;
+            padding-bottom:10px;
+        }
+
+        .popover-inner .comment-date {
+            margin-bottom: 4px;
+        }
+
+        .popover-inner .reason-txt {
+            font-size: 13px;
+            color: #222222;
+        }
+
+        .popover-inner .label-approve,
+        .popover-inner .label-disapprove {
+            display: block;
+            color: #222;
+            text-align: left;
+            border-radius: 2px;
+            margin-bottom: 0;
+        }
+
+        .popover-inner .label-approve {
+            color: #8DC153;
+        }
+
+        .popover-inner .label-disapprove {
+            color: #E9573E;
+        }
+
+        .popover-inner .reason-form {
+            padding: 10px;
+            background: #EEF0F4;
+            border-radius: 0 0 3px 3px;
+        }
+
+    .well-holiday {
+        background-color: #E9573E;
+        color: #FFFFFF;
+        border: 1px solid #E9573E;
+    }
+</style>
+
+<div data-ng-controller="ApplyLeaveCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Apply For Leaves </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" data-ng-init="setEmployeeId(@ViewBag.EmployeeId,@ViewBag.LeaveDate)">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form role="form" class="form-inline" data-ng-submit="FilterByUser(filterData)" name="filterform">
+                    <div class="form-group">
+                        <label style="display: inline-block; margin-right: 15px; margin-top: 4px; color: #212121;">Calendar For:</label>
+                    </div>
+                    <div class="form-group">
+                        <select name="drpUserList" data-ng-model="filterData.EmployeeId" class="form-control" style="width: 150px;" required>
+                            <option data-ng-if="isTeamLead" value="0">All Members</option>
+                            <option data-ng-repeat="t in UserList" data-ng-selected="t.Id==filterData.EmployeeId" value="{{t.Id}}">{{t.Label}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END FILTER PANEL -->
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form role="form" name="leaveform" id="leaveform">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="calendar-env">
+                            <div class="calendar-body" style="width: 100%; border: 1px solid #ebebeb;">
+                                <div data-ui-calendar="uiConfig.calendar" data-ng-model="eventSources"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="well well-sm text-right" style="border-top: 0px;">
+                            <label class="label text-caption" data-ng-repeat="c in colorList" data-ng-style="{'background-color': c.DisplayColorCode }">{{c.FestivalType}}</label>
+                            <label class="label text-caption" data-ng-repeat="c in FixedColorList" data-ng-style="{'background-color': c.colorCode }">{{c.text}}</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END LEAVE FORM -->
+
+</div>
+
+<!-- APPLY LEAVE POPUP TEMPLATE -->
+<script type="text/ng-template" id="ApplyLeavePopup.html">
+        <div class="modal-header">
+            <h3>{{ApplyingFor}}</h3>
+        </div>
+        <div class="modal-body">
+            <form role="form" name="frmLeave" data-ng-submit="ApplyForLeave(editData)">
+                <div class="row leave-row" data-ng-repeat="r in rows" data-ng-form="subform">
+                    <div data-ng-if="!rows[$index].isFestival">
+                        
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="leave-form-wrapper clearfix">
+                                    <div class="col-sm-12">
+                                        <div class="leave-date">
+                                            <h5 data-ng-model="rows[$index].LeaveDate">
+                                                {{r.LeaveDate}}
+                                                <a title="Delete" class="leave-remove" href="#" data-ng-show="$index != '0' && $last" data-ng-click="DeleteRow($index)" data-ng-model="rows[$index].GroupId">
+                                                    <i class="entypo-trash"></i>
+                                                </a>
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    <label for="txtTitle">Leave Title<span class="compulsary">*</span></label>
+                                                    <input type="text" class="form-control" id="txt_title" name="txtTitle" placeholder="Leave Title" maxlength="50" value="" data-ng-model="rows[$index].LeaveTitle" required />
+                                                    <div data-ng-show="subform.txtTitle.$dirty && subform.txtTitle.$invalid" class="label label-danger">
+                                                        Invalid: <span data-ng-show="subform.txtTitle.$error.required">Tell us your leave title.</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="drpLeaveType">Leave Type<span class="compulsary">*</span></label>
+                                                    <select name="drpLeaveType" data-ng-model="rows[$index].LeaveType" class="form-control">
+                                                        <option value="1">Paid Leave</option>
+                                                        <option value="2">Sick Leave</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="drpPartFullTime">Part/Full Time<span class="compulsary">*</span></label>
+                                                    <select name="drpPartFullTime" data-ng-model="rows[$index].PartFullTime" class="form-control">
+                                                        <option value="F">Full Time</option>
+                                                        <option value="P">Part Time</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6" data-ng-if="rows[$index].PartFullTime == 'P'">
+                                                <div class="form-group">
+                                                    <label for="drpStartTime">From<span class="compulsary">*</span></label>
+                                                    <select name="drpStartTime" data-ng-model="rows[$index].StartTime"
+                                                            data-ng-options="t.key as t.val for t in TimeArray"
+                                                            data-ng-change="BindTime2(rows[$index].StartTime,$index)"
+                                                            class="form-control"></select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6" data-ng-if="rows[$index].PartFullTime == 'P'">
+                                                <div class="form-group">
+                                                    <label for="drpEndTime">To<span class="compulsary">*</span></label>
+                                                    <select name="drpEndTime" data-ng-model="rows[$index].EndTime"
+                                                            data-ng-options="t.key as t.val for t in subTime2Array[$index]"
+                                                            data-ng-selected="subTime2Array[$index][0].key == rows[$index].EndTime"
+                                                            class="form-control"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="txtComments">Comment</label>
+                                            <textarea class="form-control" id="txtComments" name="txtComments" placeholder="Comments" style="height:98px;" maxlength="150" value="" data-ng-model="rows[$index].Comments"></textarea>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                         
+                    </div>
+
+                    <div data-ng-if="rows[$index].isFestival">
+                        <div class="col-sm-12">
+                            <div class="well well-sm well-holiday">
+                                {{r.LeaveDate}} Official Holiday
+                                <a title="Delete" href="#" data-ng-show="$index != '0' && $last" data-ng-click="DeleteRow($index)" data-ng-model="rows[$index].GroupId" style="float:right; color:#FFFFFF;">
+                                    Remove
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </form> <!-- / END LEAVE FORM -->
+        </div>
+        <div class="modal-footer">
+            <button data-ng-if="Mode == 'Add'" data-ng-click="AddRow()" class="btn btn-sm btn-info">Add Next Day</button>
+            <button class="btn btn-sm btn-danger" 
+                    data-ng-if="Mode == 'Edit'" 
+                    data-drc-confirm-box=""
+                    data-callback="CancelLeave()" 
+                    data-message="Are you sure want to cancel this leave?">Cancel Leave</button>
+            <button class="btn btn-sm btn-success" ng-click="SaveApplyLeave()" data-ng-disabled="frmLeave.$invalid">{{Mode == 'Add' ? 'Apply' : 'Update'}} </button>
+            <button class="btn btn-sm btn-default" ng-click="Close()">Close</button>
+        </div>
+</script>
+<!-- / END APPLY LEAVE POPUP TEMPLATE -->
+
+@section Scripts{
+    <script src="~/Content/js/fullcalendar.js"></script>
+    <script src="~/Areas/HR/Scripts/controllers/ApplyLeaveCtrl.js"></script>
+    <script src="~/Areas/HR/Scripts/services/ApplyLeaveService.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/drcPopover.js"></script>
+}
+
+@* <script src="~/Scripts/controllers/ApplyLeaveCtrl.js"></script>
+    <script src="~/Scripts/services/ApplyLeaveService.js"></script>*@
+

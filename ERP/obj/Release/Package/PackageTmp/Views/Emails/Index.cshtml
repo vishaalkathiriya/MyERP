@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Title = "Email Management";
+}
+
+<div ng-controller="EmailsCtrl as vm">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2 ng-bind="vm.title"></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-9">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Add New Email
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form>
+                        <div class="form-group">
+                            <label>Title:</label>
+                            <input type="text" class="form-control" placeholder="Enter title" value="" />
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>From Name:</label>
+                                    <input type="text" class="form-control" placeholder="Enter from name" value="" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>From Email:</label>
+                                    <input type="text" class="form-control" placeholder="Enter from email" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>To Emails:</label>
+                            <tags-input data-ng-model="vm.editData.services"></tags-input>
+                        </div>
+                        <div class="form-group">
+                            <label>Email content:</label>
+                            <textarea ckeditor="vm.editorOptions" ng-model="vm.editData.htmlcontent"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Actions
+                    </h3>
+                </div>
+                <div class="list-group">
+                    <a href="" class="list-group-item">Preview Email</a>
+                    <a href="" class="list-group-item">Save Email</a>
+                    <a href="" class="list-group-item">Schedule Email</a>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Open Rate
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="padding-lg text-center">
+                                TOTAL SENT
+                                <h3 class="text-muted">100</h3>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="padding-lg text-center">
+                                TOTAL OPEN
+                                <h3 class="text-muted">60</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success" style="width: 60%;">60%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@section Styles{
+    
+}
+@section Scripts{
+    <script src="~/Scripts/controllers/EmailsCtrl.js"></script>
+}

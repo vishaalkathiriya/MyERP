@@ -1,0 +1,239 @@
+﻿@{
+    ViewBag.Title = "Manage Roles";
+}
+@using ERP.Utilities
+
+<style>
+    .modal-dialog {
+        width: 60%;
+    }
+</style>
+<div data-ng-controller="RoleCtrl">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="page-header main-page-header">
+                <h2><i class="entypo-doc-text"></i>Manage Roles</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEGIN HEADER SECTION -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="well well-sm">
+                <form class="form-inline">
+                    @{
+                        var ctrl = ViewBag.ctrlName;
+                        bool hasInsertRights = ERPUtilities.HasAccessPermission(1, ctrl);
+                        if (hasInsertRights)
+                        {
+                            <button type="button" class="btn btn-sm btn-info" data-ng-click="AddRole()">Add New</button>
+                        }
+                    }
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-danger">Download</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                            <i class="entypo-down"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-danger" role="menu">
+                            <li>
+                                <a href="#" data-ng-click="ExportToExcel()">Excel Format</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / END HEADER SECTION -->
+
+    <!-- BEGIN FORM SECTION -->
+    <div class="row">
+        <div class="col-sm-12 ng-hide" data-ng-show="isFormVisible">
+            <form role="form" data-ng-submit="CreateUpdateRole(editData)" name="roleform" id="roleform">
+                <div class="panel panel-default panel-shadow">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{mode}} Role</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label for="txtRoleName">Role Name</label>
+                            <input type="text" class="form-control" id="txtRoleName" name="roleName" data-ng-model="editData.Roles" data-drc-focus="isFirstFocus" placeholder="Enter role name" maxlength="50" value="" required />
+                            <div data-ng-show="roleform.roleName.$dirty && roleform.roleName.$invalid" class="label label-danger">
+                                Invalid: <span data-ng-show="roleform.roleName.$error.required">Tell us your role name.</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsActive" name="chkIsActive" data-ng-model="editData.IsActive">Active
+                            </label>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        @{
+                            if (hasInsertRights)
+                            {
+                                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="roleform.$invalid"><i class="entypo-check"></i>{{saveText}}</button>
+                            }
+                        }
+                        <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetRole()"><i class="entypo-erase"></i>Reset</button>
+                        <button type="button" class="btn btn-sm btn-primary btn-icon icon-left" data-ng-click="CloseRole()"><i class="entypo-cancel"></i>Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- / END FORM SECTION -->
+
+    <!-- BEGING ROLES LIST -->
+    <div class="row" data-ng-init="RetrieveRole()">
+        <div class="col-sm-12">
+            <div data-loading-container="tableParams.settings().$loading">
+                <div class="table-responsive">
+                    <table data-ng-table="tableParams" data-show-filter="true" class="table table-hover table-bordered table-condensed table-striped">
+                        <tr data-ng-repeat="d in $data">
+                            @{
+                                var editPermission = ERPUtilities.HasAccessPermission(2, ctrl);
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px; text-align: center;" data-title="'Status'">
+                                        <a href="#" class="btn btn-success btn-xs" data-ng-show="{{d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.RolesId, d.IsActive)" data-message="Are you sure want to InActive '{{d.Roles}}' Role?" data-drc-tooltip="Inactive"><i class="entypo-check"></i></a>
+                                        <a href="#" class="btn btn-default btn-xs" data-ng-show="{{!d.IsActive}}" data-drc-confirm-box="" data-callback="ChangeStatus(d.RolesId, d.IsActive)" data-message="Are you sure want to Active '{{d.Roles}}' Role?" data-drc-tooltip="Active"><i class="entypo-cancel"></i></a>
+                                    </td>
+                                }
+                            }
+                            <td data-title="'Roles'" data-filter="{ 'Roles': 'text' }" data-sortable="'Roles'">{{d.Roles}}</td>
+                            <td style="width: 125px;" data-title="'Changed On'" data-sortable="'ChgDate'">{{d.ChgDate | date:'dd-MMM-yyyy HH:mm'}}</td>
+
+                            @{
+                                var deletePermission = ERPUtilities.HasAccessPermission(3, ctrl);
+                                if (hasInsertRights || editPermission || deletePermission)
+                                {
+                                    <td style="width: 135px; text-align: center;" data-title="'Actions'">
+                                        @if (hasInsertRights || editPermission)
+                                        {
+                                            <a href="#" class="btn btn-info btn-xs" data-ng-click="ShowModel(d)" data-drc-tooltip="Assign Rights"><i class="entypo-eye"></i></a>
+    <a href="#" class="btn btn-info btn-xs" data-drc-tooltip="View Users" data-ng-click="ShowUsersModel(d)"><i class="entypo-users"></i></a>
+                                        }
+                                        @if (editPermission)
+                                        {
+                                            <a href="#" class="btn btn-primary btn-xs" data-ng-click="UpdateRole(d)" data-drc-tooltip="Edit"><i class="entypo-pencil"></i></a>
+                                        }
+                                        @if (deletePermission)
+                                        {
+                                            <a href="#" class="btn btn-danger btn-xs" data-drc-confirm-box="" data-callback="DeleteRole(d.RolesId)" data-message="Are you sure want to delete '{{d.Roles}}' from Role?" data-drc-tooltip="Delete"><i class="entypo-trash"></i></a>
+                                        }
+                                    </td>
+                                }
+
+                            }
+
+                        </tr>
+                        <tr data-ng-show="noRecord" style="text-align: center;">
+                            @{
+                                if (editPermission)
+                                {
+                                    <td style="width: 50px;"></td>
+                                }
+                            }
+                            <td>
+                                Your search - <b>{{filterText}}</b> - did not match any role.
+                            </td>
+                            <td style="width: 125px;"></td>
+                            @{
+                                if (hasInsertRights || editPermission || deletePermission)
+                                {
+                                    <td style="width: 135px;"></td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/ END ROLES LIST -->
+</div>
+
+<script type="text/ng-template" id="AssignedUsersPopup.html">
+    <div class="modal-header">
+        <h3>Assigned Users <span data-ng-if="roleUsers.length > 0">( {{roleUsers.length}} )</span></h3>
+    </div>
+    <div class="modal-body" style="padding: 0;">
+        <table class="table table-striped table-hover" style="margin-bottom: 0;" data-ng-if="roleUsers.length > 0">
+            <tr data-ng-repeat="user in roleUsers">
+                <td>{{user.Name}}</td>
+            </tr>
+        </table>
+        <div class="alert alert-info" data-ng-if="roleUsers.length == 0">
+            No any assigned users.
+        </div>
+    </div>
+    <div class="modal-footer" style="margin-top:0;">
+        <button class="btn btn-sm btn-default" data-ng-click="CloseUserPopup()">Close</button>
+    </div>
+</script>
+
+
+<!-- BEGIN ASSIGN PERMISSION POPUP TEMPLATE -->
+<script type="text/ng-template" id="AssignRightsPopup.html">
+    <div class="modal-header">
+        <h3>Assign Access Rights For {{RoleName}}</h3>
+    </div>
+    <div class="modal-body">
+        <form role="form" name="apfrm">
+            <div class="row leave-row" data-ng-repeat="(module, events) in rows" data-ng-form="subform">
+
+                <accordion close-others="oneAtATime">
+                    <accordion-group is-open="isopen">
+                        <accordion-heading>
+                            <input type="checkbox" data-ng-model="events.IsMainSelected" data-ng-click="ModuleCheckboxClick(module, $event)" />&nbsp;
+                            <a href="#">{{module}}</a> <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': isopen, 'glyphicon-chevron-right': !isopen}"></i>
+                        </accordion-heading>
+
+                        <div class="row" data-ng-repeat="event in events">
+                            <div class="col-sm-4">
+                                <label>
+                                    <input type="checkbox" data-ng-model="event.IsSubSelected" data-ng-click="SubModuleCheckboxClick(event,events, $event)" />&nbsp;
+                                    {{event.SubModuleName}}<label>
+                            </div>
+                            <div class="col-sm-6" data-ng-show="event.AllowedAccess.length > 0">
+                                <label data-ng-repeat="s in event.AllowedAccess"><input type="checkbox" data-ng-change="CheckSubModule(event,events)" data-ng-model="event.AllowedAccess[$index].IsSelected">{{s.Label}}&nbsp;</label>
+                            </div>
+                            <div class="col-sm-6" data-ng-show="event.AllowedAccess.length == 0">
+                                &nbsp;
+                            </div>
+                    </accordion-group>
+                </accordion>
+
+                @*<div class="col-sm-12">
+                        <h5 data-ng-model="rows[$index].ModuleName">
+                            {{module}}
+                        </h5>
+                    </div>
+                    <div data-ng-repeat="event in events">
+                        <div class="col-sm-4">
+                            {{event.SubModuleName}}
+                        </div>
+                        <div class="col-sm-6">
+                            <label data-ng-repeat="s in event.AllowedAccess"><input type="checkbox" data-ng-model="event.AllowedAccess[$index].IsSelected">{{s.Label}}&nbsp;</label>
+                        </div>
+                    </div>*@
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" data-ng-click="AssignRights()" class="btn btn-sm btn-success">Assign</button>
+        <button class="btn btn-sm btn-default" data-ng-click="Close()">Close</button>
+    </div>
+</script>
+<!-- / END ASSIGN PERMISSION POPUP TEMPLATE -->
+
+@section Scripts{
+    <script src="~/Scripts/controllers/RoleCtrl.js"></script>
+    <script src="~/Scripts/services/RoleService.js"></script>
+    <script src="~/Scripts/directives/confirmbox.js"></script>
+    <script src="~/Scripts/directives/focus.js"></script>
+}

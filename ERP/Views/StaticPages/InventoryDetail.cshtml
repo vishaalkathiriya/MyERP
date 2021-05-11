@@ -1,0 +1,60 @@
+﻿@{
+    Layout = null;
+}
+
+@*<td colspan="6">{{detail}}
+</td>*@
+
+
+<td style="width: 25px">{{index}}</td>
+<td style="width: 25%">
+    <select id="_cmbBrand" data-ng-model="detail.BrandId" class="form-control input-sm" data-ng-required="true">
+        <option value="0">--Select--</option>
+        <option data-ng-repeat="b in Brands" data-ng-selected="detail.BrandId == b.BrandId" value="{{b.BrandId}}">{{b.BrandName}}</option>
+    </select>
+</td>
+<td style="width: 25%">
+    <select id="_cmbCategory" data-ng-model="detail.CategoryId" class="form-control input-sm" data-ng-required="true" data-ng-change="RetrieveSubCategories(detail.CategoryId)">
+        <option value="0">--Select--</option>
+        <option data-ng-repeat="c in Categories" data-ng-selected="detail.CategoryId == c.CategoryId" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+    </select>
+</td>
+<td style="width: 25%">
+    <select id="_cmbSubCategory" data-ng-model="detail.SubCategoryId" class="form-control input-sm" data-ng-required="true">
+        <option value="0">--Select--</option>
+        <option data-ng-repeat="sc in SubCategories" data-ng-selected="detail.SubCategoryId == sc.SubCategoryId" value="{{sc.SubCategoryId}}">{{sc.SubCategoryName}}</option>
+    </select>
+</td>
+<td style="width: 25%">
+    <input type="text" class="form-control input-sm" id="_txtSerialNumber" name="_txtSerialNumber" data-ng-model="detail.SerialNumber" placeholder="Enter Serial Number" maxlength="50" value="" required />
+</td>
+<td style="width: 55px">
+    <a href="#" class="btn btn-danger btn-xs" data-ng-click="del()"><i class="entypo-trash"></i></a>
+</td>
+
+
+<!--<td style="width: 25px">{{$index + 1}}</td>
+<td>
+    <select id="_cmbBrand" data-ng-model="details[$index].BrandId" class="form-control input-sm" data-ng-required="true">
+        <option value="0">--Select--</option>
+        <option data-ng-repeat="b in Brands" value="{{b.BrandId}}">{{b.BrandName}}</option>
+    </select>
+</td>
+<td>
+    <select id="_cmbCategory" data-ng-model="details[$index].CategoryId" class="form-control input-sm" data-ng-required="true" data-ng-change="RetrieveSubCategoriesForDetail(details[$index].CategoryId, $index)">
+        <option value="0">--Select--</option>
+        <option data-ng-repeat="c in Categories" value="{{c.CategoryId}}">{{c.CategoryName}}</option>
+    </select>
+</td>
+<td>
+    <select id="_cmbSubCategory" data-ng-model="details[$index].SubCategoryId" class="form-control input-sm" data-ng-required="true">
+        <option value="0">--Select--</option>
+        <option data-ng-repeat="_sc in SubCategoriesForDetail[$index]" value="{{_sc.SubCategoryId}}">{{_sc.SubCategoryName}}</option>
+    </select>
+</td>
+<td>
+    <input type="text" class="form-control input-sm" id="_txtSerialNumber" name="_txtSerialNumber" data-ng-model="details[$index].SerialNumber" placeholder="Enter Serial Number" maxlength="50" value="" required />
+</td>
+<td style="width: 55px">
+    <a href="#" class="btn btn-danger btn-xs" data-ng-click="DeleteInventoryDetail($index)"><i class="entypo-trash"></i></a>
+</td>-->

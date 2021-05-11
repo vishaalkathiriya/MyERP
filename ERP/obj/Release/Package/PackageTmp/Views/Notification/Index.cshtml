@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Notification</h2>
+
+
+<div class="row">
+    <div class="col-sm-3">
+        <h3 class="page-header">Online Users</h3>
+        <ul id="users" class="list-group"></ul>
+    </div>
+    <div class="col-sm-9">
+        <h3 class="page-header">Messages</h3>
+        <form>
+            <div class="form-group">
+                <label>Notification Title:</label>
+                <input class="form-control" type="text" id="title" />
+            </div>
+            <div class="form-group">
+                <label>Notification Message:</label>
+                <textarea class="form-control" id="message" rows="6"></textarea>
+            </div>
+            <button class="btn btn-primary" id="btnSendMessage">Send Message</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/notification")
+}

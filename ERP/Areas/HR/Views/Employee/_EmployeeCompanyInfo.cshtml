@@ -1,0 +1,135 @@
+﻿@model ERP.Models.HasAccessViewModel
+
+<div data-tab data-ng-controller="EmpCompanyInfoCtrl" disabled="!master.Mode == 'Edit' || master.Mode == 'Add'" data-select="BindCompanyInfo();SetFocus()">
+    <div data-tab-heading>
+        <i class="fa fa-info"></i>Company Info
+    </div>
+    <form role="form" data-ng-submit="CreateUpdateCompanyInfo(companyinfo)" name="frmCompanyInfo" id="frmCompanyInfo">
+        <input type="hidden" data-ng-model="companyinfo.CompanyId" />
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Company Information</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblTeamGroup">Team Group<span class="compulsary">*</span></label>
+                            <select id="cmbTeamGroup" name="cmbTeamGroup" data-ng-model="companyinfo.TeamId" data-drc-focus="isFirstFocus" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="fm in techonologygroup" value="{{fm.Id}}">{{fm.TechnologiesGroup}}</option>
+                            </select>
+                            <div data-ng-show="frmCompanyInfo.cmbTeamGroup.$dirty && validateTeamGroup()" class="label label-danger">
+                                Invalid: Please select your Team.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblReportingTo">Reporting To<span class="compulsary">*</span></label>
+                            <select id="cmbReportingTo" name="cmbReportingTo" data-ng-model="companyinfo.ReportingTo" class="form-control">
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="fm in reporting" value="{{fm.EmployeeId}}" data-ng-selected="companyinfo.ReportingTo==fm.EmployeeId">{{fm.CandidateFirstName}}{{fm.CandidateMiddleName | limitTo:1 | uppercase}}{{fm.CandidateLastName | limitTo:1 | uppercase}}</option>
+                            </select>
+                            <div data-ng-show="frmCompanyInfo.cmbReportingTo.$dirty && validateReportingTo()" class="label label-danger">
+                                Invalid: Please select your Reporting Person.
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lbldesignations">Designation<span class="compulsary">*</span></label>
+                            <select id="cmbDesignation" name="cmbDesignation" data-ng-model="companyinfo.DesignationId" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="fm in designation" value="{{fm.Id}}">{{fm.Designation}}</option>
+                            </select>
+                            <div data-ng-show="frmCompanyInfo.cmbDesignation.$dirty && validateDesignation()" class="label label-danger">
+                                Invalid: Please select your Designation.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblRole">Role<span class="compulsary">*</span></label>
+                            <select id="cmbRole" name="cmbRole" data-ng-model="companyinfo.RoleId" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option data-ng-repeat="fm in roles" value="{{fm.RolesId}}">{{fm.Roles}}</option>
+                            </select>
+                            <div data-ng-show="frmCompanyInfo.cmbRole.$dirty && validateRole()" class="label label-danger">
+                                Invalid: Please select your Role.
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblRole">Increment Cycle<span class="compulsary">*</span></label>
+                            <select id="cmbIncrementCycle" name="cmbIncrementCycle" data-ng-model="companyinfo.IncrementCycle" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option value="Y">Yearly</option>
+                                <option value="M">Six Month</option>
+                            </select>
+                            <div data-ng-show="frmCompanyInfo.cmbIncrementCycle.$dirty && validateIncrementCycle()" class="label label-danger">
+                                Invalid: Please select your Increment Cycle.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="lblModuleUser">
+                                Module User<span class="compulsary">*</span>
+                            </label>
+                            <select id="cmbModuleUser" name="cmbModuleUser" data-ng-model="companyinfo.ModuleUser" class="form-control" required>
+                                <option value="0">--Select--</option>
+                                <option value="1">Admin</option>
+                                <option value="2">CRM</option>
+                                <option value="3">PMS</option>
+                                <option value="4">HRM</option>
+                                <option value="5">Account</option>
+                                <option value="6">Support</option>
+                            </select>
+                            <div data-ng-show="frmCompanyInfo.cmbModuleUser.$dirty && validateModuleUser()" class="label label-danger">
+                                Invalid: Please select from Module User.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsTL" name="chkIsActive" data-ng-model="companyinfo.IsTL">IsTL
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkIsBillable" name="chkIsBillable" data-ng-model="companyinfo.IsBillable">IsBillable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" style="display: none;">
+                            <label class="checkbox">
+                                <input type="checkbox" id="chkCompInfoActive" name="chkCompInfoActive" data-ng-model="companyinfo.IsActive">IsActive
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <hr />
+                <button type="submit" class="btn btn-sm btn-info btn-icon icon-left" data-ng-disabled="frmCompanyInfo.$invalid || validateTeamGroup() || validateReportingTo() || validateDesignation() || validateRole() || validateIncrementCycle() || validateModuleUser()"><i class="entypo-check"></i>{{saveText}}</button>
+                <button type="button" class="btn btn-sm btn-success btn-icon icon-left" data-ng-click="ResetComapnyInfo()"><i class="entypo-erase"></i>Reset</button>
+                <!-- <a class="btn btn-sm btn-primary btn-icon icon-left" href="/Employee"><i class="entypo-reply"></i>Back To List</a> -->
+            </div>
+        </div>
+
+    </form>
+</div>
